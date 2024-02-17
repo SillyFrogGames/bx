@@ -1,11 +1,15 @@
 cmake_minimum_required (VERSION 3.1)
 
-set (RUNTIME_SRCS
-	"Main.cpp"
+set (GAME_RUNTIME_SRCS
+	"GameMain.cpp"
 )
 
-add_executable (Game ${RUNTIME_SRCS})
+add_executable (Game ${GAME_RUNTIME_SRCS})
 target_link_libraries (Game Framework)
 
-add_executable (Editor ${RUNTIME_SRCS})
+set (EDITOR_RUNTIME_SRCS
+	"EditorMain.cpp"
+)
+
+add_executable (Editor ${EDITOR_RUNTIME_SRCS})
 target_link_libraries (Editor FrameworkEditor)

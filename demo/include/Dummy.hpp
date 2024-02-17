@@ -1,7 +1,13 @@
 #pragma once
 
-class Dummy
+#include <Core/Plugin.hpp>
+
+class Dummy : public Plugin
 {
 public:
-	static void Test();
+	const char* Name() override { return "Dummy"; }
+	int Version() override { return BX_ENGINE_VERSION; }
+
+	void Initialize() override;
+	void Shutdown() override;
 };

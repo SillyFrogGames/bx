@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.1)
 # Core lib
 set (CORE_SRCS
 	"Module.cpp"
+	"Plugin.cpp"
 )
 
 set (CORE_LIBS)# ctti wnaabi cereal fmt glm PortAudio glad glfw wren imgui box2d bullet3 file_embed)
