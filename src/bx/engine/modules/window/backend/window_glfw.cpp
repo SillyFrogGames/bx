@@ -76,7 +76,7 @@ bool Window::Create()
 
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 
-#ifdef BX_DEBUG_BUILD
+#if defined BX_DEBUG_BUILD || defined BX_EDITOR_BUILD
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #else
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
