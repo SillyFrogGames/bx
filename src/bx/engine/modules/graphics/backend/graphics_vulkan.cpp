@@ -1,14 +1,13 @@
-#ifdef GRAPHICS_VULKAN_BACKEND
-#include "Engine/Modules/Graphics.hpp"
+#include "bx/engine/modules/graphics/backend/graphics_vulkan.hpp"
 
-#include "Engine/Core/File.hpp"
-#include "Engine/Core/Profiler.hpp"
-#include "Engine/Core/Memory.hpp"
-#include "Engine/Core/Macros.hpp"
+#include "bx/engine/core/file.hpp"
+#include "bx/engine/core/profiler.hpp"
+#include "bx/engine/core/memory.hpp"
+#include "bx/engine/core/macros.hpp"
 
-#include "Engine/Modules/Window.hpp"
+#include "bx/engine/modules/window.hpp"
 
-#ifdef WINDOW_GLFW_BACKEND
+#ifdef BX_WINDOW_GLFW_BACKEND
 #define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -1898,5 +1897,3 @@ void Graphics::Draw(const DrawAttribs& attribs)
 void Graphics::DrawIndexed(const DrawIndexedAttribs& attribs)
 {
 }
-
-#endif // GRAPHICS_VK_BACKEND

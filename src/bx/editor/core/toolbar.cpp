@@ -236,7 +236,7 @@ void Toolbar::Present()
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
 		ImGui::SameLine();
 
-		ImGui::Text("| Engine v%s |", ENGINE_VERSION_STR);
+		ImGui::Text("| Engine v%s |", BX_VERSION_STR);
 		Tooltip("Version");
 		ImGui::SameLine();
 

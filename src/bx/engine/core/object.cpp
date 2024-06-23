@@ -39,7 +39,7 @@ ObjectHandle ObjectRef::NewObj(TypeId typeId, SizeType size, SizeType align)
 void ObjectRef::DeleteObj(ObjectHandle handle)
 {
 	auto it = s_objects.find(handle);
-	ENGINE_ENSURE(it != s_objects.end());
+	BX_ENSURE(it != s_objects.end());
 
 #ifdef MEMORY_CUSTOM_CONTAINERS
 	Memory::Deallocate(it->second.pStorage);
@@ -53,20 +53,20 @@ void ObjectRef::DeleteObj(ObjectHandle handle)
 void* ObjectRef::GetObj(ObjectHandle handle)
 {
 	auto it = s_objects.find(handle);
-	ENGINE_ENSURE(it != s_objects.end());
+	BX_ENSURE(it != s_objects.end());
 	return it->second.pStorage;
 }
 
 SizeType& ObjectRef::GetObjRefCount(ObjectHandle handle)
 {
 	auto it = s_objects.find(handle);
-	ENGINE_ENSURE(it != s_objects.end());
+	BX_ENSURE(it != s_objects.end());
 	return it->second.refCount;
 }
 
 const TypeId ObjectRef::GetObjTypeId(ObjectHandle handle)
 {
 	auto it = s_objects.find(handle);
-	ENGINE_ENSURE(it != s_objects.end());
+	BX_ENSURE(it != s_objects.end());
 	return it->second.typeId;
 }

@@ -52,7 +52,7 @@ template <typename T>
 static T& GetImpl(PhysicsHandle handle, HashMap<PhysicsHandle, T>& map)
 {
     auto it = map.find(handle);
-    ENGINE_ENSURE(it != map.end());
+    BX_ENSURE(it != map.end());
     return it->second;
 }
 
@@ -136,7 +136,7 @@ public:
 
     virtual void reportErrorWarning(const char* warningString) override
     {
-        ENGINE_LOGW("Bullet Warning: {}", warningString);
+        BX_LOGW("Bullet Warning: {}", warningString);
     }
 
     virtual void draw3dText(const btVector3& location, const char* textString) override

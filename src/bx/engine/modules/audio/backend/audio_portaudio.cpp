@@ -96,7 +96,7 @@ bool Audio::Initialize()
     PaError err = Pa_Initialize();
     if (err != paNoError)
     {
-        ENGINE_LOGE("Failed to initialize PortAudio: {}", Pa_GetErrorText(err));
+        BX_LOGE("Failed to initialize PortAudio: {}", Pa_GetErrorText(err));
         return false;
     }
 
@@ -112,14 +112,14 @@ bool Audio::Initialize()
 
     if (err != paNoError)
     {
-        ENGINE_LOGE("PortAudio failed to open default stream: {}", Pa_GetErrorText(err));
+        BX_LOGE("PortAudio failed to open default stream: {}", Pa_GetErrorText(err));
         return false;
     }
 
     err = Pa_StartStream(g_stream);
     if (err != paNoError)
     {
-        ENGINE_LOGE("PortAudio failed to start stream: {}", Pa_GetErrorText(err));
+        BX_LOGE("PortAudio failed to start stream: {}", Pa_GetErrorText(err));
         return false;
     }
 
@@ -131,13 +131,13 @@ void Audio::Shutdown()
     PaError err = Pa_StopStream(g_stream);
     if (err != paNoError)
     {
-        ENGINE_LOGE("PortAudio failed to stop stream: ", Pa_GetErrorText(err));
+        BX_LOGE("PortAudio failed to stop stream: ", Pa_GetErrorText(err));
     }
 
     err = Pa_CloseStream(g_stream);
     if (err != paNoError)
     {
-        ENGINE_LOGE("PortAudio failed to close stream: ", Pa_GetErrorText(err));
+        BX_LOGE("PortAudio failed to close stream: ", Pa_GetErrorText(err));
     }
 
     Pa_Terminate();

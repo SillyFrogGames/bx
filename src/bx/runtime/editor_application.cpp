@@ -160,7 +160,7 @@ bool Application::Initialize()
 
 	if (!Window::Create())
 	{
-		ENGINE_LOGE("Failed to create window!");
+		BX_LOGE("Failed to create window!");
 		return false;
 	}
 
@@ -168,13 +168,13 @@ bool Application::Initialize()
 
 	if (!Graphics::Initialize(Window::GetDevicePtr()))
 	{
-		ENGINE_LOGE("Failed to initialize graphics!");
+		BX_LOGE("Failed to initialize graphics!");
 		return false;
 	}
 
 	if (!ImGuiImpl::Initialize(Window::GetDevicePtr()))
 	{
-		ENGINE_LOGE("Failed to initialize ImGui!");
+		BX_LOGE("Failed to initialize ImGui!");
 		return false;
 	}
 

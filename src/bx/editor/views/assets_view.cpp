@@ -184,7 +184,7 @@ static const char* GetAssetIcon(bool isDirectory, const String& extension)
 			{ hashFn("audio"),		ICON_FA_MUSIC },
 			{ hashFn("terrain"),	ICON_FA_MOUNTAIN },
 		};
-		static SizeType g_iconsCount = ENGINE_ARRAYSIZE(g_icons);
+		static SizeType g_iconsCount = BX_ARRAYSIZE(g_icons);
 
 		SizeType hash = hashFn(extension);
 		for (SizeType i = 0; i < g_iconsCount; ++i)

@@ -99,7 +99,7 @@ float Input::GetAxis(GamepadAxis axis)
 	if (!gamepad_connected) return 0.0;
 
 	int axis_id = int(axis);
-	ENGINE_ENSURE(axis_id >= 0 && axis_id <= GLFW_GAMEPAD_AXIS_LAST);
+	BX_ENSURE(axis_id >= 0 && axis_id <= GLFW_GAMEPAD_AXIS_LAST);
 	return static_cast<float>(gamepad_state.axes[axis_id]);
 }
 
@@ -108,7 +108,7 @@ bool Input::GetButton(GamepadButton button)
 	if (!gamepad_connected) return false;
 
 	int button_id = int(button);
-	ENGINE_ENSURE(button_id >= 0 && button_id <= GLFW_GAMEPAD_BUTTON_LAST);
+	BX_ENSURE(button_id >= 0 && button_id <= GLFW_GAMEPAD_BUTTON_LAST);
 	return static_cast<bool>(gamepad_state.buttons[button_id]);
 }
 
@@ -117,7 +117,7 @@ bool Input::GetButtonOnce(GamepadButton button)
 	if (!gamepad_connected) return false;
 
 	int button_id = int(button);
-	ENGINE_ENSURE(button_id >= 0 && button_id <= GLFW_GAMEPAD_BUTTON_LAST);
+	BX_ENSURE(button_id >= 0 && button_id <= GLFW_GAMEPAD_BUTTON_LAST);
 	return
 		!static_cast<bool>(prev_gamepad_state.buttons[button_id]) &&
 		static_cast<bool>(gamepad_state.buttons[button_id]);
@@ -125,13 +125,13 @@ bool Input::GetButtonOnce(GamepadButton button)
 
 bool Input::GetKey(Key key)
 {
-	ENGINE_ENSURE(key >= GLFW_KEY_SPACE && key <= GLFW_KEY_LAST);
+	BX_ENSURE(key >= GLFW_KEY_SPACE && key <= GLFW_KEY_LAST);
 	return keys_down[key];
 }
 
 bool Input::GetKeyOnce(Key key)
 {
-	ENGINE_ENSURE(key >= GLFW_KEY_SPACE && key <= GLFW_KEY_LAST);
+	BX_ENSURE(key >= GLFW_KEY_SPACE && key <= GLFW_KEY_LAST);
 	return keys_down[key] && !prev_keys_down[key];
 }
 

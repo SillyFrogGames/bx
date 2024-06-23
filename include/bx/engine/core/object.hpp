@@ -140,7 +140,7 @@ public:
 	explicit Object(Args&&... args)
 		: ObjectRef(New<T, Args...>(std::forward<Args>(args)...))
 	{
-		ENGINE_LOGD("New object ({}): {}", Type<T>::ClassName(), m_handle);
+		BX_LOGD("New object ({}): {}", Type<T>::ClassName(), m_handle);
 	}
 
 	virtual ~Object()
@@ -151,7 +151,7 @@ public:
 			if (refCount == 0)
 			{
 				Delete<T>(m_handle);
-				ENGINE_LOGD("Delete object ({}): {}", Type<T>::ClassName(), m_handle);
+				BX_LOGD("Delete object ({}): {}", Type<T>::ClassName(), m_handle);
 			}
 		}
 		m_handle = INVALID_OBJECT_HANDLE;

@@ -30,7 +30,7 @@ public:
 		case ResourceStorage::MEMORY:
 		//	ar(cereal::make_nvp("handle", res.GetHandle()));
 		//	ar(cereal::make_nvp("data", data.data));
-			ENGINE_ASSERT(false, "TODO: Currently not supported!");
+			BX_ASSERT(false, "TODO: Currently not supported!");
 			break;
 		}
 	}
@@ -63,7 +63,7 @@ public:
 		//	ar(cereal::make_nvp("handle", handle));
 		//	ar(cereal::make_nvp("data", data));
 		//	res = ResourceManager::Create<TData>(handle, data);
-			ENGINE_ASSERT(false, "TODO: Currently not supported!");
+			BX_ASSERT(false, "TODO: Currently not supported!");
 			break;
 		}
 	}

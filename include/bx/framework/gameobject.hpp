@@ -55,16 +55,16 @@ public:
 
 	inline void Bind() const
 	{
-		ENGINE_ASSERT(m_bindObjFn, "No bind function bound!");
+		BX_ASSERT(m_bindObjFn, "No bind function bound!");
 		m_bindObjFn();
 	}
 
 	inline void Start()
 	{
-		ENGINE_ENSURE(m_started == false);
+		BX_ENSURE(m_started == false);
 		m_started = true;
 
-		ENGINE_ASSERT(m_startFn, "No start function bound!");
+		BX_ASSERT(m_startFn, "No start function bound!");
 		try
 		{
 			m_startFn();
@@ -76,7 +76,7 @@ public:
 
 	inline void Update() const
 	{
-		ENGINE_ASSERT(m_updateFn, "No update function bound!");
+		BX_ASSERT(m_updateFn, "No update function bound!");
 		m_updateFn();
 	}
 

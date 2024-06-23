@@ -47,17 +47,17 @@ bool ImGuiImpl::Initialize(void* device)
 
     if (!ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true))
     {
-        ENGINE_LOGE("Failed to initialize ImGui GLFW backend!");
+        BX_LOGE("Failed to initialize ImGui GLFW backend!");
         return false;
     }
 
-#if defined GRAPHICS_OPENGL_BACKEND
+#if defined BX_GRAPHICS_OPENGL_BACKEND
     if (!ImGui_ImplOpenGL3_Init("#version 460 core\n"))
-#elif defined GRAPHICS_OPENGLES_BACKEND
+#elif defined BX_GRAPHICS_OPENGLES_BACKEND
     if (!ImGui_ImplOpenGL3_Init("#version 300 es\n"))
 #endif
     {
-        ENGINE_LOGE("Failed to initialize ImGui OpenGL backend!");
+        BX_LOGE("Failed to initialize ImGui OpenGL backend!");
         return false;
     }
 

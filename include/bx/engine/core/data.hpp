@@ -12,7 +12,7 @@
 // Note: If the serialization library can handle any abstract type then this may take advantage of that by not having to specify 
 // a hashmap for every supported type. Possibly a generic abstract table?
 
-#ifdef EDITOR_BUILD
+#ifdef BX_EDITOR_BUILD
 ENUM(DataTarget,
 	NONE = 0,
 	SYSTEM = 1,

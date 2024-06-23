@@ -15,7 +15,7 @@ struct Serial<RigidBody>
 		}
 		catch (cereal::Exception& e)
 		{
-			ENGINE_LOGW("Failed to save rigidbody component: {}", e.what());
+			BX_LOGW("Failed to save rigidbody component: {}", e.what());
 		}
 	}
 
@@ -27,7 +27,7 @@ struct Serial<RigidBody>
 		}
 		catch (cereal::Exception& e)
 		{
-			ENGINE_LOGW("Failed to load rigidbody component: {}", e.what());
+			BX_LOGW("Failed to load rigidbody component: {}", e.what());
 		}
 	}
 };

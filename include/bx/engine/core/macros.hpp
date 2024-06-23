@@ -5,40 +5,40 @@
 
 #include <cstdlib>
 
-#define ENGINE_STR(x) #x
-#define ENGINE_XSTR(x) ENGINE_STR(x)
+#define BX_STR(x) #x
+#define BX_XSTR(x) BX_STR(x)
 
-#define ENGINE_ARRAYSIZE(_ARR) ((u32)(sizeof(_ARR) / sizeof(*(_ARR))))
+#define BX_ARRAYSIZE(_ARR) ((u32)(sizeof(_ARR) / sizeof(*(_ARR))))
 
-#define ENGINE_BIT(x) (1 << (x))
+#define BX_BIT(x) (1 << (x))
 
-#ifdef DEBUG_BUILD
-#define ENGINE_LOGD(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_DEBUG, Log::Format(format, __VA_ARGS__))
-#define ENGINE_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
-#define ENGINE_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
-#define ENGINE_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
+#ifdef BX_DEBUG_BUILD
+#define BX_LOGD(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_DEBUG, Log::Format(format, __VA_ARGS__))
+#define BX_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
+#define BX_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
+#define BX_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
 
-#define ENGINE_ASSERT(condition, message) \
+#define BX_ASSERT(condition, message) \
     do { \
         if (!(condition)) \
         { \
-			ENGINE_LOGE("Assertion failed: {}", message); \
+			BX_LOGE("Assertion failed: {}", message); \
             std::abort(); \
         } \
     } while (false)
 
-#define ENGINE_ENSURE(condition) ENGINE_ASSERT(condition, #condition)
-#define ENGINE_FAIL(message) ENGINE_ASSERT(false, message)
+#define BX_ENSURE(condition) BX_ASSERT(condition, #condition)
+#define BX_FAIL(message) BX_ASSERT(false, message)
 
 #else
 
-#define ENGINE_LOGD(format, ...)
-#define ENGINE_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
-#define ENGINE_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
-#define ENGINE_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
+#define BX_LOGD(format, ...)
+#define BX_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
+#define BX_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
+#define BX_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
 
-#define ENGINE_ASSERT(condition, message)
-#define ENGINE_ENSURE(condition)
-#define ENGINE_FAIL(message)
+#define BX_ASSERT(condition, message)
+#define BX_ENSURE(condition)
+#define BX_FAIL(message)
 
 #endif

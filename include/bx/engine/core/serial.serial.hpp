@@ -10,7 +10,7 @@
 
 #include <cereal/types/polymorphic.hpp>
 
-#define SERIAL_OP_ARCHIVE(Expr, Message) try { Expr; } catch (const cereal::Exception& e) { ENGINE_LOGW(Message); }
+#define SERIAL_OP_ARCHIVE(Expr, Message) try { Expr; } catch (const cereal::Exception& e) { BX_LOGW(Message); }
 
 #define REGISTER_SERIAL(TType) \
 template<class Archive> \
@@ -18,14 +18,14 @@ void save(Archive& ar, const TType& data) \
 { \
 try { \
 	Serial<TType>::Save(ar, data); \
-} catch (cereal::Exception& e) { ENGINE_LOGW("Failed to save type: {}. {}", Type<TType>::ClassName(), e.what()); } \
+} catch (cereal::Exception& e) { BX_LOGW("Failed to save type: {}. {}", Type<TType>::ClassName(), e.what()); } \
 } \
 template<class Archive> \
 void load(Archive& ar, TType& data) \
 { \
 try { \
 	Serial<TType>::Load(ar, data); \
-} catch (cereal::Exception& e) { ENGINE_LOGW("Failed to load type: {}. {}", Type<TType>::ClassName(), e.what()); } \
+} catch (cereal::Exception& e) { BX_LOGW("Failed to load type: {}. {}", Type<TType>::ClassName(), e.what()); } \
 }
 
 #define REGISTER_SERIAL_T(TType) \
@@ -34,14 +34,14 @@ void save(Archive& ar, const TType<T>& data) \
 { \
 try { \
 	Serial<TType<T>>::Save(ar, data); \
-} catch (cereal::Exception& e) { ENGINE_LOGW("Failed to save type: {}. {}", Type<TType<T>>::ClassName(), e.what()); } \
+} catch (cereal::Exception& e) { BX_LOGW("Failed to save type: {}. {}", Type<TType<T>>::ClassName(), e.what()); } \
 } \
 template<class Archive, typename T> \
 void load(Archive& ar, TType<T>& data) \
 { \
 try { \
 	Serial<TType<T>>::Load(ar, data); \
-} catch (cereal::Exception& e) { ENGINE_LOGW("Failed to load type: {}. {}", Type<TType<T>>::ClassName(), e.what()); } \
+} catch (cereal::Exception& e) { BX_LOGW("Failed to load type: {}. {}", Type<TType<T>>::ClassName(), e.what()); } \
 }
 
 #define REGISTER_POLYMORPHIC_SERIAL(TBase, TType) \

@@ -62,23 +62,23 @@ public:
 
     inline TData& New(SizeType idx)
     {
-        ENGINE_ASSERT(m_used[idx] == false, "New called on used index!");
+        BX_ASSERT(m_used[idx] == false, "New called on used index!");
         m_used[idx] = true;
         return Get(idx);
     }
 
     inline TData& Get(SizeType idx)
     {
-        ENGINE_ASSERT(idx < GetSize(), "Index out of bounds!");
-        ENGINE_ASSERT(IsUsed(idx), "Index is not used!");
+        BX_ASSERT(idx < GetSize(), "Index out of bounds!");
+        BX_ASSERT(IsUsed(idx), "Index is not used!");
 
         return m_data[idx];
     }
 
     inline const TData& Get(SizeType idx) const
     {
-        ENGINE_ASSERT(idx < GetSize(), "Index out of bounds!");
-        ENGINE_ASSERT(IsUsed(idx), "Index is not used!");
+        BX_ASSERT(idx < GetSize(), "Index out of bounds!");
+        BX_ASSERT(IsUsed(idx), "Index is not used!");
 
         return m_data[idx];
     }
@@ -97,8 +97,8 @@ public:
 
     inline TData& Set(SizeType idx)
     {
-        ENGINE_ASSERT(idx < GetSize(), "Index out of bounds!");
-        ENGINE_ASSERT(IsUsed(idx), "Setting data to unused index!");
+        BX_ASSERT(idx < GetSize(), "Index out of bounds!");
+        BX_ASSERT(IsUsed(idx), "Setting data to unused index!");
 
         return m_data[idx];
     }
@@ -111,8 +111,8 @@ public:
 
     inline void Set(SizeType idx, const TData& data)
     {
-        ENGINE_ASSERT(idx < GetSize(), "Index out of bounds!");
-        ENGINE_ASSERT(IsUsed(idx), "Setting data to unused index!");
+        BX_ASSERT(idx < GetSize(), "Index out of bounds!");
+        BX_ASSERT(IsUsed(idx), "Setting data to unused index!");
 
         m_data[idx] = data;
     }
@@ -129,8 +129,8 @@ public:
 
     virtual inline void Remove(SizeType idx) override
     {
-        ENGINE_ASSERT(idx < GetSize(), "Index out of bounds!");
-        ENGINE_ASSERT(IsUsed(idx), "Index is not used!");
+        BX_ASSERT(idx < GetSize(), "Index out of bounds!");
+        BX_ASSERT(IsUsed(idx), "Index is not used!");
 
         m_used[idx] = false;
 
@@ -173,7 +173,7 @@ private:
     inline void Resize(SizeType size)
     {
         // TODO: This assert is a placeholder until the ECS can handle resizing
-        ENGINE_ASSERT(false, "TODO: The ECS doesn't support resizing!");
+        BX_ASSERT(false, "TODO: The ECS doesn't support resizing!");
         m_used.resize((m_used.size() + 1) * 2, false);
         m_data.resize((m_data.size() + 1) * 2, m_initializer);
     }

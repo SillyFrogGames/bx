@@ -90,25 +90,25 @@ public:
 
 	inline TData& GetData(ResourceHandle handle)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 		auto it = m_database.find(handle);
-		ENGINE_ENSURE(it != m_database.end());
+		BX_ENSURE(it != m_database.end());
 		return it->second.data;
 	}
 
 	inline TData* GetDataPtr(ResourceHandle handle)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 		auto it = m_database.find(handle);
-		ENGINE_ENSURE(it != m_database.end());
+		BX_ENSURE(it != m_database.end());
 		return &it->second.data;
 	}
 
 	inline const ResourceData<TData>& GetResourceData(ResourceHandle handle)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 		auto it = m_database.find(handle);
-		ENGINE_ENSURE(it != m_database.end());
+		BX_ENSURE(it != m_database.end());
 		return it->second;
 	}
 
@@ -120,7 +120,7 @@ public:
 
 	inline bool Load(ResourceHandle handle, const String& filename, LoadFn loadFn)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 		TData data{};
 		
 		auto it = m_database.find(handle);
@@ -129,20 +129,20 @@ public:
 
 		if (!loadFn(filename, data))
 		{
-			ENGINE_LOGE("Failed to load resource ({} | {})", handle, filename);
+			BX_LOGE("Failed to load resource ({} | {})", handle, filename);
 			return false;
 		}
 
 		auto entry = ResourceData<TData>(ResourceStorage::DISK, filename, data);
 		m_database.insert(std::make_pair(handle, entry));
 
-		ENGINE_LOGD("Loaded resource ({} | {})", handle, filename);
+		BX_LOGD("Loaded resource ({} | {})", handle, filename);
 		return true;
 	}
 
 	inline void LoadData(ResourceHandle handle, const TData& data)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 
 		auto it = m_database.find(handle);
 		if (it != m_database.end())
@@ -151,31 +151,31 @@ public:
 		auto entry = ResourceData<TData>(ResourceStorage::MEMORY, "", data);
 		m_database.insert(std::make_pair(handle, entry));
 
-		ENGINE_LOGD("Loaded resource ({})", handle);
+		BX_LOGD("Loaded resource ({})", handle);
 	}
 
 	inline void Save(ResourceHandle handle, const String& filename, SaveFn saveFn)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 
 		auto it = m_database.find(handle);
-		ENGINE_ASSERT(it != m_database.end(), "Data for handle not found!");
+		BX_ASSERT(it != m_database.end(), "Data for handle not found!");
 
 		if (!saveFn(filename, it->second.data))
 		{
-			ENGINE_LOGE("Failed to save resource ({} | {})", handle, filename);
+			BX_LOGE("Failed to save resource ({} | {})", handle, filename);
 			return;
 		}
 
 		it->second.storage = ResourceStorage::DISK;
 		it->second.filename = filename;
 
-		ENGINE_LOGD("Saved resource ({} | {})", handle, filename);
+		BX_LOGD("Saved resource ({} | {})", handle, filename);
 	}
 
 	inline void Unload(ResourceHandle handle, UnloadFn unloadFn)
 	{
-		ENGINE_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
+		BX_ASSERT(handle != RESOURCE_HANDLE_INVALID, "Resource handle is invalid!");
 
 		auto it = m_database.find(handle);
 		if (it == m_database.end())
@@ -184,30 +184,30 @@ public:
 		unloadFn(it->second.data);
 
 		m_database.erase(it);
-		ENGINE_LOGD("Unloaded resource ({})", handle);
+		BX_LOGD("Unloaded resource ({})", handle);
 	}
 
 	inline void IncreaseRefCount(ResourceHandle handle)
 	{
-		ENGINE_ENSURE(handle != RESOURCE_HANDLE_INVALID);
+		BX_ENSURE(handle != RESOURCE_HANDLE_INVALID);
 
 		auto it = m_database.find(handle);
-		ENGINE_ENSURE(it != m_database.end());
+		BX_ENSURE(it != m_database.end());
 
 		it->second.refCount++;
-		ENGINE_LOGD("Resource ({}) increment ref count {}", handle, it->second.refCount);
+		BX_LOGD("Resource ({}) increment ref count {}", handle, it->second.refCount);
 	}
 
 	inline void DecreaseRefCount(ResourceHandle handle, UnloadFn unloadFn)
 	{
-		ENGINE_ENSURE(handle != RESOURCE_HANDLE_INVALID);
+		BX_ENSURE(handle != RESOURCE_HANDLE_INVALID);
 
 		auto it = m_database.find(handle);
-		ENGINE_ENSURE(it != m_database.end());
+		BX_ENSURE(it != m_database.end());
 
-		ENGINE_ENSURE(it->second.refCount > 0);
+		BX_ENSURE(it->second.refCount > 0);
 		it->second.refCount--;
-		ENGINE_LOGD("Resource ({}) decrement ref count {}", handle, it->second.refCount);
+		BX_LOGD("Resource ({}) decrement ref count {}", handle, it->second.refCount);
 
 		if (it->second.refCount == 0)
 		{

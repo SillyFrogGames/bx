@@ -13,7 +13,7 @@
 #include <bx/engine/modules/graphics.hpp>
 #include <bx/engine/modules/physics.hpp>
 
-#ifdef GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
 #include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
 

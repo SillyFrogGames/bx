@@ -162,7 +162,7 @@ static WrenLoadModuleResult WrenLoadModule(WrenVM* vm, const char* name)
 		String filepath;
 		if (!File::Find("[assets]", String(name) + ".wren", filepath))
 		{
-			ENGINE_LOGE("Module '{}' can not be found!", name);
+			BX_LOGE("Module '{}' can not be found!", name);
 			return res;
 		}
 
@@ -187,11 +187,11 @@ static void WrenError(WrenVM* vm, WrenErrorType errorType, const char* module, c
 	switch (errorType)
 	{
 	case WREN_ERROR_COMPILE:
-		ENGINE_LOGE("[Compile: {} line {}] {}", module, line, msg); break;
+		BX_LOGE("[Compile: {} line {}] {}", module, line, msg); break;
 	case WREN_ERROR_STACK_TRACE:
-		ENGINE_LOGE("[StackTrace: {} line {}] in {}", module, line, msg); break;
+		BX_LOGE("[StackTrace: {} line {}] in {}", module, line, msg); break;
 	case WREN_ERROR_RUNTIME:
-		ENGINE_LOGE("[Runtime] {}", msg); break;
+		BX_LOGE("[Runtime] {}", msg); break;
 	}
 
 	s_error = true;
@@ -271,17 +271,17 @@ static void WrenCompile(WrenVM* vm, const char* name, const char* src)
 		{
 		case WREN_RESULT_COMPILE_ERROR:
 			s_error = true;
-			ENGINE_LOGE("Wren compilation error on module: {}", moduleName);
+			BX_LOGE("Wren compilation error on module: {}", moduleName);
 			break;
 
 		case WREN_RESULT_RUNTIME_ERROR:
 			s_error = true;
-			ENGINE_LOGE("Wren runtime error on module: {}", moduleName);
+			BX_LOGE("Wren runtime error on module: {}", moduleName);
 			break;
 
 		case WREN_RESULT_SUCCESS:
 			s_initialized = true;
-			ENGINE_LOGI("Wren successfully compiled module: {}", moduleName);
+			BX_LOGI("Wren successfully compiled module: {}", moduleName);
 			break;
 		}
 
@@ -290,8 +290,8 @@ static void WrenCompile(WrenVM* vm, const char* name, const char* src)
 	}
 }
 
-#if defined DEBUG_BUILD || defined EDITOR_BUILD
-#define LOAD_ENGINE_MODULE(ModuleName) { String src = File::ReadTextFile(ENGINE_PATH"/wren/"#ModuleName".wren"); WrenCompile(s_vm, #ModuleName, src.c_str()); }
+#if defined BX_DEBUG_BUILD || defined BX_EDITOR_BUILD
+#define LOAD_ENGINE_MODULE(ModuleName) { String src = File::ReadTextFile(BX_PATH"/wren/"#ModuleName".wren"); WrenCompile(s_vm, #ModuleName, src.c_str()); }
 
 #else
 extern "C" {
@@ -498,11 +498,11 @@ static void GetComponentCallInfo(WrenVM* vm, Entity& entity, ComponentClassWrapp
 	ObjClass* objClass = wrenGetClass(vm, handle->value);
 
 	auto it = s_wrenTypeIdMap.find(objClass->name->hash);
-	ENGINE_ASSERT(it != s_wrenTypeIdMap.end(), "Class is not registered!");
+	BX_ASSERT(it != s_wrenTypeIdMap.end(), "Class is not registered!");
 	const auto& typeId = it->second;
 
 	auto it2 = s_componentClassWrappers.find(typeId);
-	ENGINE_ASSERT(it2 != s_componentClassWrappers.end(), "Component is not registered!");
+	BX_ASSERT(it2 != s_componentClassWrappers.end(), "Component is not registered!");
 	wrapper = it2->second;
 }
 
@@ -1318,7 +1318,7 @@ void Script::RegisterClass(TypeId typeId)
 const ScriptClassInfo& Script::GetClassInfo(TypeId typeId)
 {
 	auto it = s_foreignClassRegistry.find(typeId);
-	ENGINE_ASSERT(it != s_foreignClassRegistry.end(), "Class is not registered!");
+	BX_ASSERT(it != s_foreignClassRegistry.end(), "Class is not registered!");
 	return it->second;
 }
 

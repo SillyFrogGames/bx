@@ -57,7 +57,7 @@ public:
 			}
 			catch (std::exception& e)
 			{
-				ENGINE_LOGW("Failed to load gameobject: {}. {}", gameObj.className, e.what());
+				BX_LOGW("Failed to load gameobject: {}. {}", gameObj.className, e.what());
 			}
 		}
 	}

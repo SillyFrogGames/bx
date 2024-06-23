@@ -154,10 +154,10 @@ void ConsoleView::Present(bool& show)
     bool reclaim_focus = false;
     ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
     static char s_inputBuffer[256];
-    if (ImGui::InputText("Input", s_inputBuffer, IM_ARRAYSIZE(s_inputBuffer), input_text_flags, &TextEditCallbackStub, nullptr))
+    if (ImGui::InputText("Input", s_inputBuffer, BX_ARRAYSIZE(s_inputBuffer), input_text_flags, &TextEditCallbackStub, nullptr))
     {
         //char* s = s_inputBuffer;
-        ENGINE_LOGI(s_inputBuffer);
+        BX_LOGI(s_inputBuffer);
         //Strtrim(s);
         //if (s[0])
         //    ExecCommand(s);

@@ -6,60 +6,60 @@ project (bx)
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option (ENGINE_BUILD_EDITOR "Build as editor binaries" OFF)
+option (BX_BUILD_EDITOR "Build as editor binaries" OFF)
 #option (BUILD_TESTS "Build the test binaries" ON)
 
 # Define options for window backend
-set (WINDOW_BACKEND "GLFW" CACHE STRING "Choose the window backend: GLFW")
-set_property (CACHE WINDOW_BACKEND PROPERTY STRINGS "GLFW")
+set (BX_WINDOW_BACKEND "GLFW" CACHE STRING "Choose the window backend: GLFW")
+set_property (CACHE BX_WINDOW_BACKEND PROPERTY STRINGS "GLFW")
 
-if (WINDOW_BACKEND STREQUAL "GLFW")
+if (BX_WINDOW_BACKEND STREQUAL "GLFW")
     message(STATUS "Using GLFW as the window backend")
-    add_compile_definitions (WINDOW_GLFW_BACKEND)
+    add_compile_definitions (BX_WINDOW_GLFW_BACKEND)
 
 else ()
-    message(FATAL_ERROR "Unknown window backend: ${WINDOW_BACKEND}")
+    message(FATAL_ERROR "Unknown window backend: ${BX_WINDOW_BACKEND}")
 endif ()
 
 # Define options for graphics backend
-set (GRAPHICS_BACKEND "OpenGL" CACHE STRING "Choose the graphics backend: OpenGL, OpenGLES, Vulkan")
-set_property (CACHE GRAPHICS_BACKEND PROPERTY STRINGS "OpenGL" "OpenGLES" "Vulkan")
+set (BX_GRAPHICS_BACKEND "OpenGL" CACHE STRING "Choose the graphics backend: OpenGL, OpenGLES, Vulkan")
+set_property (CACHE BX_GRAPHICS_BACKEND PROPERTY STRINGS "OpenGL" "OpenGLES" "Vulkan")
 
-if (GRAPHICS_BACKEND STREQUAL "OpenGL")
+if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
     message(STATUS "Using OpenGL as the graphics backend")
-    add_compile_definitions (GRAPHICS_OPENGL_BACKEND)
+    add_compile_definitions (BX_GRAPHICS_OPENGL_BACKEND)
 
-elseif (GRAPHICS_BACKEND STREQUAL "OpenGLES")
+elseif (BX_GRAPHICS_BACKEND STREQUAL "OpenGLES")
     message(STATUS "Using OpenGLES as the graphics backend")
-    add_compile_definitions (GRAPHICS_OPENGLES_BACKEND)
+    add_compile_definitions (BX_GRAPHICS_OPENGLES_BACKEND)
 
-elseif (GRAPHICS_BACKEND STREQUAL "Vulkan")
+elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
     message(STATUS "Using Vulkan as the graphics backend")
-    add_compile_definitions (GRAPHICS_VULKAN_BACKEND)
+    add_compile_definitions (BX_GRAPHICS_VULKAN_BACKEND)
 
 else ()
     message(FATAL_ERROR "Unknown graphics backend: ${GRAPHICS_BACKEND}")
 endif ()
 
 # Define options for physics backend
-set (PHYSICS_BACKEND "Bullet" CACHE STRING "Choose the physics backend: Bullet")
-set_property (CACHE PHYSICS_BACKEND PROPERTY STRINGS "Bullet")
+set (BX_PHYSICS_BACKEND "Bullet" CACHE STRING "Choose the physics backend: Bullet")
+set_property (CACHE BX_PHYSICS_BACKEND PROPERTY STRINGS "Bullet")
 
-if (PHYSICS_BACKEND STREQUAL "Bullet")
+if (BX_PHYSICS_BACKEND STREQUAL "Bullet")
     message(STATUS "Using Bullet as the physics backend")
-    add_compile_definitions (PHYSICS_BULLET_BACKEND)
+    add_compile_definitions (BX_PHYSICS_BULLET_BACKEND)
 
 else ()
     message(FATAL_ERROR "Unknown physics backend: ${WINDOW_BACKEND}")
 endif ()
 
 # Define options for audio backend
-set (AUDIO_BACKEND "PortAudio" CACHE STRING "Choose the audio backend: PortAudio")
-set_property (CACHE AUDIO_BACKEND PROPERTY STRINGS "PortAudio")
+set (BX_AUDIO_BACKEND "PortAudio" CACHE STRING "Choose the audio backend: PortAudio")
+set_property (CACHE BX_AUDIO_BACKEND PROPERTY STRINGS "PortAudio")
 
-if (AUDIO_BACKEND STREQUAL "PortAudio")
+if (BX_AUDIO_BACKEND STREQUAL "PortAudio")
     message(STATUS "Using PortAudio as the audio backend")
-    add_compile_definitions (AUDIO_PORTAUDIO_BACKEND)
+    add_compile_definitions (BX_AUDIO_PORTAUDIO_BACKEND)
 
 else ()
     message(FATAL_ERROR "Unknown audio backend: ${WINDOW_BACKEND}")
@@ -67,25 +67,25 @@ endif ()
 
 # TODO: Use Platform.hpp for the future
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	add_compile_definitions (PLATFORM_PC)
+	add_compile_definitions (BX_PLATFORM_PC)
 endif ()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	add_compile_definitions (PLATFORM_LINUX)
+	add_compile_definitions (BX_PLATFORM_LINUX)
 endif ()
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-	add_compile_definitions (DEBUG_BUILD)
+	add_compile_definitions (BX_DEBUG_BUILD)
 
 else ()
-    add_compile_definitions (RELEASE_BUILD)
+    add_compile_definitions (BX_RELEASE_BUILD)
 endif ()
 # ---------------------------------------
 
-add_compile_definitions (ENGINE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
+add_compile_definitions (BX_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 
-if (ENGINE_BUILD_EDITOR)
-    add_compile_definitions (EDITOR_BUILD)
+if (BX_BUILD_EDITOR)
+    add_compile_definitions (BX_EDITOR_BUILD)
 endif ()
 
 add_subdirectory (extern)
@@ -96,7 +96,7 @@ add_subdirectory (wren)
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Setup common engine sources
-set (ENGINE_SRCS
+set (BX_SRCS
 	"src/bx/engine/core/data.cpp"
 	"src/bx/engine/core/ecs.cpp"
 	"src/bx/engine/core/file.cpp"
@@ -144,64 +144,54 @@ set (ENGINE_SRCS
 	"src/bx/framework/gameobject.cpp"
 )
 
-set (ENGINE_LIBS ctti wnaabi cereal fmt glm wren imgui file_embed)
+set (BX_LIBS ctti wnaabi cereal fmt glm wren imgui file_embed)
 
 # Setup window backend
-if(WINDOW_BACKEND STREQUAL "GLFW")
-	set (ENGINE_SRCS ${ENGINE_SRCS}
+if(BX_WINDOW_BACKEND STREQUAL "GLFW")
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/window/backend/window_glfw.cpp"
 	)
 
-    set (ENGINE_LIBS ${ENGINE_LIBS} glfw imgui_glfw)
+    set (BX_LIBS ${BX_LIBS} glfw imgui_glfw)
 endif()
 
 # Setup graphics backend
-if(GRAPHICS_BACKEND STREQUAL "OpenGL")
-	set (ENGINE_SRCS ${ENGINE_SRCS}
+if(BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/graphics_opengl.cpp"
 	)
 
-    set (ENGINE_LIBS ${ENGINE_LIBS} glad imgui_opengl3)
+    set (BX_LIBS ${BX_LIBS} glad imgui_opengl3)
 
-elseif(GRAPHICS_BACKEND STREQUAL "Vulkan")
-	set (ENGINE_SRCS ${ENGINE_SRCS}
+elseif(BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/graphics_vulkan.cpp"
 	)
 
-    set (ENGINE_LIBS ${ENGINE_LIBS} vulkan glslang SPIRV)
+    set (BX_LIBS ${BX_LIBS} vulkan glslang SPIRV)
 endif()
 
 # Setup physics backend
-if(PHYSICS_BACKEND STREQUAL "Bullet")
-	set (ENGINE_SRCS ${ENGINE_SRCS}
+if(BX_PHYSICS_BACKEND STREQUAL "Bullet")
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/physics/backend/physics_bullet.cpp"
 	)
 
-    set (ENGINE_LIBS ${ENGINE_LIBS} bullet3) #box2d
+    set (BX_LIBS ${BX_LIBS} bullet3) #box2d
 endif()
 
 # Setup audio backend
-if(AUDIO_BACKEND STREQUAL "PortAudio")
-	set (ENGINE_SRCS ${ENGINE_SRCS}
+if(BX_AUDIO_BACKEND STREQUAL "PortAudio")
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/audio/backend/audio_portaudio.cpp"
 	)
 
-    set (ENGINE_LIBS ${ENGINE_LIBS} PortAudio)
+    set (BX_LIBS ${BX_LIBS} PortAudio)
 endif()
 
-# Create engine lib
-add_library (Engine STATIC ${ENGINE_SRCS})
-target_link_libraries (Engine ${ENGINE_LIBS})
-target_include_directories (Engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-if (MSVC)
-	target_compile_options(Engine PUBLIC "/ZI")
-	target_link_options(Engine PUBLIC "/INCREMENTAL")
-endif ()
-
 # Setup editor sources
-if (ENGINE_BUILD_EDITOR)
-	set (EDITOR_SRCS
+if (BX_BUILD_EDITOR)
+	set (BX_SRCS ${BX_SRCS}
 		"src/bx/editor/core/asset_importer.cpp"
 		"src/bx/editor/core/assets.cpp"
 		"src/bx/editor/core/command.cpp"
@@ -223,25 +213,23 @@ if (ENGINE_BUILD_EDITOR)
 		"src/bx/editor/views/settings_view.cpp"
 	)
 
-	set (EDITOR_LIBS stb assimp implot ImGuizmo IconFontCppHeaders FontAwesome FreeFonts)
-
-	# Create editor lib
-	add_library (Editor STATIC ${EDITOR_SRCS} ${ENGINE_SRCS})
-	target_link_libraries (Editor ${EDITOR_LIBS} ${ENGINE_LIBS})
-	target_include_directories (Editor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-	if (MSVC)
-		target_compile_options(Editor PUBLIC "/ZI")
-		target_link_options(Editor PUBLIC "/INCREMENTAL")
-	endif ()
+	set (BX_LIBS ${BX_LIBS} stb assimp implot ImGuizmo IconFontCppHeaders FontAwesome FreeFonts)
 
 	# Add editor runtime
-	add_executable (EditorRuntime "src/bx/runtime/editor_application.cpp")
-	target_link_libraries (EditorRuntime Editor)
+	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/editor_application.cpp")
 
 else ()
 	
 	# Add game runtime
-	add_executable (GameRuntime "src/bx/runtime/game_application.cpp")
-	target_link_libraries (GameRuntime Engine)
+	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/game_application.cpp")
+endif ()
+
+# Create bx lib
+add_library (bx STATIC ${BX_SRCS})
+target_link_libraries (bx ${BX_LIBS})
+target_include_directories (bx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+if (MSVC)
+	target_compile_options(bx PUBLIC "/ZI")
+	target_link_options(bx PUBLIC "/INCREMENTAL")
 endif ()

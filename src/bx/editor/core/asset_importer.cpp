@@ -277,7 +277,7 @@ static void AssimpLoadMesh(const aiScene* pScene, const aiNode* pNode, ModelData
         for (SizeType f = 0; f < pMesh->mNumFaces; ++f)
         {
             const auto& face = pMesh->mFaces[f];
-            ENGINE_ASSERT(face.mNumIndices == 3, "Only triangles are supported!");
+            BX_ASSERT(face.mNumIndices == 3, "Only triangles are supported!");
 
             SizeType idx = f * 3;
             triangles[idx + 0] = face.mIndices[0];
@@ -289,7 +289,7 @@ static void AssimpLoadMesh(const aiScene* pScene, const aiNode* pNode, ModelData
         if (pMesh->HasBones())
         {
             // TODO: Handle models with more than one skeleton
-            ENGINE_ENSURE(data.skeletons.size() > 0);
+            BX_ENSURE(data.skeletons.size() > 0);
             auto& skeleton = data.skeletons[0].data;
 
             u32 boneCount = 0;
@@ -299,7 +299,7 @@ static void AssimpLoadMesh(const aiScene* pScene, const aiNode* pNode, ModelData
 
                 String boneName = pBone->mName.C_Str();
                 auto it = skeleton.GetBoneMap().find(boneName);
-                ENGINE_ENSURE(it != skeleton.GetBoneMap().end());
+                BX_ENSURE(it != skeleton.GetBoneMap().end());
 
                 u32 boneIdx = (u32)it->second;
                 for (u32 w = 0; w < pBone->mNumWeights; ++w)
@@ -307,7 +307,7 @@ static void AssimpLoadMesh(const aiScene* pScene, const aiNode* pNode, ModelData
                     auto pWeight = pBone->mWeights[w];
                     u32 vertexId = pWeight.mVertexId;
 
-                    ENGINE_ENSURE(vertexId <= vertices.size());
+                    BX_ENSURE(vertexId <= vertices.size());
 
                     auto& bone = bones[vertexId];
                     auto& weight = weights[vertexId];
@@ -427,7 +427,7 @@ bool AssetImporter::ImportModel(const String& filename)
     // If the import failed, report it
     if (pScene == nullptr)
     {
-        ENGINE_LOGE("Failed to import model: {} - Message: {}", filename, importer.GetErrorString());
+        BX_LOGE("Failed to import model: {} - Message: {}", filename, importer.GetErrorString());
         return false;
     }
 

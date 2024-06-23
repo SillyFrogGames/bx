@@ -340,7 +340,7 @@ public:
     static const ComponentMask& Mask()
     {
         static const EntityId s_id = NextId();
-        ENGINE_ENSURE(s_id < ECS_MAX_COMPONENTS);
+        BX_ENSURE(s_id < ECS_MAX_COMPONENTS);
 
         static const ComponentMask s_mask((EntityId)1 << s_id);
         return s_mask;
@@ -433,12 +433,12 @@ public:
     /// <returns>New valid entity.</returns>
     static Entity CreateEntityWithId(EntityId id)
     {
-        ENGINE_ENSURE(!IsValid(Entity(id)));
+        BX_ENSURE(!IsValid(Entity(id)));
 
         // Setup entity
         Entity& entity = GetEntities().New();
 
-        ENGINE_ENSURE(entity.m_id == INVALID_ENTITY_ID);
+        BX_ENSURE(entity.m_id == INVALID_ENTITY_ID);
         entity.m_id = id;
 
         // Update registries
@@ -518,7 +518,7 @@ private:
     template <typename TCmp>
     static bool HasComponent(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
+        BX_ENSURE(IsValid(entity));
 
         // Get component masks
         const ComponentMask& cmpMask = ComponentId<TCmp>::Mask();
@@ -537,8 +537,8 @@ private:
     template <typename TCmp>
     static void AddComponent(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
-        ENGINE_ENSURE(!HasComponent<TCmp>(entity));
+        BX_ENSURE(IsValid(entity));
+        BX_ENSURE(!HasComponent<TCmp>(entity));
 
         // Update entity component mask
         const ComponentMask& cmpMask = ComponentId<TCmp>::Mask();
@@ -591,8 +591,8 @@ private:
     template <typename TCmp>
     static TCmp& GetComponent(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
-        ENGINE_ENSURE(HasComponent<TCmp>(entity));
+        BX_ENSURE(IsValid(entity));
+        BX_ENSURE(HasComponent<TCmp>(entity));
 
         // Get component masks
         const ComponentMask& cmpMask = ComponentId<TCmp>::Mask();
@@ -614,7 +614,7 @@ private:
             }
         }
 
-        ENGINE_ASSERT(false, "Critical error!");
+        BX_ASSERT(false, "Critical error!");
         throw;
     }
 
@@ -625,7 +625,7 @@ private:
     /// <returns></returns>
     static std::vector<ComponentBase*> GetComponents(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
+        BX_ENSURE(IsValid(entity));
 
         std::vector<ComponentBase*> cmps;
         auto& cmpHandles = GetComponentHandles(entity);
@@ -651,8 +651,8 @@ private:
     template <typename TCmp>
     static void RemoveComponent(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
-        ENGINE_ENSURE(HasComponent<TCmp>(entity));
+        BX_ENSURE(IsValid(entity));
+        BX_ENSURE(HasComponent<TCmp>(entity));
 
         const ComponentMask& cmpMask = ComponentId<TCmp>::Mask();
 
@@ -683,7 +683,7 @@ private:
             }
         }
 
-        ENGINE_ASSERT(false, "Critical error!");
+        BX_ASSERT(false, "Critical error!");
     }
 
     /// <summary>
@@ -692,7 +692,7 @@ private:
     /// <param name="entity">Entity to destroy.</param>
     static void Destroy(Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
+        BX_ENSURE(IsValid(entity));
 
         ComponentMask& entityMask = GetComponentMask(entity);
 
@@ -748,18 +748,18 @@ private:
     /// <returns>Entity mask reference.</returns>
     static ComponentMask& GetComponentMask(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
+        BX_ENSURE(IsValid(entity));
         auto it = GetCmpMaskMap().find(entity.GetId());
-        ENGINE_ENSURE(it != GetCmpMaskMap().end());
+        BX_ENSURE(it != GetCmpMaskMap().end());
 
         return it->second;
     }
 
     static Pool<ComponentHandle>& GetComponentHandles(const Entity& entity)
     {
-        ENGINE_ENSURE(IsValid(entity));
+        BX_ENSURE(IsValid(entity));
         auto it = GetCmpHandles().find(entity.GetId());
-        ENGINE_ENSURE(it != GetCmpHandles().end());
+        BX_ENSURE(it != GetCmpHandles().end());
 
         return it->second;
     }
@@ -993,7 +993,7 @@ public:
         auto& systemsMap = GetSystemsMap();
 
         SizeType id = Type<TSys>::Id();
-        ENGINE_ENSURE(systemsMap.find(id) != systemsMap.end());
+        BX_ENSURE(systemsMap.find(id) != systemsMap.end());
 
         return *static_cast<TSys*>(systemsMap[id]);
     }

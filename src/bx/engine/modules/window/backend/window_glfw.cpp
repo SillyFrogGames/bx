@@ -1,4 +1,3 @@
-#ifdef WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window.hpp"
 
 #include "bx/engine/core/macros.hpp"
@@ -43,7 +42,7 @@ void Window::SetCursorMode(CursorMode mode)
 
 static void glfw_error_callback(int i, const char* c)
 {
-	ENGINE_LOGE("GLFW ({}) {}", i, c);
+	BX_LOGE("GLFW ({}) {}", i, c);
 }
 
 static void glfw_window_size_callback(GLFWwindow* window, int width, int height)
@@ -57,7 +56,7 @@ bool Window::Create()
 #ifdef __arm__
 	if (putenv((char*)"DISPLAY=:0"))
 	{
-		ENGINE_LOGE("Failed to set DISPLAY enviroment variable!");
+		BX_LOGE("Failed to set DISPLAY enviroment variable!");
 		return false;
 	}
 #endif
@@ -65,7 +64,7 @@ bool Window::Create()
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit())
 	{
-		ENGINE_LOGE("Failed to initialize GLFW!");
+		BX_LOGE("Failed to initialize GLFW!");
 		return false;
 	}
 
@@ -75,9 +74,9 @@ bool Window::Create()
 
 	GLFWmonitor* pMonitor = nullptr;
 
-#ifdef GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
 
-#ifdef DEBUG_BUILD
+#ifdef BX_DEBUG_BUILD
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #else
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_FALSE);
@@ -119,7 +118,7 @@ bool Window::Create()
 
 	if (pWindow == NULL)
 	{
-		ENGINE_LOGE("Failed to create GLFW window!");
+		BX_LOGE("Failed to create GLFW window!");
 		glfwTerminate();
 		return false;
 	}
@@ -130,11 +129,11 @@ bool Window::Create()
 
 	glfwSetWindowSizeCallback(pWindow, glfw_window_size_callback);
 
-#ifdef GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
 	glfwMakeContextCurrent(pWindow);
 	glfwSwapInterval(1);
 
-#elif defined GRAPHICS_VULKAN_BACKEND
+#elif defined BX_GRAPHICS_VULKAN_BACKEND
 	if (!glfwVulkanSupported())
 	{
 		ENGINE_LOGE("GLFW: Vulkan Not Supported!");
@@ -169,9 +168,7 @@ void Window::Display()
 {
 	PROFILE_FUNCTION();
 
-#ifdef GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
 	glfwSwapBuffers(pWindow);
 #endif
 }
-
-#endif

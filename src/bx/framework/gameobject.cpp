@@ -116,7 +116,7 @@ void GameObject::Register(const String& className, const GameObjectMetaData& met
 	g_gameObjectClasses.emplace_back(className);
 	g_gameObjectMetaDataMap.insert(std::make_pair(className, metaData));
 
-	ENGINE_LOGD("Registered GameObject class: {}", className);
+	BX_LOGD("Registered GameObject class: {}", className);
 }
 
 const List<String>& GameObject::GetClasses()
@@ -127,7 +127,7 @@ const List<String>& GameObject::GetClasses()
 const GameObjectMetaData& GameObject::GetClassMetaData(const String& className)
 {
 	auto it = g_gameObjectMetaDataMap.find(className);
-	ENGINE_ASSERT(it != g_gameObjectMetaDataMap.end(), "GameObject class not registered!");
+	BX_ASSERT(it != g_gameObjectMetaDataMap.end(), "GameObject class not registered!");
 	return it->second;
 }
 
@@ -187,7 +187,7 @@ GameObjectBase& GameObject::Find(Scene& scene, EntityId entityId)
 	for (auto& gameObj : scene.m_gameObjects)
 		if (gameObj->GetEntity().GetId() == entityId)
 			return *gameObj;
-	ENGINE_FAIL("No game object found for entity ID!");
+	BX_FAIL("No game object found for entity ID!");
 }
 
 GameObjectBase& GameObject::Duplicate(const GameObjectBase& gameObj)
@@ -228,7 +228,7 @@ void Scene::Load(Scene& scene, const String& filename)
 {
 	if (!File::Exists(filename))
 	{
-		ENGINE_LOGW("Failed to load non-existent scene: {}", filename);
+		BX_LOGW("Failed to load non-existent scene: {}", filename);
 		return;
 	}
 
@@ -244,7 +244,7 @@ void Scene::Load(Scene& scene, const String& filename)
 	}
 	catch (cereal::Exception& e)
 	{
-		ENGINE_LOGW("Failed to load scene ({}): {}", filename, e.what());
+		BX_LOGW("Failed to load scene ({}): {}", filename, e.what());
 	}
 }
 
@@ -258,7 +258,7 @@ void Scene::Save(const Scene& scene, const String& filename)
 	}
 	catch (cereal::Exception& e)
 	{
-		ENGINE_LOGW("Failed to save scene ({}): {}", filename, e.what());
+		BX_LOGW("Failed to save scene ({}): {}", filename, e.what());
 	}
 }
 

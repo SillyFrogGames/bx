@@ -21,19 +21,19 @@ public:
 
 	inline const Resource<Mesh>& GetMesh(SizeType index) const
 	{
-		ENGINE_ENSURE(index < m_meshes.size());
+		BX_ENSURE(index < m_meshes.size());
 		return m_meshes[index];
 	}
 	
 	inline void SetMesh(SizeType index, const Resource<Mesh>& mesh)
 	{
-		ENGINE_ENSURE(index < m_meshes.size());
+		BX_ENSURE(index < m_meshes.size());
 		m_meshes[index] = mesh;
 	}
 
 	inline void RemoveMesh(SizeType index)
 	{
-		ENGINE_ENSURE(index < m_meshes.size());
+		BX_ENSURE(index < m_meshes.size());
 		m_meshes.erase(m_meshes.begin() + index);
 	}
 

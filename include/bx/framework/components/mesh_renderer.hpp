@@ -23,19 +23,19 @@ public:
 
 	inline const Resource<Material>& GetMaterial(SizeType index) const
 	{
-		ENGINE_ENSURE(index < m_materials.size());
+		BX_ENSURE(index < m_materials.size());
 		return m_materials[index];
 	}
 
 	inline void SetMaterial(SizeType index, const Resource<Material>& material)
 	{
-		ENGINE_ENSURE(index < m_materials.size());
+		BX_ENSURE(index < m_materials.size());
 		m_materials[index] = material;
 	}
 
 	inline void RemoveMaterial(SizeType index)
 	{
-		ENGINE_ENSURE(index < m_materials.size());
+		BX_ENSURE(index < m_materials.size());
 		m_materials.erase(m_materials.begin() + index);
 	}
 

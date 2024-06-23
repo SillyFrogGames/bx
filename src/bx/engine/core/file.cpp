@@ -4,7 +4,7 @@
 #include "bx/engine/core/guard.hpp"
 #include "bx/engine/containers/hash_map.hpp"
 
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 #include <windows.h>
 #include <tchar.h> 
 #include <stdio.h>
@@ -17,7 +17,7 @@
 #define WinCreateDirectory  CreateDirectoryA
 #endif // !UNICODE
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(BX_PLATFORM_LINUX)
 #include <sys/stat.h>
 #include <dirent.h>
 #endif
@@ -54,7 +54,7 @@ static List<String> StringSplit(const String& source, const char* delimiter, boo
 
 void File::Initialize()
 {
-#if defined(PLATFORM_PC) || defined(PLATFORM_LINUX)
+#if defined(BX_PLATFORM_PC) || defined(BX_PLATFORM_LINUX)
 	AddWildcard("[game]", GAME_PATH);
 	AddWildcard("[assets]", GAME_PATH"/Assets");
 	AddWildcard("[settings]", GAME_PATH"/Settings");
@@ -62,7 +62,7 @@ void File::Initialize()
 	// All platforms
 	if (!Exists("[settings]/.ini"))
 	{
-		ENGINE_LOGW("Not game .ini file, creating default.");
+		BX_LOGW("Not game .ini file, creating default.");
 		File::WriteTextFile("[settings]/.ini", "GameName");
 	}
 
@@ -70,12 +70,12 @@ void File::Initialize()
 	if (gameStr.empty())
 	{
 		gameStr = "GameName";
-		ENGINE_LOGW("Game .ini does not have game name, setting to default.");
+		BX_LOGW("Game .ini does not have game name, setting to default.");
 		File::WriteTextFile("[settings]/.ini", gameStr);
 	}
 #endif
 
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 	char* pValue;
 	size_t len;
 	_dupenv_s(&pValue, &len, "APPDATA");
@@ -97,7 +97,7 @@ List<char> File::ReadBinaryFile(const String& filename)
 	std::ifstream file(path, std::ios::binary | std::ios::ate);
 	if (!file.is_open())
 	{
-		ENGINE_LOGE("File {} with full path {} was not found!", filename, path);
+		BX_LOGE("File {} with full path {} was not found!", filename, path);
 		return List<char>();
 	}
 
@@ -108,7 +108,7 @@ List<char> File::ReadBinaryFile(const String& filename)
 	if (file.read(buffer.data(), size))
 		return  buffer;
 
-	ENGINE_ASSERT(false, "");
+	BX_ASSERT(false, "");
 	return List<char>();
 }
 
@@ -122,7 +122,7 @@ String File::ReadTextFile(const String& filename)
 	std::ifstream file(path);
 	if (!file.is_open())
 	{
-		ENGINE_LOGE("File {} with full path {} was not found!", filename, path);
+		BX_LOGE("File {} with full path {} was not found!", filename, path);
 		return String();
 	}
 
@@ -157,8 +157,8 @@ void File::AddWildcard(const String& wildcard, const String& value)
 	{
 		if (!CreateDirectory(value))
 		{
-			ENGINE_LOGE("Failed to create directory!");
-			ENGINE_ASSERT(false, "Create directory failed!");
+			BX_LOGE("Failed to create directory!");
+			BX_ASSERT(false, "Create directory failed!");
 		}
 	}
 	s_wildcards[wildcard] = value;
@@ -209,26 +209,26 @@ bool File::Move(const String& oldPath, const String& newPath)
 	String oldFullPath = File::GetPath(oldPath);
 	String newFullPath = File::GetPath(newPath);
 
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 	LPCSTR oldFileName = oldFullPath.c_str();
 	LPCSTR newFileName = newFullPath.c_str();
 
 	// Attempt to move the file with additional options
 	if (MoveFileEx(oldFileName, newFileName, MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING))
 	{
-		ENGINE_LOGD("File moved old: ({}) -> new: ({})", oldPath, newPath);
+		BX_LOGD("File moved old: ({}) -> new: ({})", oldPath, newPath);
 		return true;
 	}
 	
-	ENGINE_LOGW("Failed to move file: {}", GetLastError());
+	BX_LOGW("Failed to move file: {}", GetLastError());
 	return false;
 
-#elif defined(PLATFORM_LINUX)
-	ENGINE_ASSERT(false, "Delete file not supported!");
+#elif defined(BX_PLATFORM_LINUX)
+	BX_ASSERT(false, "Delete file not supported!");
 	return false;
 
 #else
-	ENGINE_ASSERT(false, "Delete file not supported!");
+	BX_ASSERT(false, "Delete file not supported!");
 	return false;
 
 #endif
@@ -236,13 +236,13 @@ bool File::Move(const String& oldPath, const String& newPath)
 
 bool File::Delete(const String& filename)
 {
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 	const String fullpath = GetPath(filename);
 	
 	DWORD attributes = GetFileAttributes(fullpath.c_str());
 	if (attributes == INVALID_FILE_ATTRIBUTES)
 	{
-		ENGINE_LOGD("Invalid path or unable to get attributes. Error code: {}", GetLastError());
+		BX_LOGD("Invalid path or unable to get attributes. Error code: {}", GetLastError());
 		return false;
 	}
 
@@ -250,27 +250,27 @@ bool File::Delete(const String& filename)
 	{
 		if (RemoveDirectory(fullpath.c_str()))
 		{
-			ENGINE_LOGD("Folder deleted: {}", filename);
+			BX_LOGD("Folder deleted: {}", filename);
 		}
 	}
 	else
 	{
 		if (DeleteFile(fullpath.c_str()))
 		{
-			ENGINE_LOGD("File deleted: {}", filename);
+			BX_LOGD("File deleted: {}", filename);
 			return true;
 		}
 	}
 
-	ENGINE_LOGW("Failed to delete file: {}", filename);
+	BX_LOGW("Failed to delete file: {}", filename);
 	return false;
 
-#elif defined(PLATFORM_LINUX)
-	ENGINE_ASSERT(false, "Delete file not supported!");
+#elif defined(BX_PLATFORM_LINUX)
+	BX_ASSERT(false, "Delete file not supported!");
 	return false;
 
 #else
-	ENGINE_ASSERT(false, "Delete file not supported!");
+	BX_ASSERT(false, "Delete file not supported!");
 	return false;
 
 #endif
@@ -285,25 +285,25 @@ bool File::Exists(const String& path)
 
 bool File::CreateDirectory(const String& path)
 {
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 	BOOL ret = WinCreateDirectory(path.c_str(), NULL);
 	switch (GetLastError())
 	{
-	case ERROR_ALREADY_EXISTS: ENGINE_LOGE("Directory already exists, failed to create!"); break;
-	case ERROR_PATH_NOT_FOUND: ENGINE_LOGE("Directory path not found, failed to create!"); break;
+	case ERROR_ALREADY_EXISTS: BX_LOGE("Directory already exists, failed to create!"); break;
+	case ERROR_PATH_NOT_FOUND: BX_LOGE("Directory path not found, failed to create!"); break;
 	}
 	return ret;
-#elif defined(PLATFORM_LINUX)
-	ENGINE_ASSERT(false, "Create directory not supported!");
+#elif defined(BX_BX_PLATFORM_LINUX)
+	BX_ASSERT(false, "Create directory not supported!");
 #else
-	ENGINE_ASSERT(false, "Create directory not supported!");
+	BX_ASSERT(false, "Create directory not supported!");
 #endif
 }
 
 uint64_t File::LastWrite(const String& filename)
 {
-#if (defined(PLATFORM_PC) || defined(PLATFORM_LINUX)) \
-&& (defined(BUILD_DEBUG) || defined(BUILD_PROFILE))
+#if (defined(BX_PLATFORM_PC) || defined(BX_PLATFORM_LINUX)) \
+&& (defined(BX_BUILD_DEBUG) || defined(BX_BUILD_PROFILE))
 	const auto filepath = GetPath(filename);
 	struct stat info;
 	if (stat(filename.c_str(), &info) == 0)
@@ -317,7 +317,7 @@ uint64_t File::LastWrite(const String& filename)
 
 bool File::ListFiles(const String& root, List<FileHandle>& files)
 {
-#if defined(PLATFORM_PC)
+#if defined(BX_PLATFORM_PC)
 
 	String rootPath = GetPath(root);
 
@@ -360,7 +360,7 @@ bool File::ListFiles(const String& root, List<FileHandle>& files)
 	FindClose(hFind);
 	return true;
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(BX_PLATFORM_LINUX)
 
 	String rootPath = GetPath(root);
 
@@ -389,7 +389,7 @@ bool File::ListFiles(const String& root, List<FileHandle>& files)
 
 #else
 
-	ENGINE_ASSERT(false, "Find file not supported!");
+	BX_ASSERT(false, "Find file not supported!");
 	return false;
 
 #endif

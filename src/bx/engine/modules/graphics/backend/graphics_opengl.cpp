@@ -1,4 +1,3 @@
-#ifdef GRAPHICS_OPENGL_BACKEND
 #include "bx/engine/modules/graphics/backend/graphics_opengl.hpp"
 
 #include "bx/engine/core/file.hpp"
@@ -25,7 +24,7 @@ template <typename T>
 static T& GetImpl(GraphicsHandle handle, HashMap<GraphicsHandle, T>& map)
 {
     auto it = map.find(handle);
-    ENGINE_ENSURE(it != map.end());
+    BX_ENSURE(it != map.end());
     return it->second;
 }
 
@@ -102,24 +101,24 @@ static void APIENTRY DebugCallback(GLenum source, GLenum type, u32 id, GLenum se
     switch (severity)
     {
     case GL_DEBUG_SEVERITY_HIGH:
-        ENGINE_LOGE("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
+        BX_LOGE("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
         break;
     case GL_DEBUG_SEVERITY_MEDIUM:
-        ENGINE_LOGW("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
+        BX_LOGW("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
         break;
     case GL_DEBUG_SEVERITY_LOW:
-        ENGINE_LOGI("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
+        BX_LOGI("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
         break;
 
     case GL_DEBUG_SEVERITY_NOTIFICATION:
     default:
-        ENGINE_LOGD("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
+        BX_LOGD("GL message ID:({}) - Source:({}) - Type:({}) - Severity:({})\n{}", id, GetGlSource(source), GetGlType(type), GetGlSeverity(severity), message);
     }
 }
 
 static bool InitializeGlDebug()
 {
-#if defined GRAPHICS_OPENGL_BACKEND
+#if defined BX_GRAPHICS_OPENGL_BACKEND
     i32 flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
     if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
@@ -132,7 +131,7 @@ static bool InitializeGlDebug()
 
         return true;
     }
-#elif defined GRAPHICS_OPENGLES_BACKEND
+#elif defined BX_GRAPHICS_OPENGLES_BACKEND
     //i32 flags;
     //glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
     //if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
@@ -154,15 +153,15 @@ static void PrintGlInfo()
 {
     i32 numOfExtensions;
     glGetIntegerv(GL_NUM_EXTENSIONS, &numOfExtensions);
-    ENGINE_LOGD("GL Supported extensions ({}):", numOfExtensions);
+    BX_LOGD("GL Supported extensions ({}):", numOfExtensions);
     for (i32 i = 0; i < numOfExtensions; i++)
     {
-        ENGINE_LOGD((const char*)glGetStringi(GL_EXTENSIONS, i));
+        BX_LOGD((const char*)glGetStringi(GL_EXTENSIONS, i));
     }
 
     GLint maxUniformBufferBindings;
     glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBufferBindings);
-    ENGINE_LOGD("GL Max Uniform Buffer Bindings: {}", maxUniformBufferBindings);
+    BX_LOGD("GL Max Uniform Buffer Bindings: {}", maxUniformBufferBindings);
 }
 
 static bool CompileShader(GLuint& shader, GLenum type, const GLchar* source)
@@ -171,7 +170,7 @@ static bool CompileShader(GLuint& shader, GLenum type, const GLchar* source)
 
     if (!source)
     {
-        ENGINE_LOGE("Failed to compile empty shader");
+        BX_LOGE("Failed to compile empty shader");
         return false;
     }
 
@@ -187,7 +186,7 @@ static bool CompileShader(GLuint& shader, GLenum type, const GLchar* source)
     {
         GLchar* log = static_cast<GLchar*>(malloc(log_length));
         glGetShaderInfoLog(shader, log_length, &log_length, log);
-        if (log) ENGINE_LOGW("Program compile log: {}", log);
+        if (log) BX_LOGW("Program compile log: {}", log);
         free(log);
     }
     //#endif
@@ -215,7 +214,7 @@ static bool LinkProgram(GLuint program)
     {
         GLchar* log = static_cast<GLchar*>(malloc(logLength));
         glGetProgramInfoLog(program, logLength, &logLength, log);
-        if (log) ENGINE_LOGW("Program link log: {}", log);
+        if (log) BX_LOGW("Program link log: {}", log);
         free(log);
     }
     //#endif
@@ -252,14 +251,14 @@ static bool InitializeDebugDraw()
     GLuint vshader;
     if (!CompileShader(vshader, GL_VERTEX_SHADER, vsrc))
     {
-        ENGINE_LOGE("Renderer failed to compile shader!");
+        BX_LOGE("Renderer failed to compile shader!");
         return false;
     }
 
     GLuint pshader;
     if (!CompileShader(pshader, GL_FRAGMENT_SHADER, psrc))
     {
-        ENGINE_LOGE("Renderer failed to compile shader!");
+        BX_LOGE("Renderer failed to compile shader!");
         return false;
     }
 
@@ -270,7 +269,7 @@ static bool InitializeDebugDraw()
     if (!LinkProgram(g_debugShader))
     {
         glDeleteProgram(g_debugShader);
-        ENGINE_LOGE("Renderer failed to link shader program!");
+        BX_LOGE("Renderer failed to link shader program!");
         return false;
     }
 
@@ -282,15 +281,15 @@ bool Graphics::Initialize(void* device)
 {
     GLFWwindow* glfwWindow = (GLFWwindow*)device;
 
-#if defined GRAPHICS_OPENGL_BACKEND
+#if defined BX_GRAPHICS_OPENGL_BACKEND
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        ENGINE_LOGE("Failed to initialize GLAD GL!");
+        BX_LOGE("Failed to initialize GLAD GL!");
         return false;
     }
 #endif
 
-#ifdef GRAPHICS_OPENGLES_BACKEND
+#ifdef BX_GRAPHICS_OPENGLES_BACKEND
     if (!gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress))
     {
         ENGINE_LOGE("Failed to initialize GLAD GLES!");
@@ -298,9 +297,9 @@ bool Graphics::Initialize(void* device)
     }
 #endif
 
-#if defined DEBUG_BUILD || defined EDITOR_BUILD
+#if defined BX_DEBUG_BUILD || defined BX_EDITOR_BUILD
     if (!InitializeGlDebug())
-        ENGINE_LOGW("GL debug output not supported.");
+        BX_LOGW("GL debug output not supported.");
 
     PrintGlInfo();
 #endif
@@ -453,7 +452,7 @@ GraphicsHandle Graphics::CreateShader(const ShaderInfo& info)
         break;
 
     default:
-        ENGINE_LOGE("Shader type not supported!");
+        BX_LOGE("Shader type not supported!");
         return INVALID_GRAPHICS_HANDLE;
     }
 
@@ -464,7 +463,7 @@ GraphicsHandle Graphics::CreateShader(const ShaderInfo& info)
     GLboolean ret = CompileShader(shader_handle, shader_type, psrc);
     if (!ret)
     {
-        ENGINE_LOGE("Renderer failed to compile shader!");
+        BX_LOGE("Renderer failed to compile shader!");
         return INVALID_GRAPHICS_HANDLE;
     }
 
@@ -497,7 +496,7 @@ static GLenum GetTextureFormat(TextureFormat format)
     case TextureFormat::D24_UNORM_S8_UINT: return GL_DEPTH24_STENCIL8;
 
     default:
-        ENGINE_FAIL("Texture format not supported!");
+        BX_FAIL("Texture format not supported!");
         return 0;
     }
 }
@@ -664,7 +663,7 @@ static GLenum GetValueType(GraphicsValueType vt)
         break;
 
     default:
-        ENGINE_LOGE("Value type not supported!");
+        BX_LOGE("Value type not supported!");
         return 0;
     }
 }
@@ -681,7 +680,7 @@ static u32 GetValueSize(GraphicsValueType vt)
         break;
 
     default:
-        ENGINE_LOGE("Value type not supported!");
+        BX_LOGE("Value type not supported!");
         return 0;
     }
 }
@@ -700,7 +699,7 @@ GraphicsHandle Graphics::CreatePipeline(const PipelineInfo& info)
     {
         glDeleteProgram(program_handle);
 
-        ENGINE_LOGE("Renderer failed to link shader program!");
+        BX_LOGE("Renderer failed to link shader program!");
         return INVALID_GRAPHICS_HANDLE;
     }
 
@@ -821,7 +820,7 @@ static bool GetBufferInfo(const BufferInfo& info, GLenum& target, GLenum& usage)
         break;
 
     default:
-        ENGINE_LOGE("Bind flag not supported!");
+        BX_LOGE("Bind flag not supported!");
         return false;
     }
 
@@ -840,7 +839,7 @@ static bool GetBufferInfo(const BufferInfo& info, GLenum& target, GLenum& usage)
         break;
 
     default:
-        ENGINE_LOGE("Usage flag not supported!");
+        BX_LOGE("Usage flag not supported!");
         return false;
     }
 
@@ -946,5 +945,3 @@ void Graphics::DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, 
     glUseProgram(0);
     glBindVertexArray(0);
 }
-
-#endif // GRAPHICS_GL_BACKEND

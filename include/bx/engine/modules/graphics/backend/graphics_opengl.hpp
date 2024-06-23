@@ -1,6 +1,5 @@
 #pragma once
 
-#ifdef GRAPHICS_OPENGL_BACKEND
 #include "bx/engine/modules/graphics.hpp"
 
 #include "bx/engine/containers/string.hpp"
@@ -8,11 +7,11 @@
 
 #include <glad/glad.h>
 
-#ifdef GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
 #define GLSL_VERSION "#version 460 core\n"
 #endif
 
-#ifdef GRAPHICS_OPENGLES_BACKEND
+#ifdef BX_GRAPHICS_OPENGLES_BACKEND
 #define GLSL_VERSION "#version 310 es\n"
 #endif
 
@@ -81,4 +80,3 @@ class GraphicsOpenGL
 public:
     static GLuint GetTextureHandle(GraphicsHandle texture);
 };
-#endif

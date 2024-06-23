@@ -49,20 +49,20 @@ public:
 
 	inline const Resource<Animation>& GetAnimation(SizeType index) const
 	{
-		ENGINE_ENSURE(index < m_animations.size());
+		BX_ENSURE(index < m_animations.size());
 		return m_animations[index];
 	}
 
 	inline void SetAnimation(SizeType index, const Resource<Animation>& anim)
 	{
-		ENGINE_ENSURE(index < m_animations.size());
+		BX_ENSURE(index < m_animations.size());
 		m_animations[index] = anim;
 		RefreshCurrent();
 	}
 
 	inline void RemoveAnimation(SizeType index)
 	{
-		ENGINE_ENSURE(index < m_animations.size());
+		BX_ENSURE(index < m_animations.size());
 		m_animations.erase(m_animations.begin() + index);
 		RefreshCurrent();
 	}

@@ -63,7 +63,7 @@ public:
     inline const Node& GetNode(TreeNodeId nodeId) const
     {
         auto nodeIndex = GetIndex(nodeId);
-        ENGINE_ENSURE(nodeIndex >= 0 || nodeIndex < m_nodes.size());
+        BX_ENSURE(nodeIndex >= 0 || nodeIndex < m_nodes.size());
         return m_nodes[nodeIndex];
     }
 
@@ -72,8 +72,8 @@ public:
         auto parentIndex = GetIndex(parentId);
         auto childIndex = GetIndex(childId);
 
-        ENGINE_ENSURE(parentIndex >= 0 || parentIndex < m_nodes.size());
-        ENGINE_ENSURE(childIndex >= 0 || childIndex < m_nodes.size());
+        BX_ENSURE(parentIndex >= 0 || parentIndex < m_nodes.size());
+        BX_ENSURE(childIndex >= 0 || childIndex < m_nodes.size());
 
         m_nodes[parentIndex].children.emplace_back(childId);
         m_nodes[childIndex].parent = parentId;
@@ -113,7 +113,7 @@ private:
     inline SizeType GetIndex(TreeNodeId nodeId) const
     {
         auto it = m_indices.find(nodeId);
-        ENGINE_ENSURE(it != m_indices.end());
+        BX_ENSURE(it != m_indices.end());
         return it->second;
     }
 
