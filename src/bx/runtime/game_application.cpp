@@ -1,25 +1,25 @@
-#include "Runtime/GameApplication.hpp"
+#include "bx/runtime/game_application.hpp"
 
-#include <Engine/Core/Memory.hpp>
-#include <Engine/Core/Log.hpp>
-#include <Engine/Core/Time.hpp>
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/Profiler.hpp>
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Input.hpp>
-#include <Engine/Core/Module.hpp>
-#include <Engine/Core/Ecs.hpp>
-#include <Engine/Core/Resource.hpp>
-#include <Engine/Modules/Window.hpp>
-#include <Engine/Modules/Graphics.hpp>
-#include <Engine/Modules/Physics.hpp>
-#include <Engine/Modules/Script.hpp>
-#include <Engine/Modules/GameObject.hpp>
-#include <Engine/Modules/ImGui.hpp>
+#include <bx/engine/core/memory.hpp>
+#include <bx/engine/core/log.hpp>
+#include <bx/engine/core/time.hpp>
+#include <bx/engine/core/data.hpp>
+#include <bx/engine/core/profiler.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/input.hpp>
+#include <bx/engine/core/module.hpp>
+#include <bx/engine/core/ecs.hpp>
+#include <bx/engine/core/resource.hpp>
+#include <bx/engine/modules/window.hpp>
+#include <bx/engine/modules/graphics.hpp>
+#include <bx/engine/modules/physics.hpp>
+#include <bx/engine/modules/script.hpp>
+#include <bx/engine/modules/imgui.hpp>
 
-#include <Framework/Systems/Renderer.hpp>
-#include <Framework/Systems/Dynamics.hpp>
-#include <Framework/Systems/Acoustics.hpp>
+#include <bx/framework/systems/renderer.hpp>
+#include <bx/framework/systems/dynamics.hpp>
+#include <bx/framework/systems/acoustics.hpp>
+#include <bx/framework/gameobject.hpp>
 
 static bool s_running = true;
 
