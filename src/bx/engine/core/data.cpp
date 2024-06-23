@@ -1,9 +1,9 @@
-#include "Engine/Core/Data.hpp"
+#include "bx/engine/core/Data.hpp"
 
-#include "Engine/Core/Log.hpp"
-#include "Engine/Core/Math.hpp"
-#include "Engine/Core/File.hpp"
-#include "Engine/Containers/HashMap.serial.hpp"
+#include "bx/engine/core/Log.hpp"
+#include "bx/engine/core/Math.hpp"
+#include "bx/engine/core/File.hpp"
+#include "bx/engine/containers/hash_map.serial.hpp"
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/json.hpp>

@@ -1,6 +1,6 @@
-#include "Editor/Views/GameObjectView.hpp"
+#include "bx/editor/views/gameobject_view.hpp"
 
-#include <Engine/Modules/GameObject.hpp>
+#include <bx/framework/gameobject.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>

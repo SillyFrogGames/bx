@@ -1,7 +1,7 @@
-#include "Editor/Core/Command.hpp"
+#include "bx/editor/core/command.hpp"
 
-#include <Engine/Core/ByteTypes.hpp>
-#include <Engine/Containers/List.hpp>
+#include <bx/engine/core/byte_types.hpp>
+#include <bx/engine/containers/list.hpp>
 
 static List<ICommand*> g_commands;
 static SizeType g_current = 0;

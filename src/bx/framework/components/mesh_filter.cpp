@@ -1,5 +1,5 @@
-#include "Framework/Components/MeshFilter.hpp"
-#include "Framework/Components/MeshFilter.serial.hpp"
+#include "bx/framework/components/mesh_filter.hpp"
+#include "bx/framework/components/mesh_filter.serial.hpp"
 
 MeshFilter::MeshFilter()
 {

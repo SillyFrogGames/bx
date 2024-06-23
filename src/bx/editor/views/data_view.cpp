@@ -1,9 +1,9 @@
-#include "Editor/Views/DataView.hpp"
+#include "bx/editor/views/data_view.hpp"
 
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/File.hpp>
-#include <Engine/Containers/List.hpp>
-#include <Engine/Containers/HashMap.hpp>
+#include <bx/engine/core/data.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/containers/list.hpp>
+#include <bx/engine/containers/hash_map.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>

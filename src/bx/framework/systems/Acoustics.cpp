@@ -1,4 +1,4 @@
-#include "Framework/Systems/Acoustics.hpp"
+#include "bx/framework/systems/acoustics.hpp"
 
 void Acoustics::Initialize()
 {

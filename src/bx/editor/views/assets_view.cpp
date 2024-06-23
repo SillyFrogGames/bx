@@ -1,16 +1,17 @@
-#include "Editor/Views/AssetsView.hpp"
+#include "bx/editor/views/assets_view.hpp"
 
-#include "Editor/Core/Assets.hpp"
-#include "Editor/Core/Selection.hpp"
-#include "Editor/Core/AssetImporter.hpp"
+#include "bx/Editor/core/assets.hpp"
+#include "bx/Editor/core/selection.hpp"
+#include "bx/Editor/core/asset_importer.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Time.hpp>
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/Macros.hpp>
-#include <Engine/Core/Resource.hpp>
-#include <Engine/Modules/Graphics.hpp>
-#include <Engine/Modules/GameObject.hpp>
+#include <bx/engine/core/File.hpp>
+#include <bx/engine/core/Time.hpp>
+#include <bx/engine/core/Data.hpp>
+#include <bx/engine/core/Macros.hpp>
+#include <bx/engine/core/Resource.hpp>
+#include <bx/engine/modules/Graphics.hpp>
+
+#include <bx/framework/gameobject.hpp>
 
 #include <cstring>
 #include <fstream>

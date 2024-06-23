@@ -1,6 +1,6 @@
-#include "Editor/Views/ConsoleView.hpp"
+#include "bx/editor/views/console_view.hpp"
 
-#include <Engine/Core/Macros.hpp>
+#include <bx/engine/core/macros.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>

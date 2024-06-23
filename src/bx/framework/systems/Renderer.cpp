@@ -1,19 +1,19 @@
-#include "Framework/Systems/Renderer.hpp"
+#include "bx/framework/systems/renderer.hpp"
 
-#include "Framework/Components/Transform.hpp"
-#include "Framework/Components/Camera.hpp"
-#include "Framework/Components/MeshFilter.hpp"
-#include "Framework/Components/MeshRenderer.hpp"
-#include "Framework/Components/Animator.hpp"
-#include "Framework/Components/Light.hpp"
+#include "bx/framework/components/transform.hpp"
+#include "bx/framework/components/camera.hpp"
+#include "bx/framework/components/mesh_filter.hpp"
+#include "bx/framework/components/mesh_renderer.hpp"
+#include "bx/framework/components/animator.hpp"
+#include "bx/framework/components/light.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/Profiler.hpp>
-#include <Engine/Core/Resource.hpp>
-#include <Engine/Containers/Tree.hpp>
-#include <Engine/Modules/Graphics.hpp>
-#include <Engine/Modules/Window.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/data.hpp>
+#include <bx/engine/core/profiler.hpp>
+#include <bx/engine/core/resource.hpp>
+#include <bx/engine/containers/tree.hpp>
+#include <bx/engine/modules/graphics.hpp>
+#include <bx/engine/modules/window.hpp>
 
 struct ViewData
 {

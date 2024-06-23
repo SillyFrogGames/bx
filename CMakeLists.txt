@@ -82,8 +82,7 @@ else ()
 endif ()
 # ---------------------------------------
 
-add_compile_definitions (GAME_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Game")
-add_compile_definitions (ENGINE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/Project")
+add_compile_definitions (ENGINE_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (ENGINE_BUILD_EDITOR)
     add_compile_definitions (EDITOR_BUILD)

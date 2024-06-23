@@ -1,7 +1,7 @@
-#include "Editor/Gizmos/TransformGizmo.hpp"
+#include "bx/editor/gizmos/transform_gizmo.hpp"
 
-#include <imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 #include <IconsFontAwesome5.h>

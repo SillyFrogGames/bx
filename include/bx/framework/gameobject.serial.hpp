@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bx/engine/modules/gameobject.hpp>
+#include "bx/framework/gameobject.hpp"
 
 #include <bx/engine/core/serial.serial.hpp>
 #include <bx/engine/core/ecs.serial.hpp>

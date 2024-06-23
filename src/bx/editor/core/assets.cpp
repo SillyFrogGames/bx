@@ -1,8 +1,8 @@
-#include "Editor/Core/Assets.hpp"
+#include "bx/editor/core/assets.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Thread.hpp>
-#include <Engine/Containers/HashMap.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/thread.hpp>
+#include <bx/engine/containers/hash_map.hpp>
 
 static Tree<Asset> g_assetTree;
 static Tree<Asset> g_assetTreeCopy;

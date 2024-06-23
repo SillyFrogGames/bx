@@ -1,5 +1,5 @@
-#include "Framework/Components/Spline.hpp"
-#include "Framework/Components/Spline.serial.hpp"
+#include "bx/framework/components/spline.hpp"
+#include "bx/framework/components/spline.serial.hpp"
 
 Spline::Spline()
 {

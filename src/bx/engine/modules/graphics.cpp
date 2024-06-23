@@ -1,10 +1,10 @@
-#include "Engine/Modules/Graphics.hpp"
+#include "bx/engine/modules/graphics.hpp"
 
-#include "Engine/Core/Log.hpp"
-#include "Engine/Core/Guard.hpp"
-#include "Engine/Core/File.hpp"
-#include "Engine/Core/Profiler.hpp"
-#include "Engine/Containers/Pool.hpp"
+#include "bx/engine/core/log.hpp"
+#include "bx/engine/core/guard.hpp"
+#include "bx/engine/core/file.hpp"
+#include "bx/engine/core/profiler.hpp"
+#include "bx/engine/containers/pool.hpp"
 
 struct DebugLineData
 {

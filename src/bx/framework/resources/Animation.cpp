@@ -1,9 +1,9 @@
-#include "Framework/Resources/Animation.hpp"
+#include "bx/framework/resources/animation.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Modules/Graphics.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/modules/graphics.hpp>
 
-#include "Framework/Resources/Animation.serial.hpp"
+#include "bx/framework/resources/animation.serial.hpp"
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>

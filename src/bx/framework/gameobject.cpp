@@ -1,15 +1,15 @@
-#include "Engine/Modules/GameObject.hpp"
+#include "bx/framework/gameobject.hpp"
 
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/File.hpp"
-#include "Engine/Core/Application.hpp"
-#include "Engine/Containers/HashMap.hpp"
+#include <bx/engine/core/macros.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/application.hpp>
+#include <bx/engine/containers/hash_map.hpp>
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/polymorphic.hpp>
 
-#include "Engine/Modules/GameObject.serial.hpp"
+#include "bx/framework/gameobject.serial.hpp"
 
 #include <cstring>
 #include <fstream>

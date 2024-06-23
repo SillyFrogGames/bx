@@ -1,22 +1,22 @@
-#include "Editor/Core/AssetImporter.hpp"
+#include "bx/editor/core/asset_importer.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Resource.hpp>
-#include <Engine/Containers/List.hpp>
-#include <Engine/Containers/HashMap.hpp>
-#include <Engine/Modules/Graphics.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/resource.hpp>
+#include <bx/engine/containers/list.hpp>
+#include <bx/engine/containers/hash_map.hpp>
+#include <bx/engine/modules/graphics.hpp>
 
-#include <Framework/Resources/Animation.hpp>
-#include <Framework/Resources/Material.hpp>
-#include <Framework/Resources/Mesh.hpp>
-#include <Framework/Resources/Shader.hpp>
-#include <Framework/Resources/Skeleton.hpp>
-#include <Framework/Resources/Texture.hpp>
+#include <bx/framework/resources/animation.hpp>
+#include <bx/framework/resources/material.hpp>
+#include <bx/framework/resources/mesh.hpp>
+#include <bx/framework/resources/shader.hpp>
+#include <bx/framework/resources/skeleton.hpp>
+#include <bx/framework/resources/texture.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image.h>
-#include <stb_image_resize.h>
+#include <stb_image_resize2.h>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

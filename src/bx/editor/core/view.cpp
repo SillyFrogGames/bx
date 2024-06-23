@@ -1,6 +1,6 @@
-#include "Editor/Core/View.hpp"
+#include "bx/editor/core/view.hpp"
 
-#include <Engine/Containers/List.hpp>
+#include <bx/engine/containers/list.hpp>
 
 struct InspectorView
 {

@@ -1,8 +1,8 @@
-#include "Engine/Modules/Window.hpp"
+#include "bx/engine/modules/window.hpp"
 
-#include "Engine/Core/Log.hpp"
-#include "Engine/Core/Data.hpp"
-#include "Engine/Core/Profiler.hpp"
+#include "bx/engine/core/log.hpp"
+#include "bx/engine/core/data.hpp"
+#include "bx/engine/core/profiler.hpp"
 
 #include <stdlib.h>
 

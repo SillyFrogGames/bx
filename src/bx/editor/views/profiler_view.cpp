@@ -1,9 +1,9 @@
-#include "Editor/Views/ProfilerView.hpp"
+#include "bx/editor/views/profiler_view.hpp"
 
-#include <Engine/Core/Math.hpp>
-#include <Engine/Core/Profiler.hpp>
-#include <Engine/Core/Time.hpp>
-#include <Engine/Containers/List.hpp>
+#include <bx/engine/core/math.hpp>
+#include <bx/engine/core/profiler.hpp>
+#include <bx/engine/core/time.hpp>
+#include <bx/engine/containers/list.hpp>
 
 #include <imgui.h>
 #include <implot.h>

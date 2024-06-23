@@ -1,41 +1,41 @@
-#include "Editor/Views/SceneView.hpp"
+#include "bx/editor/views/scene_view.hpp"
 
-#include "Editor/Core/Selection.hpp"
-#include "Editor/Gizmos/TransformGizmo.hpp"
+#include "bx/editor/core/selection.hpp"
+#include "bx/editor/gizmos/transform_gizmo.hpp"
 
-#include <Engine/Core/Input.hpp>
-#include <Engine/Core/Ecs.hpp>
-#include <Engine/Core/Time.hpp>
-#include <Engine/Core/File.hpp>
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/Inspector.hpp>
-#include <Engine/Modules/Window.hpp>
-#include <Engine/Modules/Graphics.hpp>
-#include <Engine/Modules/Physics.hpp>
-#include <Engine/Modules/GameObject.hpp>
+#include <bx/engine/core/input.hpp>
+#include <bx/engine/core/ecs.hpp>
+#include <bx/engine/core/time.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/core/data.hpp>
+#include <bx/engine/core/inspector.hpp>
+#include <bx/engine/modules/window.hpp>
+#include <bx/engine/modules/graphics.hpp>
+#include <bx/engine/modules/physics.hpp>
 
 #ifdef GRAPHICS_OPENGL_BACKEND
-#include <Engine/Modules/Graphics/GraphicsOpenGL.hpp>
+#include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
 
-#include <Framework/Components/Transform.hpp>
-#include <Framework/Components/Camera.hpp>
-#include <Framework/Components/MeshFilter.hpp>
-#include <Framework/Components/MeshRenderer.hpp>
-#include <Framework/Components/Animator.hpp>
-#include <Framework/Components/Collider.hpp>
-#include <Framework/Components/RigidBody.hpp>
-#include <Framework/Components/CharacterController.hpp>
-#include <Framework/Systems/Renderer.hpp>
-#include <Framework/Systems/Dynamics.hpp>
-#include <Framework/Systems/Acoustics.hpp>
+#include <bx/framework/components/transform.hpp>
+#include <bx/framework/components/camera.hpp>
+#include <bx/framework/components/mesh_filter.hpp>
+#include <bx/framework/components/mesh_renderer.hpp>
+#include <bx/framework/components/animator.hpp>
+#include <bx/framework/components/collider.hpp>
+#include <bx/framework/components/rigidbody.hpp>
+#include <bx/framework/components/character_controller.hpp>
+#include <bx/framework/systems/renderer.hpp>
+#include <bx/framework/systems/dynamics.hpp>
+#include <bx/framework/systems/acoustics.hpp>
+#include <bx/framework/gameobject.hpp>
 
 #include <cstring>
 #include <fstream>
 #include <sstream>
 
-#include <imgui.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui.h>
 #include <imgui_internal.h>
 #include <ImGuizmo.h>
 #include <IconsFontAwesome5.h>

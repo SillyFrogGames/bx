@@ -1,5 +1,5 @@
-#include "Engine/Core/Resource.hpp"
-#include "Engine/Core/Resource.serial.hpp"
+#include "bx/engine/core/resource.hpp"
+#include "bx/engine/core/resource.serial.hpp"
 
 static HashMap<ResourceHandle, SizeType> g_refCountMap;
 

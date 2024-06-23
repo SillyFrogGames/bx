@@ -1,5 +1,5 @@
-#include "Framework/Components/CharacterController.hpp"
-#include "Framework/Components/CharacterController.serial.hpp"
+#include "bx/framework/components/character_controller.hpp"
+#include "bx/framework/components/character_controller.serial.hpp"
 
 CharacterController::CharacterController()
 {

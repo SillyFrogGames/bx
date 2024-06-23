@@ -1,5 +1,5 @@
-#include "Framework/Components/AudioListener.hpp"
-#include "Framework/Components/AudioListener.serial.hpp"
+#include "bx/framework/components/audio_listener.hpp"
+#include "bx/framework/components/audio_listener.serial.hpp"
 
 AudioListener::AudioListener()
 {

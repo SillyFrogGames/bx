@@ -6,7 +6,7 @@
 #include <bx/engine/core/ecs.hpp>
 #include <bx/engine/core/math.hpp>
 #include <bx/engine/core/resource.hpp>
-#include <bx/engine/modules/graphics/graphics.hpp>
+#include <bx/engine/modules/graphics.hpp>
 
 class Animator : public Component<Animator>
 {

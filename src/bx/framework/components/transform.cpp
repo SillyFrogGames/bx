@@ -1,5 +1,5 @@
-#include "Framework/Components/Transform.hpp"
-#include "Framework/Components/Transform.serial.hpp"
+#include "bx/framework/components/transform.hpp"
+#include "bx/framework/components/transform.serial.hpp"
 
 Transform::Transform()
 {

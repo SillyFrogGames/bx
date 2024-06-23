@@ -1,10 +1,10 @@
 #ifdef GRAPHICS_OPENGL_BACKEND
-#include "Engine/Modules/Graphics/GraphicsOpenGL.hpp"
+#include "bx/engine/modules/graphics/backend/graphics_opengl.hpp"
 
-#include "Engine/Core/File.hpp"
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/Profiler.hpp"
-#include "Engine/Modules/Window.hpp"
+#include "bx/engine/core/file.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/profiler.hpp"
+#include "bx/engine/modules/window.hpp"
 
 // TODO: Temp should be replaced by Window.hpp completely
 #include <GLFW/glfw3.h>

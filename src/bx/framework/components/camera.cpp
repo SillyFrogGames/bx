@@ -1,5 +1,5 @@
-#include "Framework/Components/Camera.hpp"
-#include "Framework/Components/Camera.serial.hpp"
+#include "bx/framework/components/camera.hpp"
+#include "bx/framework/components/camera.serial.hpp"
 
 Camera::Camera()
 {

@@ -1,9 +1,9 @@
-#include "Framework/Systems/Dynamics.hpp"
+#include "bx/framework/systems/dynamics.hpp"
 
-#include "Framework/Components/Transform.hpp"
-#include "Framework/Components/Collider.hpp"
-#include "Framework/Components/RigidBody.hpp"
-#include "Framework/Components/CharacterController.hpp"
+#include "bx/framework/components/transform.hpp"
+#include "bx/framework/components/collider.hpp"
+#include "bx/framework/components/rigidbody.hpp"
+#include "bx/framework/components/character_controller.hpp"
 
 void Dynamics::Initialize()
 {

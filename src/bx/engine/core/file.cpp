@@ -1,8 +1,8 @@
-#include "Engine/Core/File.hpp"
+#include "bx/engine/core/file.hpp"
 
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/Guard.hpp"
-#include "Engine/Containers/HashMap.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/guard.hpp"
+#include "bx/engine/containers/hash_map.hpp"
 
 #if defined(PLATFORM_PC)
 #include <windows.h>

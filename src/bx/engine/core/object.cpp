@@ -1,8 +1,8 @@
-#include "Engine/Core/Object.hpp"
+#include "bx/engine/core/object.hpp"
 
-#include "Engine/Core/Memory.hpp"
-#include "Engine/Containers/List.hpp"
-#include "Engine/Containers/HashMap.hpp"
+#include "bx/engine/core/memory.hpp"
+#include "bx/engine/containers/list.hpp"
+#include "bx/engine/containers/hash_map.hpp"
 
 #include <unordered_map>
 

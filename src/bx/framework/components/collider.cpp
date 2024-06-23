@@ -1,5 +1,5 @@
-#include "Framework/Components/Collider.hpp"
-#include "Framework/Components/Collider.serial.hpp"
+#include "bx/framework/components/collider.hpp"
+#include "bx/framework/components/collider.serial.hpp"
 
 Collider::Collider()
 {

@@ -1,7 +1,7 @@
-#include "Framework/Components/Animator.hpp"
-#include "Framework/Components/Animator.serial.hpp"
+#include "bx/framework/components/animator.hpp"
+#include "bx/framework/components/animator.serial.hpp"
 
-#include <Engine/Core/Time.hpp>
+#include <bx/engine/core/time.hpp>
 
 #define ENABLE_INTERPOLATION
 

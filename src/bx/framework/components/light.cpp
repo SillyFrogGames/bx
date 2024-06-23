@@ -1,5 +1,5 @@
-#include "Framework/Components/Light.hpp"
-#include "Framework/Components/Light.serial.hpp"
+#include "bx/framework/components/light.hpp"
+#include "bx/framework/components/light.serial.hpp"
 
 Light::Light()
 {

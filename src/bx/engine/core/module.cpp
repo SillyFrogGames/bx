@@ -1,5 +1,5 @@
-#include "Engine/Core/Module.hpp"
-#include "Engine/Containers/List.hpp"
+#include "bx/engine/core/module.hpp"
+#include "bx/engine/containers/list.hpp"
 
 struct ModuleHandle
 {

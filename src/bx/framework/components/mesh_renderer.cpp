@@ -1,5 +1,5 @@
-#include "Framework/Components/MeshRenderer.hpp"
-#include "Framework/Components/MeshRenderer.serial.hpp"
+#include "bx/framework/components/mesh_renderer.hpp"
+#include "bx/framework/components/mesh_renderer.serial.hpp"
 
 MeshRenderer::MeshRenderer()
 {

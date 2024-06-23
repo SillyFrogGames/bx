@@ -1,5 +1,5 @@
-#include "Framework/Components/Attributes.hpp"
-#include "Framework/Components/Attributes.serial.hpp"
+#include "bx/framework/components/attributes.hpp"
+#include "bx/framework/components/attributes.serial.hpp"
 
 Attributes::Attributes()
 {

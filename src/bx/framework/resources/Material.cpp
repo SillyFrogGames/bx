@@ -1,8 +1,8 @@
-#include "Framework/Resources/Material.hpp"
-#include "Framework/Resources/Material.serial.hpp"
+#include "bx/framework/resources/material.hpp"
+#include "bx/framework/resources/material.serial.hpp"
 
-#include <Engine/Core/File.hpp>
-#include <Engine/Modules/Graphics.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/modules/graphics.hpp>
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>

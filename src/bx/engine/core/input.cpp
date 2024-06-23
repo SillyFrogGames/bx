@@ -1,8 +1,8 @@
-#include "Engine/Core/Input.hpp"
+#include "bx/engine/core/input.hpp"
 
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/Guard.hpp"
-#include "Engine/Core/Profiler.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/guard.hpp"
+#include "bx/engine/core/profiler.hpp"
 
 #include <GLFW/glfw3.h>
 

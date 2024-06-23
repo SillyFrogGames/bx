@@ -1,22 +1,24 @@
-#include "Editor/Core/Toolbar.hpp"
+#include "bx/editor/core/toolbar.hpp"
 
-#include "Editor/Views/ProfilerView.hpp"
-#include "Editor/Views/DataView.hpp"
-#include "Editor/Views/SceneView.hpp"
-#include "Editor/Views/InspectorView.hpp"
-#include "Editor/Views/AssetsView.hpp"
-#include "Editor/Views/SettingsView.hpp"
-#include "Editor/Views/GameObjectView.hpp"
-#include "Editor/Views/ConsoleView.hpp"
+#include "bx/editor/views/profiler_view.hpp"
+#include "bx/editor/views/data_view.hpp"
+#include "bx/editor/views/scene_view.hpp"
+#include "bx/editor/views/inspector_view.hpp"
+#include "bx/editor/views/assets_view.hpp"
+#include "bx/editor/views/settings_view.hpp"
+#include "bx/editor/views/gameobject_view.hpp"
+#include "bx/editor/views/console_view.hpp"
 
-#include <Engine/Core/Time.hpp>
-#include <Engine/Core/Version.hpp>
-#include <Engine/Core/Data.hpp>
-#include <Engine/Core/Application.hpp>
-#include <Engine/Modules/Window.hpp>
-#include <Engine/Modules/Script.hpp>
-#include <Engine/Modules/GameObject.hpp>
+#include <bx/engine/core/time.hpp>
+#include <bx/engine/core/version.hpp>
+#include <bx/engine/core/data.hpp>
+#include <bx/engine/core/application.hpp>
+#include <bx/engine/modules/window.hpp>
+#include <bx/engine/modules/script.hpp>
 
+#include <bx/framework/gameobject.hpp>
+
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>

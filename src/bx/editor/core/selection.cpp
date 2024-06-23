@@ -1,4 +1,4 @@
-#include "Editor/Core/Selection.hpp"
+#include "bx/editor/core/selection.hpp"
 
 static ObjectRef s_selected = ObjectRef::Invalid();
 

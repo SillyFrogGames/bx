@@ -1,4 +1,4 @@
-#include "Engine/Core/Time.hpp"
+#include "bx/engine/core/time.hpp"
 
 static Timer s_timer;
 static float s_time = 0;

@@ -1,9 +1,9 @@
 #ifdef WINDOW_GLFW_BACKEND
-#include "Engine/Modules/Window.hpp"
+#include "bx/engine/modules/window.hpp"
 
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/Data.hpp"
-#include "Engine/Core/Profiler.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/data.hpp"
+#include "bx/engine/core/profiler.hpp"
 
 #include <GLFW/glfw3.h>
 #include <stdlib.h>

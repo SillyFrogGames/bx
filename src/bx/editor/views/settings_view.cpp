@@ -1,4 +1,4 @@
-#include "Editor/Views/SettingsView.hpp"
+#include "bx/editor/views/settings_view.hpp"
 
 #include <imgui.h>
 #include <imgui_internal.h>

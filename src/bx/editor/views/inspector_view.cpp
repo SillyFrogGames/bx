@@ -1,26 +1,26 @@
-#include "Editor/Views/InspectorView.hpp"
+#include "bx/editor/views/inspector_view.hpp"
 
-#include "Editor/Core/Assets.hpp"
-#include "Editor/Core/Selection.hpp"
-#include "Editor/Views/SceneView.hpp"
-#include "Editor/Views/AssetsView.hpp"
+#include "bx/editor/core/assets.hpp"
+#include "bx/editor/core/selection.hpp"
+#include "bx/editor/views/scene_view.hpp"
+#include "bx/editor/views/assets_view.hpp"
 
-#include <Engine/Core/Ecs.hpp>
-#include <Engine/Core/Inspector.hpp>
-#include <Engine/Modules/GameObject.hpp>
+#include <bx/engine/core/ecs.hpp>
+#include <bx/engine/core/inspector.hpp>
 
-#include <Framework/Components/Animator.hpp>
-#include <Framework/Components/AudioListener.hpp>
-#include <Framework/Components/AudioSource.hpp>
-#include <Framework/Components/Camera.hpp>
-#include <Framework/Components/CharacterController.hpp>
-#include <Framework/Components/Collider.hpp>
-#include <Framework/Components/Light.hpp>
-#include <Framework/Components/MeshFilter.hpp>
-#include <Framework/Components/MeshRenderer.hpp>
-#include <Framework/Components/RigidBody.hpp>
-#include <Framework/Components/Spline.hpp>
-#include <Framework/Components/Transform.hpp>
+#include <bx/framework/gameobject.hpp>
+#include <bx/framework/components/animator.hpp>
+#include <bx/framework/components/audio_listener.hpp>
+#include <bx/framework/components/audio_source.hpp>
+#include <bx/framework/components/camera.hpp>
+#include <bx/framework/components/character_controller.hpp>
+#include <bx/framework/components/collider.hpp>
+#include <bx/framework/components/light.hpp>
+#include <bx/framework/components/mesh_filter.hpp>
+#include <bx/framework/components/mesh_renderer.hpp>
+#include <bx/framework/components/rigidbody.hpp>
+#include <bx/framework/components/spline.hpp>
+#include <bx/framework/components/transform.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>

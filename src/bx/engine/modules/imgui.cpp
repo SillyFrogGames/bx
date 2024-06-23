@@ -1,14 +1,14 @@
-#include "Engine/Modules/ImGui.hpp"
+#include "bx/engine/modules/imgui.hpp"
 
-#include "Engine/Core/Macros.hpp"
-#include "Engine/Core/File.hpp"
-#include "Engine/Core/Profiler.hpp"
-#include "Engine/Modules/Graphics.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/file.hpp"
+#include "bx/engine/core/profiler.hpp"
+#include "bx/engine/modules/graphics.hpp"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
 //#define IMGUI_CUSTOM_IMPL
-
 // TODO: This is a temporary patch to make imgui work while the custom implementation is being built
 #ifndef IMGUI_CUSTOM_IMPL
 

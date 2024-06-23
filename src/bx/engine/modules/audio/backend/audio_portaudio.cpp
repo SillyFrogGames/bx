@@ -1,6 +1,6 @@
-#include "Engine/Modules/Audio.hpp"
+#include "bx/engine/modules/audio.hpp"
 
-#include "Engine/Core/Macros.hpp"
+#include "bx/engine/core/macros.hpp"
 
 #include <stdio.h>
 #include <math.h>

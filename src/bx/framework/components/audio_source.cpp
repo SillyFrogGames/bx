@@ -1,5 +1,5 @@
-#include "Framework/Components/AudioSource.hpp"
-#include "Framework/Components/AudioSource.serial.hpp"
+#include "bx/framework/components/audio_source.hpp"
+#include "bx/framework/components/audio_source.serial.hpp"
 
 AudioSource::AudioSource()
 {

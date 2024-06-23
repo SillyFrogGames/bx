@@ -14,7 +14,7 @@ set (SKIP_PERFORMANCE_COMPARISON ON)
 add_subdirectory (cereal)
 
 # FMT lib
-set(FMT_MODULE ON)
+#set(FMT_MODULE ON)
 
 add_subdirectory (fmt)
 

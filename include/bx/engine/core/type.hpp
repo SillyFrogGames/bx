@@ -3,7 +3,7 @@
 #include "bx/engine/core/byte_types.hpp"
 #include "bx/engine/core/meta.hpp"
 #include "bx/engine/core/hash.hpp"
-#include "bx/engine/containers/`string.hpp"
+#include "bx/engine/containers/string.hpp"
 
 #include <wnaabi/type_info.hpp>
 
@@ -47,7 +47,7 @@ public:
 
 // Enum -----------------------------------------------
 
-#include "Engine/Containers/List.hpp"
+#include "bx/engine/containers/list.hpp"
 
 //#include <cereal/cereal.hpp>
 namespace cereal { class access; }

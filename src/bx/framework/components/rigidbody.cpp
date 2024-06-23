@@ -1,5 +1,5 @@
-#include "Framework/Components/RigidBody.hpp"
-#include "Framework/Components/RigidBody.serial.hpp"
+#include "bx/framework/components/rigidbody.hpp"
+#include "bx/framework/components/rigidbody.serial.hpp"
 
 RigidBody::RigidBody()
 {
