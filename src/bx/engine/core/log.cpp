@@ -13,7 +13,7 @@ static std::vector<LogEntry> g_entries;
 
 void Log::Print(LogLevel level, const String& message)
 {
-	fmt::print(message + "\n");
+	std::cout << message << std::endl;
 
 	if (level == LogLevel::LOG_DEBUG)
 		return;

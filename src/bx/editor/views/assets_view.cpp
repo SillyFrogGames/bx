@@ -109,7 +109,11 @@ static void ProcessFolderImport(TreeNodeId id, const Asset& asset)
 		const auto& child = AssetManager::GetAssetTree().GetNode(childId);
 		const auto& childAsset = child.data;
 
-		bool isModel = childAsset.extension == "glb" || childAsset.extension == "fbx";
+		bool isModel =
+			childAsset.extension == "glb" ||
+			childAsset.extension == "fbx" ||
+			childAsset.extension == "obj";
+
 		if (isModel)
 		{
 			AssetImporter::ImportModel(childAsset.path);
@@ -134,7 +138,11 @@ static void ProcessAssetContextMenu(TreeNodeId id, const Asset& asset)
 	}
 	else
 	{
-		bool isModel = asset.extension == "glb" || asset.extension == "fbx";
+		bool isModel =
+			asset.extension == "glb" ||
+			asset.extension == "fbx" ||
+			asset.extension == "obj";
+
 		if (isModel && ImGui::MenuItem("Import"))
 		{
 			AssetImporter::ImportModel(asset.path);
