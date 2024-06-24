@@ -118,6 +118,11 @@ static void APIENTRY DebugCallback(GLenum source, GLenum type, u32 id, GLenum se
 
 static bool InitializeGlDebug()
 {
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* version = glGetString(GL_VERSION);
+    BX_LOGD("Renderer: {}", (const char*)renderer);
+    BX_LOGD("OpenGL version supported: {}", (const char*)version);
+
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     i32 flags;
     glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -563,6 +568,7 @@ GraphicsHandle Graphics::CreateTexture(const TextureInfo& info, const BufferData
     glTextureSubImage2D(texture_impl.texture, 0, 0, 0, info.width, info.height, format, type, data.pData);
     glGenerateTextureMipmap(texture_impl.texture);
     
+    BX_ENSURE(glGetTextureSamplerHandleARB != nullptr);
     texture_impl.handle = glGetTextureSamplerHandleARB(texture_impl.texture, texture_impl.sampler);
     glMakeTextureHandleResidentARB(texture_impl.handle);
 #endif

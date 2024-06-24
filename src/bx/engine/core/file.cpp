@@ -19,7 +19,11 @@
 
 #elif defined(BX_PLATFORM_LINUX)
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <pwd.h>
 #endif
 
 #include <cassert>
@@ -56,8 +60,8 @@ void File::Initialize()
 {
 #if defined(BX_PLATFORM_PC) || defined(BX_PLATFORM_LINUX)
 	AddWildcard("[game]", GAME_PATH);
-	AddWildcard("[assets]", GAME_PATH"/Assets");
-	AddWildcard("[settings]", GAME_PATH"/Settings");
+	AddWildcard("[assets]", GAME_PATH"/assets");
+	AddWildcard("[settings]", GAME_PATH"/settings");
 
 	// All platforms
 	if (!Exists("[settings]/.ini"))
@@ -83,6 +87,17 @@ void File::Initialize()
 	if (pValue != nullptr)
 	{
 		String save_path = String(pValue) + "/" + gameStr + "/";
+		if (!Exists(save_path))
+			CreateDirectory(save_path);
+
+		AddWildcard("[save]", save_path);
+	}
+
+#elif defined(BX_PLATFORM_LINUX)
+	const char* homeDir = std::getenv("HOME");
+	if (homeDir)
+	{
+		String save_path = String(homeDir) + "/" + gameStr + "/";
 		if (!Exists(save_path))
 			CreateDirectory(save_path);
 
@@ -293,8 +308,18 @@ bool File::CreateDirectory(const String& path)
 	case ERROR_PATH_NOT_FOUND: BX_LOGE("Directory path not found, failed to create!"); break;
 	}
 	return ret;
-#elif defined(BX_BX_PLATFORM_LINUX)
-	BX_ASSERT(false, "Create directory not supported!");
+
+#elif defined(BX_PLATFORM_LINUX)
+	int ret = mkdir(path.c_str(), 0755);
+    if (ret == 0)
+        return true;
+
+	switch (errno)
+	{
+	case EEXIST: BX_LOGE("Directory already exists, failed to create!"); break;
+	case ENOENT: BX_LOGE("Directory path not found, failed to create!"); break;
+	default: BX_LOGE("Failed to create directory: %s", strerror(errno)); break;
+	}
 	return false;
 #else
 	BX_ASSERT(false, "Create directory not supported!");
