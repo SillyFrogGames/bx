@@ -5,7 +5,7 @@
 #include "bx/engine/core/hash.hpp"
 #include "bx/engine/containers/string.hpp"
 
-#include <wnaabi/type_info.hpp>
+//#include <wnaabi/type_info.hpp>
 
 using TypeId = SizeType;
 constexpr TypeId INVALID_TYPEID = -1;
@@ -26,7 +26,8 @@ private:
 
 	static String ClassName()
 	{
-		return wnaabi::type_info<TType>::name_tokens(wnaabi::runtime_visitors::stringify_t{}).str;
+		//return wnaabi::type_info<TType>::name_tokens(wnaabi::runtime_visitors::stringify_t{}).str;
+		return String(__PRETTY_FUNCTION__);
 	}
 };
 
@@ -36,12 +37,14 @@ class Type
 public:
 	static TypeId Id()
 	{
-		return TypeImpl<meta::decay_t<TType>>::Id();
+		//return TypeImpl<meta::decay_t<TType>>::Id();
+		return TypeImpl<TType>::Id();
 	}
 
 	static String ClassName()
 	{
-		return TypeImpl<meta::decay_t<TType>>::ClassName();
+		//return TypeImpl<meta::decay_t<TType>>::ClassName();
+		return TypeImpl<TType>::ClassName();
 	}
 };
 

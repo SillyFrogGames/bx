@@ -88,7 +88,11 @@ target_link_libraries(bullet3 Bullet3Collision Bullet3Dynamics LinearMath)
 target_include_directories (bullet3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/bullet3/src)
 
 
-if(WINDOW_BACKEND STREQUAL "GLFW")
+if (BX_WINDOW_BACKEND STREQUAL "GLFW")
+	if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		set (GLFW_BUILD_WAYLAND OFF)
+	endif ()
+
     # GLFW lib
 	add_subdirectory (glfw)
 
@@ -97,9 +101,9 @@ if(WINDOW_BACKEND STREQUAL "GLFW")
 	target_link_libraries (imgui_glfw glfw)
 	target_include_directories (imgui_glfw PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 
-endif()
+endif ()
 
-if(GRAPHICS_BACKEND STREQUAL "OpenGL")
+if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
     # GLAD lib
 	add_subdirectory (glad)
 
@@ -107,7 +111,7 @@ if(GRAPHICS_BACKEND STREQUAL "OpenGL")
 	add_library (imgui_opengl3 STATIC "imgui/backends/imgui_impl_opengl3.cpp")
 	target_include_directories (imgui_opengl3 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 
-elseif(GRAPHICS_BACKEND STREQUAL "Vulkan")
+elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
     # Vulkan
 	find_package(Vulkan REQUIRED)
 	add_library(vulkan INTERFACE)
@@ -119,9 +123,9 @@ elseif(GRAPHICS_BACKEND STREQUAL "Vulkan")
 	#set (BUILD_SHARED_LIBS OFF)
 	add_subdirectory (glslang)
 
-endif()
+endif ()
 
-if (ENGINE_BUILD_EDITOR)
+if (BX_BUILD_EDITOR)
 	# STB lib
 	add_library (stb INTERFACE)
 	set_property(TARGET stb APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/stb)

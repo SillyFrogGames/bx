@@ -1,4 +1,5 @@
 #include "bx/engine/core/profiler.hpp"
+#include "bx/engine/core/math.hpp"
 
 #include <deque>
 
@@ -33,7 +34,7 @@ void Profiler::Update()
     g_time += Time::GetDeltaTime();
     if (g_time > delta)
     {
-        g_time = std::fmod(g_time, delta);
+        g_time = Math::FMod(g_time, delta);
 
         for (auto& itr : s_entries)
         {

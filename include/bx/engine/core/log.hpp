@@ -14,7 +14,11 @@ enum struct LogLevel { LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR };
 
 struct LogEntry
 {
-	LogLevel level = LogLevel::LOG_INFO;
+	LogEntry() {}
+	LogEntry(LogLevel level, const String& message)
+		: level(level), message(message) {}
+	
+	LogLevel level{ LogLevel::LOG_INFO };
 	String message;
 };
 

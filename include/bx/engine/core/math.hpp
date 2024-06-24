@@ -2,8 +2,16 @@
 
 #include "bx/engine/core/byte_types.hpp"
 
+#include <cmath>
+
 namespace Math
 {
+	template <typename T>
+	static T FMod(const T& a, const T& b)
+	{
+		return std::fmod(a, b);
+	}
+
 	template <typename T>
 	static T Max(const T& a, const T& b)
 	{

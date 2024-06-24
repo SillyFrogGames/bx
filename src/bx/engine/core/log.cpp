@@ -19,7 +19,7 @@ void Log::Print(LogLevel level, const String& message)
 		return;
 
 	// Output the formatted string to the console
-	g_entries.emplace_back(LogEntry{ level, message });
+	g_entries.emplace_back(level, message);
 
 	if (g_entries.size() > 1024)
 		g_entries.erase(g_entries.begin());

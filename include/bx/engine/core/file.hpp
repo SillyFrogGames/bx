@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bx/engine/core/byte_types.hpp"
 #include "bx/engine/containers/list.hpp"
 #include "bx/engine/containers/string.hpp"
 
@@ -28,7 +29,7 @@ public:
 	static void AddWildcard(const String& wildcard, const String& value);
 
 	static bool Exists(const String& path);
-	static uint64_t LastWrite(const String& filename);
+	static u64 LastWrite(const String& filename);
 	static String GetPath(const String& filename);
 
 	static String GetExt(const String& filename);

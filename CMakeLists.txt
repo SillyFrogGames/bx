@@ -12,6 +12,7 @@ option (BX_BUILD_EDITOR "Build as editor binaries" OFF)
 # Define options for window backend
 set (BX_WINDOW_BACKEND "GLFW" CACHE STRING "Choose the window backend: GLFW")
 set_property (CACHE BX_WINDOW_BACKEND PROPERTY STRINGS "GLFW")
+message ("BX window backend: ${BX_WINDOW_BACKEND}")
 
 if (BX_WINDOW_BACKEND STREQUAL "GLFW")
     message(STATUS "Using GLFW as the window backend")
@@ -24,6 +25,7 @@ endif ()
 # Define options for graphics backend
 set (BX_GRAPHICS_BACKEND "OpenGL" CACHE STRING "Choose the graphics backend: OpenGL, OpenGLES, Vulkan")
 set_property (CACHE BX_GRAPHICS_BACKEND PROPERTY STRINGS "OpenGL" "OpenGLES" "Vulkan")
+message ("BX graphics backend: ${BX_GRAPHICS_BACKEND}")
 
 if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
     message(STATUS "Using OpenGL as the graphics backend")
@@ -44,6 +46,7 @@ endif ()
 # Define options for physics backend
 set (BX_PHYSICS_BACKEND "Bullet" CACHE STRING "Choose the physics backend: Bullet")
 set_property (CACHE BX_PHYSICS_BACKEND PROPERTY STRINGS "Bullet")
+message ("BX physics backend: ${BX_PHYSICS_BACKEND}")
 
 if (BX_PHYSICS_BACKEND STREQUAL "Bullet")
     message(STATUS "Using Bullet as the physics backend")
@@ -56,6 +59,7 @@ endif ()
 # Define options for audio backend
 set (BX_AUDIO_BACKEND "PortAudio" CACHE STRING "Choose the audio backend: PortAudio")
 set_property (CACHE BX_AUDIO_BACKEND PROPERTY STRINGS "PortAudio")
+message ("BX audio backend: ${BX_AUDIO_BACKEND}")
 
 if (BX_AUDIO_BACKEND STREQUAL "PortAudio")
     message(STATUS "Using PortAudio as the audio backend")
@@ -66,15 +70,17 @@ else ()
 endif ()
 
 # TODO: Use Platform.hpp for the future
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+message ("CMake system name: ${CMAKE_SYSTEM_NAME}")
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	add_compile_definitions (BX_PLATFORM_PC)
 endif ()
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	add_compile_definitions (BX_PLATFORM_LINUX)
 endif ()
 
-if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+message ("CMake build type: ${CMAKE_BUILD_TYPE}")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_compile_definitions (BX_DEBUG_BUILD)
 
 else ()
@@ -147,7 +153,7 @@ set (BX_SRCS
 set (BX_LIBS ctti wnaabi cereal fmt glm wren imgui file_embed)
 
 # Setup window backend
-if(BX_WINDOW_BACKEND STREQUAL "GLFW")
+if (BX_WINDOW_BACKEND STREQUAL "GLFW")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/window/backend/window_glfw.cpp"
 	)
@@ -156,38 +162,38 @@ if(BX_WINDOW_BACKEND STREQUAL "GLFW")
 endif()
 
 # Setup graphics backend
-if(BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
+if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/graphics_opengl.cpp"
 	)
 
     set (BX_LIBS ${BX_LIBS} glad imgui_opengl3)
 
-elseif(BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
+elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/graphics_vulkan.cpp"
 	)
 
     set (BX_LIBS ${BX_LIBS} vulkan glslang SPIRV)
-endif()
+endif ()
 
 # Setup physics backend
-if(BX_PHYSICS_BACKEND STREQUAL "Bullet")
+if (BX_PHYSICS_BACKEND STREQUAL "Bullet")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/physics/backend/physics_bullet.cpp"
 	)
 
     set (BX_LIBS ${BX_LIBS} bullet3) #box2d
-endif()
+endif ()
 
 # Setup audio backend
-if(BX_AUDIO_BACKEND STREQUAL "PortAudio")
+if (BX_AUDIO_BACKEND STREQUAL "PortAudio")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/audio/backend/audio_portaudio.cpp"
 	)
 
     set (BX_LIBS ${BX_LIBS} PortAudio)
-endif()
+endif ()
 
 # Setup editor sources
 if (BX_BUILD_EDITOR)

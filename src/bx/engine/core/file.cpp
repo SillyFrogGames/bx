@@ -295,12 +295,14 @@ bool File::CreateDirectory(const String& path)
 	return ret;
 #elif defined(BX_BX_PLATFORM_LINUX)
 	BX_ASSERT(false, "Create directory not supported!");
+	return false;
 #else
 	BX_ASSERT(false, "Create directory not supported!");
+	return false;
 #endif
 }
 
-uint64_t File::LastWrite(const String& filename)
+u64 File::LastWrite(const String& filename)
 {
 #if (defined(BX_PLATFORM_PC) || defined(BX_PLATFORM_LINUX)) \
 && (defined(BX_BUILD_DEBUG) || defined(BX_BUILD_PROFILE))
@@ -371,16 +373,22 @@ bool File::ListFiles(const String& root, List<FileHandle>& files)
 	struct dirent* ent;
 	while ((ent = readdir(dir)) != NULL)
 	{
+		FileHandle fh;
+		fh.filepath = root + "/" + ent->d_name;
+		fh.filename = ent->d_name;
+
 		if (ent->d_type == DT_DIR)
 		{
 			if (strcmp(ent->d_name, ".") == 0) continue;
 			if (strcmp(ent->d_name, "..") == 0) continue;
 
-			files.emplace_back(FileHandle(ent->d_name, true));
+			fh.isDirectory = true;
+			files.emplace_back(fh);
 		}
 		else
 		{
-			files.emplace_back(FileHandle(ent->d_name, false));
+			fh.isDirectory = false;
+			files.emplace_back(fh);
 		}
 	}
 

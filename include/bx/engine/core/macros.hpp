@@ -13,10 +13,10 @@
 #define BX_BIT(x) (1 << (x))
 
 #ifdef BX_DEBUG_BUILD
-#define BX_LOGD(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_DEBUG, Log::Format(format, __VA_ARGS__))
-#define BX_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
-#define BX_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
-#define BX_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
+#define BX_LOGD(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_DEBUG, Log::Format(__VA_ARGS__))
+#define BX_LOGI(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(__VA_ARGS__))
+#define BX_LOGW(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(__VA_ARGS__))
+#define BX_LOGE(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(__VA_ARGS__))
 
 #define BX_ASSERT(condition, message) \
     do { \
@@ -32,10 +32,10 @@
 
 #else
 
-#define BX_LOGD(format, ...)
-#define BX_LOGI(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(format, __VA_ARGS__))
-#define BX_LOGW(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(format, __VA_ARGS__))
-#define BX_LOGE(format, ...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(format, __VA_ARGS__))
+#define BX_LOGD(...)
+#define BX_LOGI(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_INFO, Log::Format(__VA_ARGS__))
+#define BX_LOGW(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(__VA_ARGS__))
+#define BX_LOGE(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(__VA_ARGS__))
 
 #define BX_ASSERT(condition, message)
 #define BX_ENSURE(condition)

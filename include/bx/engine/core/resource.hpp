@@ -12,7 +12,7 @@ constexpr ResourceHandle RESOURCE_HANDLE_INVALID = 0;
 
 enum struct ResourceStorage { NONE, DISK, MEMORY };
 
-class IResource;
+//class IResource;
 
 template <typename TData>
 class Resource;
@@ -24,7 +24,7 @@ public:
 	static void Shutdown();
 
 private:
-	friend class IResource;
+	//friend class IResource;
 
 	static void IncreaseRefCount(ResourceHandle handle);
 	static bool DecreaseRefCount(ResourceHandle handle);
@@ -300,7 +300,8 @@ public:
 	inline ResourceHandle GetHandle() const { return m_handle; }
 	inline bool IsValid() const { return m_handle != RESOURCE_HANDLE_INVALID; }
 
-	inline bool operator==(const IResource& other) const { return m_handle == other.m_handle; }
+	inline bool operator==(const Resource& other) const { return m_handle == other.m_handle; }
+	//inline bool operator==(const IResource& other) const { return m_handle == other.m_handle; }
 
 	// Utility operators for ease of use
 	inline operator bool() const { return IsValid() && IsLoaded(); }

@@ -1,8 +1,8 @@
-#include "bx/engine/core/Data.hpp"
+#include "bx/engine/core/data.hpp"
 
-#include "bx/engine/core/Log.hpp"
-#include "bx/engine/core/Math.hpp"
-#include "bx/engine/core/File.hpp"
+#include "bx/engine/core/log.hpp"
+#include "bx/engine/core/math.hpp"
+#include "bx/engine/core/file.hpp"
 #include "bx/engine/containers/hash_map.serial.hpp"
 
 #include <cereal/cereal.hpp>
@@ -18,7 +18,7 @@ void Data::Initialize()
 	Load(DataTarget::GAME);
 	Load(DataTarget::PLAYER);
 	Load(DataTarget::DEBUG);
-#ifdef EDITOR_BUILD
+#ifdef BX_EDITOR_BUILD
 	Load(DataTarget::EDITOR);
 #endif
 }
@@ -29,7 +29,7 @@ void Data::Shutdown()
 	Save(DataTarget::GAME);
 	Save(DataTarget::PLAYER);
 	Save(DataTarget::DEBUG);
-#ifdef EDITOR_BUILD
+#ifdef BX_EDITOR_BUILD
 	Save(DataTarget::EDITOR);
 #endif
 }
@@ -67,7 +67,7 @@ const String& Data::GetFilepath(DataTarget target)
 	static const String game_path = "[settings]/game.json";
 	static const String player_path = "[save]/player.json";
 	static const String debug_path = "[save]/debug.json";
-#ifdef EDITOR_BUILD
+#ifdef BX_EDITOR_BUILD
 	static const String editor_path = "[settings]/editor.json";
 #endif
 	
@@ -83,7 +83,7 @@ const String& Data::GetFilepath(DataTarget target)
 	case DataTarget::DEBUG:
 		return debug_path;
 
-#ifdef EDITOR_BUILD
+#ifdef BX_EDITOR_BUILD
 	case DataTarget::EDITOR:
 		return editor_path;
 #endif

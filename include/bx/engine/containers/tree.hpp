@@ -32,8 +32,8 @@ public:
     using Node = TreeNode<T>;
     using RecurseFn = std::function<void(TreeNodeId, const Node&)>;
 
-    template <typename T>
-    using RecurseParamFn = std::function<T(const T&, TreeNodeId, const Node&)>;
+    template <typename C>
+    using RecurseParamFn = std::function<C(const C&, TreeNodeId, const Node&)>;
 
 public:
     Tree() {}
@@ -97,11 +97,11 @@ public:
         }
     }
 
-    template <typename T>
-    inline void RecurseParam(const T& param, TreeNodeId nodeId, const RecurseParamFn<T>& recurseFn) const
+    template <typename C>
+    inline void RecurseParam(const C& param, TreeNodeId nodeId, const RecurseParamFn<C>& recurseFn) const
     {
         const auto& node = GetNode(nodeId);
-        T ret = recurseFn(param, nodeId, node);
+        C ret = recurseFn(param, nodeId, node);
 
         for (TreeNodeId childIndex : node.children)
         {

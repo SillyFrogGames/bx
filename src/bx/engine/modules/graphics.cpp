@@ -8,6 +8,10 @@
 
 struct DebugLineData
 {
+    DebugLineData() {}
+	DebugLineData(const Vec3& a, const Vec3& b, u32 c, f32 l)
+		: a(a), b(b), color(c), lifespan(l) {}
+
     Vec3 a = Vec3(0, 0, 0);
     Vec3 b = Vec3(0, 0, 0);
     u32 color = 0;
@@ -21,7 +25,7 @@ static List<DebugVertex> g_debugVertices;
 
 void Graphics::DebugLine(const Vec3& a, const Vec3& b, u32 color, f32 lifespan)
 {
-    g_debugLines.emplace_back(DebugLineData{ a, b, color, lifespan });
+    g_debugLines.emplace_back(a, b, color, lifespan);
 }
 
 void Graphics::UpdateDebugLines()
@@ -32,8 +36,8 @@ void Graphics::UpdateDebugLines()
     g_debugLinesBuffer.reserve(g_debugLines.size());
     for (auto& line : g_debugLines)
     {
-        g_debugVertices.emplace_back(DebugVertex{ line.a, line.color });
-        g_debugVertices.emplace_back(DebugVertex{ line.b, line.color });
+        g_debugVertices.emplace_back(line.a, line.color);
+        g_debugVertices.emplace_back(line.b, line.color);
     
         line.lifespan -= Time::GetDeltaTime();
         if (line.lifespan > 0.0f)

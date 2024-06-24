@@ -355,7 +355,7 @@ struct ScriptArgArray
 	{
 		Array<T, Size> val;
 		i32 count = ScriptArg<void*>::GetListCount(vm, slot);
-		ENGINE_ASSERT(Size == count, "List does not match size of array!");
+		BX_ASSERT(Size == count, "List does not match size of array!");
 		for (i32 i = 0; i < count; i++)
 		{
 			ScriptArg<void*>::GetListElement(vm, slot, i, 0);

@@ -111,8 +111,12 @@ struct DrawIndexedAttribs
 
 struct DebugVertex
 {
-	Vec3 vert = Vec3(0, 0, 0);
-	u32 col = 0;
+	DebugVertex() {}
+	DebugVertex(const Vec3& vert, u32 col)
+		: vert(vert), col(col) {}
+
+	Vec3 vert{ 0, 0, 0 };
+	u32 col{ 0 };
 };
 
 struct DebugDrawAttribs
