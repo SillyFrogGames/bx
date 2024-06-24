@@ -320,7 +320,7 @@ void Script::Configure()
 	LOAD_ENGINE_MODULE(framework);
 
 	File::FindEach("[assets]", ".wren",
-		[](const auto& path, const auto& name)
+		[](const String& path, const String& name)
 		{
 			WrenCompile(s_vm, name.c_str(), File::ReadTextFile(path).c_str());
 		});

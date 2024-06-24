@@ -1,8 +1,8 @@
 #include "bx/framework/resources/texture.hpp"
 #include "bx/framework/resources/texture.serial.hpp"
 
-#include <bx/engine/core/File.hpp>
-#include <bx/engine/modules/Graphics.hpp>
+#include <bx/engine/core/file.hpp>
+#include <bx/engine/modules/graphics.hpp>
 
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>

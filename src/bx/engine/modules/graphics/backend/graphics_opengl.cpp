@@ -275,6 +275,8 @@ static bool InitializeDebugDraw()
 
     glDeleteShader(vshader);
     glDeleteShader(pshader);
+
+    return true;
 }
 
 bool Graphics::Initialize(void* device)

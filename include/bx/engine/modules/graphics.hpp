@@ -49,12 +49,25 @@ struct TextureInfo
 
 struct BufferData
 {
+	BufferData() {}
+	BufferData(const void* pData, u32 dataSize)
+		: pData(pData)
+		, dataSize(dataSize) {}
+
 	const void* pData = nullptr;
 	u32 dataSize = 0;
 };
 
 struct ResourceBindingElement
 {
+	ResourceBindingElement() {}
+	ResourceBindingElement(ShaderType shaderType, const char* name, u32 count, ResourceBindingType type, ResourceBindingAccess access)
+		: shaderType(shaderType)
+		, name(name)
+		, count(count)
+		, type(type)
+		, access(access) {}
+
 	ShaderType shaderType = ShaderType::UNKNOWN;
 	const char* name = nullptr;
 	u32 count = 0;
@@ -70,6 +83,16 @@ struct ResourceBindingInfo
 
 struct LayoutElement
 {
+	LayoutElement() {}
+	LayoutElement(u32 inputIndex, u32 bufferSlot, u32 numComponents, GraphicsValueType valueType, bool isNormalized, u32 relativeOffset, u32 instanceDataStepRate)
+		: inputIndex(inputIndex)
+		, bufferSlot(bufferSlot)
+		, numComponents(numComponents)
+		, valueType(valueType)
+		, isNormalized(isNormalized)
+		, relativeOffset(relativeOffset)
+		, instanceDataStepRate(instanceDataStepRate) {}
+
 	u32 inputIndex = 0;
 	u32 bufferSlot = 0;
 	u32 numComponents = 0;
@@ -100,11 +123,19 @@ struct PipelineInfo
 
 struct DrawAttribs
 {
+	DrawAttribs() {}
+	DrawAttribs(u32 numVertices)
+		: numVertices(numVertices) {}
+
 	u32 numVertices = 0;
 };
 
 struct DrawIndexedAttribs
 {
+	DrawIndexedAttribs() {}
+	DrawIndexedAttribs(GraphicsValueType indexType, u32 numIndices)
+		: indexType(indexType), numIndices(numIndices) {}
+
 	GraphicsValueType indexType = GraphicsValueType::UINT32;
 	u32 numIndices = 0;
 };

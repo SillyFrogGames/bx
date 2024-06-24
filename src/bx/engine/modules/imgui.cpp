@@ -95,7 +95,10 @@ bool ImGuiImpl::Initialize(void* device)
     const char* constStr = iniPath.c_str();
     const SizeType pathSize = iniPath.size() + 1;
     char* str = new char[pathSize];
-    strcpy_s(str, pathSize, constStr);
+
+    strncpy(str, constStr, pathSize);
+    str[pathSize - 1] = '\0';
+
     io.IniFilename = str;
 
     return true;
@@ -1862,6 +1865,6 @@ void ImGuiImpl::EndFrame()
     //
     //// Present Main Platform Window
     ////if (!isMinimized)
-    ////    ÌmGuiImpl_FramePresent();
+    ////    ï¿½mGuiImpl_FramePresent();
 }
 */

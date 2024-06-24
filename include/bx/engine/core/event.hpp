@@ -14,12 +14,20 @@ using SigSlots = HashMap<SignalId, SigSPtr>;
 
 struct SigHandle
 {
+    SigHandle() {}
+    SigHandle(SignalId id1, SignalId id2)
+        : id1(id1), id2(id2) {}
+    
     SignalId id1 = 0;
     SignalId id2 = 0;
 };
 
 struct SignalData
 {
+    SignalData() {}
+    SignalData(SignalId id, SigSlots slots)
+        : id(id), slots(slots) {}
+    
     SignalId id = 0;
     SigSlots slots;
 };

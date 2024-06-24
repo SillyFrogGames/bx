@@ -14,6 +14,8 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
+#include <exception>
+#include <stdexcept>
 
 static List<String> g_gameObjectClasses;
 static HashMap<String, GameObjectMetaData> g_gameObjectMetaDataMap;
@@ -143,7 +145,7 @@ GameObjectBase& GameObject::NewFromData(Scene& scene, const GameObjectData& data
 	metaData.bindClassFn();
 	if (!metaData.constructFn(data))
 	{
-		throw std::exception("Failed to construct game object!");
+		throw std::runtime_error("Failed to construct game object!");
 	}
 
 	return *scene.m_gameObjects[scene.m_gameObjects.size() - 1];

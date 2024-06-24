@@ -42,13 +42,13 @@ void Material::BuildPipeline()
 
     LayoutElement layoutElems[] =
     {
-        LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false },
-        LayoutElement { 1, 0, 4, GraphicsValueType::FLOAT32, false },
-        LayoutElement { 2, 0, 3, GraphicsValueType::FLOAT32, false },
-        LayoutElement { 3, 0, 3, GraphicsValueType::FLOAT32, false },
-        LayoutElement { 4, 0, 2, GraphicsValueType::FLOAT32, false },
-        LayoutElement { 5, 0, 4, GraphicsValueType::INT32 },
-        LayoutElement { 6, 0, 4, GraphicsValueType::FLOAT32, false }
+        LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 },
+        LayoutElement { 1, 0, 4, GraphicsValueType::FLOAT32, false, 0, 0 },
+        LayoutElement { 2, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 },
+        LayoutElement { 3, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 },
+        LayoutElement { 4, 0, 2, GraphicsValueType::FLOAT32, false, 0, 0 },
+        LayoutElement { 5, 0, 4, GraphicsValueType::INT32, false, 0, 0 },
+        LayoutElement { 6, 0, 4, GraphicsValueType::FLOAT32, false, 0, 0 }
     };
 
     pipelineInfo.layoutElements = layoutElems;
