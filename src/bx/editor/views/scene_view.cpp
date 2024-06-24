@@ -151,7 +151,7 @@ void SceneView::Initialize()
 
         LayoutElement layoutElems[] =
         {
-            LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false }
+            LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 }
         };
 
         info.layoutElements = layoutElems;

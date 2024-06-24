@@ -42,3 +42,11 @@
 #define BX_FAIL(message)
 
 #endif
+
+#if defined(__GNUC__) || defined(__clang__)
+#define BX_FUNCTION __PRETTY_FUNCTION__
+#elif defined(_MSC_VER)
+#define BX_FUNCTION __FUNCSIG__
+#else
+#define BX_FUNCTION __func__
+#endif
