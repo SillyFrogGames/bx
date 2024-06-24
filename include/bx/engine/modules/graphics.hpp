@@ -88,7 +88,8 @@ struct PipelineInfo
 	PipelineTopology topology = PipelineTopology::UNDEFINED;
 	PipelineFaceCull faceCull = PipelineFaceCull::NONE;
 
-	bool depthEnabled = true;
+	bool depthEnable = true;
+	bool blendEnable = false;
 
 	GraphicsHandle vertShader = INVALID_GRAPHICS_HANDLE;
 	GraphicsHandle pixelShader = INVALID_GRAPHICS_HANDLE;

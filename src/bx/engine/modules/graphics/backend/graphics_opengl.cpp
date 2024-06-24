@@ -731,6 +731,8 @@ GraphicsHandle Graphics::CreatePipeline(const PipelineInfo& info)
     PipelineImpl pipeline_impl;
     pipeline_impl.program = program_handle;
     pipeline_impl.vao = vao_handle;
+    pipeline_impl.depthEnable = info.depthEnable;
+    pipeline_impl.blendEnable = info.blendEnable;
     s_pipelines.insert(std::make_pair(program_handle, pipeline_impl));
 
     return program_handle;
@@ -746,12 +748,13 @@ void Graphics::SetPipeline(const GraphicsHandle pipeline)
     pipeline_impl.bufferCount = 0;
 
     glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_DITHER);
+    glFrontFace(pipeline_impl.faceCull);
 
-    glEnable(GL_BLEND);
+    pipeline_impl.depthEnable ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+    pipeline_impl.blendEnable ? glEnable(GL_BLEND) : glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDisable(GL_DITHER);
 
     glUseProgram(pipeline_impl.program);
     glBindVertexArray(pipeline_impl.vao);

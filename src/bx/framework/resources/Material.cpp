@@ -38,7 +38,7 @@ void Material::BuildPipeline()
 
     pipelineInfo.topology = PipelineTopology::TRIANGLES;
     pipelineInfo.faceCull = PipelineFaceCull::CCW;
-    pipelineInfo.depthEnabled = true;
+    pipelineInfo.depthEnable = true;
 
     LayoutElement layoutElems[] =
     {

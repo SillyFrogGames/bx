@@ -72,6 +72,11 @@ struct PipelineImpl
     GLuint program = 0;
     GLuint vao = 0;
 
+    GLenum faceCull = GL_CCW;
+
+    bool depthEnable = true;
+    bool blendEnable = true;
+
     GLuint bufferCount = 0;
 };
 

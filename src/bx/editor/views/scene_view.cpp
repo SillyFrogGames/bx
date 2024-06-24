@@ -147,7 +147,7 @@ void SceneView::Initialize()
 
         info.topology = PipelineTopology::TRIANGLES;
         info.faceCull = PipelineFaceCull::CCW;
-        info.depthEnabled = true;
+        info.depthEnable = true;
 
         LayoutElement layoutElems[] =
         {
