@@ -6,7 +6,7 @@
 #include "bx/engine/core/macros.hpp"
 #include "bx/engine/containers/string.hpp"
 
-//#include <wnaabi/type_info.hpp>
+#include <wnaabi/type_info.hpp>
 
 using TypeId = SizeType;
 constexpr TypeId INVALID_TYPEID = -1;
@@ -27,8 +27,8 @@ private:
 
 	static String ClassName()
 	{
-		return BX_FUNCTION;
-		//return wnaabi::type_info<TType>::name_tokens(wnaabi::runtime_visitors::stringify_t{}).str;
+		//return BX_FUNCTION;
+		return wnaabi::type_info<TType>::name_tokens(wnaabi::runtime_visitors::stringify_t{}).str;
 	}
 };
 
