@@ -147,7 +147,7 @@ public:
 
     inline const TData& operator[](SizeType idx) const
     {
-        return Get[idx];
+        return Get(idx);
     }
 
     virtual inline SizeType GetSize() const override

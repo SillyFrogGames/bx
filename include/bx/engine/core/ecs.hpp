@@ -357,13 +357,13 @@ struct ComponentHandle
 };
 
 template <typename TCmp>
-static constexpr void SetComponentMask(ComponentMask& cmpMask)
+static void SetComponentMask(ComponentMask& cmpMask)
 {
     cmpMask |= ComponentId<TCmp>::Mask();
 }
 
 template <typename TCmpA, typename TCmpB, typename ... TCmps>
-static constexpr void SetComponentMask(ComponentMask& cmpMask)
+static void SetComponentMask(ComponentMask& cmpMask)
 {
     cmpMask |= ComponentId<TCmpA>::Mask();
     SetComponentMask<TCmpB, TCmps...>(cmpMask);
