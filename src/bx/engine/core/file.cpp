@@ -97,7 +97,7 @@ void File::Initialize()
 	const char* homeDir = std::getenv("HOME");
 	if (homeDir)
 	{
-		String save_path = String(homeDir) + "/" + gameStr + "/";
+		String save_path = String(homeDir) + "/." + gameStr + "/";
 		if (!Exists(save_path))
 			CreateDirectory(save_path);
 

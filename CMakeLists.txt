@@ -1,4 +1,9 @@
 cmake_minimum_required (VERSION 3.22)
+message(STATUS "CMake Version: ${CMAKE_VERSION}")
+message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "C++ Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "C Compiler: ${CMAKE_C_COMPILER}")
+message(STATUS "C Compiler Version: ${CMAKE_C_COMPILER_VERSION}")
 
 project (bx)
 
@@ -87,6 +92,13 @@ else ()
 endif ()
 # ---------------------------------------
 
+if (CMAKE_INSTALL_PREFIX)
+	set (GAME_PATH_DIR "./game")
+else ()
+	set (GAME_PATH_DIR "${CMAKE_SOURCE_DIR}/game")
+endif ()
+
+add_compile_definitions (GAME_PATH="${GAME_PATH_DIR}")
 add_compile_definitions (BX_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (BX_BUILD_EDITOR)
@@ -237,4 +249,17 @@ target_include_directories (bx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 if (MSVC)
 	target_compile_options(bx PUBLIC "/ZI")
 	target_link_options(bx PUBLIC "/INCREMENTAL")
+
+	# Hide the console on release builds
+	target_link_options(bx INTERFACE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
 endif ()
+
+# Copy game contents to install dir
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/game DESTINATION bin)
+
+# Package game in zip file of the installed files
+#add_custom_target(install_and_package
+#    COMMAND ${CMAKE_COMMAND} --install . --prefix ${CMAKE_INSTALL_PREFIX}
+#    COMMAND ${CMAKE_COMMAND} -E tar cfv "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.zip" --format=zip -- "${CMAKE_INSTALL_PREFIX}/."
+#    COMMENT "Creating distributable zip file"
+#)
