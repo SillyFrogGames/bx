@@ -217,7 +217,6 @@ void Scene::Create(const String& filename)
 
 void Scene::Load(const String& filename)
 {
-	Application::Reload();
 	Load(g_currentScene, filename);
 }
 

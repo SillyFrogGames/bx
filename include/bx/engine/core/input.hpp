@@ -209,7 +209,7 @@ public:
 	static void ResetPadLightbarColor();
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static void Initialize(void* device);
 	static void Shutdown(void* device);

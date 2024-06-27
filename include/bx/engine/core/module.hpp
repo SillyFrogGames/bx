@@ -15,7 +15,8 @@ public:
 	static void Register(ModuleInitializeFn initialize, ModuleReloadFn bindApi, ModuleReloadFn reload, ModuleShutdownFn shutdown);
 
 private:
-	friend class Application;
+	friend class Runtime;
+
 	static void Initialize();
 	static void BindApi();
 	static void Reload();

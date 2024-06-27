@@ -30,7 +30,7 @@ public:
 	static void StopAudio(const AudioHandle channel, const AudioHandle audio);
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static bool Initialize();
 	static void Shutdown();

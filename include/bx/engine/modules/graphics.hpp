@@ -208,7 +208,7 @@ public:
 	static void DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, const List<DebugVertex>& vertices);
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static bool Initialize(void* device);
 	static void Shutdown();

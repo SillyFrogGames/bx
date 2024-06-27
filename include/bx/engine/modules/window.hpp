@@ -23,7 +23,7 @@ public:
 	static void SetCursorMode(CursorMode mode);
 		
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static bool Create();
 	static void Destroy();

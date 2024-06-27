@@ -18,6 +18,8 @@
 
 #include <bx/framework/gameobject.hpp>
 
+#include <bx/runtime/runtime.hpp>
+
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -174,6 +176,8 @@ void Toolbar::Present()
 				if (ImGui::MenuItem("Open", "CTRL+O"))
 				{
 					const String& scene = Data::GetString("Current Scene", "", DataTarget::EDITOR);
+
+					Runtime::Reload();
 					Scene::Load(scene);
 				}
 				if (ImGui::MenuItem("Save", "CTRL+S"))
@@ -184,7 +188,7 @@ void Toolbar::Present()
 				ImGui::Separator();
 				if (ImGui::MenuItem("Exit"))
 				{
-					Application::Close();
+					Runtime::Close();
 				}
 
 				ImGui::EndMenu();
@@ -317,6 +321,8 @@ void Toolbar::Present()
 		if (ImGui::Button(ICON_FA_SYNC_ALT))
 		{
 			const String& scene = Data::GetString("Current Scene", "", DataTarget::EDITOR);
+
+			Runtime::Reload();
 			Scene::Load(scene);
 		}
 		Tooltip("Reload");
@@ -331,6 +337,8 @@ void Toolbar::Present()
 				paused = false;
 
 				const String& scene = Data::GetString("Current Scene", "", DataTarget::EDITOR);
+
+				Runtime::Reload();
 				Scene::Load(scene);
 
 				Window::SetCursorMode(CursorMode::NORMAL);

@@ -168,7 +168,7 @@ public:
 	static String& SetString(const String& name, String value, DataTarget target) { return Set<String>(name, value, target); }
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static void Initialize();
 	static void Shutdown();

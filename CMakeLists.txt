@@ -11,6 +11,7 @@ set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option (BX_BUILD_EDITOR "Build as editor binaries" OFF)
+option (BX_INSTALL "Install binaries" OFF)
 #option (BUILD_TESTS "Build the test binaries" ON)
 
 # Define options for window backend
@@ -92,7 +93,7 @@ else ()
 endif ()
 # ---------------------------------------
 
-if (CMAKE_INSTALL_PREFIX)
+if (BX_INSTALL)
 	set (GAME_PATH_DIR "./game")
 else ()
 	set (GAME_PATH_DIR "${CMAKE_SOURCE_DIR}/game")
@@ -233,12 +234,12 @@ if (BX_BUILD_EDITOR)
 	set (BX_LIBS ${BX_LIBS} stb assimp implot ImGuizmo IconFontCppHeaders FontAwesome FreeFonts)
 
 	# Add editor runtime
-	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/editor_application.cpp")
+	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/editor_runtime.cpp")
 
 else ()
 	
 	# Add game runtime
-	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/game_application.cpp")
+	set (BX_SRCS ${BX_SRCS} "src/bx/runtime/game_runtime.cpp")
 endif ()
 
 # Create bx lib
@@ -254,12 +255,14 @@ if (MSVC)
 	target_link_options(bx INTERFACE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
 endif ()
 
-# Copy game contents to install dir
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/game DESTINATION bin)
+if (BX_INSTALL)
+	# Copy game contents to install dir
+	install(DIRECTORY ${CMAKE_SOURCE_DIR}/game DESTINATION bin)
 
-# Package game in zip file of the installed files
-#add_custom_target(install_and_package
-#    COMMAND ${CMAKE_COMMAND} --install . --prefix ${CMAKE_INSTALL_PREFIX}
-#    COMMAND ${CMAKE_COMMAND} -E tar cfv "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.zip" --format=zip -- "${CMAKE_INSTALL_PREFIX}/."
-#    COMMENT "Creating distributable zip file"
-#)
+	# Package game in zip file of the installed files
+	#add_custom_target(install_and_package
+	#    COMMAND ${CMAKE_COMMAND} --install . --prefix ${CMAKE_INSTALL_PREFIX}
+	#    COMMAND ${CMAKE_COMMAND} -E tar cfv "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.zip" --format=zip -- "${CMAKE_INSTALL_PREFIX}/."
+	#    COMMENT "Creating distributable zip file"
+	#)
+endif ()

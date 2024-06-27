@@ -1,4 +1,4 @@
-#include "bx/runtime/game_application.hpp"
+#include "bx/runtime/runtime.hpp"
 
 #include <bx/engine/core/memory.hpp>
 #include <bx/engine/core/log.hpp>
@@ -10,6 +10,7 @@
 #include <bx/engine/core/module.hpp>
 #include <bx/engine/core/ecs.hpp>
 #include <bx/engine/core/resource.hpp>
+#include <bx/engine/core/application.hpp>
 #include <bx/engine/modules/window.hpp>
 #include <bx/engine/modules/graphics.hpp>
 #include <bx/engine/modules/physics.hpp>
@@ -25,20 +26,20 @@ static bool s_running = true;
 
 int main(int argc, char** argv)
 {
-	return Application::Run(argc, argv);
+	return Runtime::Launch(argc, argv);
 }
 
-bool Application::IsRunning()
+bool Runtime::IsRunning()
 {
 	return s_running && Window::IsOpen();
 }
 
-void Application::Close()
+void Runtime::Close()
 {
 	s_running = false;
 }
 
-void Application::Reload()
+void Runtime::Reload()
 {
 	Script::DestroyVm();
 	GameObject::Shutdown();
@@ -58,9 +59,11 @@ void Application::Reload()
 	SystemManager::Initialize();
 
 	GameObject::Initialize();
+
+	Application::Reload();
 }
 
-int Application::Run(int argc, char** argv)
+int Runtime::Launch(int argc, char** argv)
 {
 	if (!Initialize())
 		return EXIT_FAILURE;
@@ -100,7 +103,7 @@ int Application::Run(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-bool Application::Initialize()
+bool Runtime::Initialize()
 {
 #ifdef MEMORY_CUSTOM_CONTAINERS
 	Memory::Initialize();
@@ -149,11 +152,13 @@ bool Application::Initialize()
 
 	GameObject::Initialize();
 
-	return true;
+	return Application::Initialize();
 }
 
-void Application::Shutdown()
+void Runtime::Shutdown()
 {
+	Application::Shutdown();
+
 	SystemManager::Shutdown();
 
 	Module::Shutdown();

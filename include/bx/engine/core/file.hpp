@@ -49,6 +49,6 @@ public:
 	static bool WriteTextFile(const String& filename, const String& text);
 
 private:
-	friend class Application;
+	friend class Runtime;
 	static void Initialize();
 };

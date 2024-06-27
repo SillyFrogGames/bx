@@ -84,7 +84,7 @@ public:
 	static void BindEnumVal(const char* signature);
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static void CreateVm();
 	static void BindApi();

@@ -2,15 +2,11 @@
 
 class Application
 {
-public:
-	static bool IsRunning();
-	static void Close();
-
-	static void Reload();
-
-	static int Run(int argc, char** argv);
-
 private:
+	friend class Runtime;
+
 	static bool Initialize();
 	static void Shutdown();
+
+	static void Reload();
 };

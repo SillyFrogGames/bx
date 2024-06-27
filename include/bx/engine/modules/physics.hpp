@@ -134,7 +134,7 @@ public:
 	static void CharacterControllerApplyImpulse(const PhysicsHandle characterController, const Vec3& impulse);
 
 private:
-	friend class Application;
+	friend class Runtime;
 
 	static void Initialize();
 	static void Shutdown();
