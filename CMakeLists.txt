@@ -94,12 +94,12 @@ endif ()
 # ---------------------------------------
 
 if (BX_INSTALL)
-	set (GAME_PATH_DIR "./game")
+	set (PROJECT_PATH_DIR ".")
 else ()
-	set (GAME_PATH_DIR "${CMAKE_SOURCE_DIR}/game")
+	set (PROJECT_PATH_DIR "${CMAKE_SOURCE_DIR}")
 endif ()
 
-add_compile_definitions (GAME_PATH="${GAME_PATH_DIR}")
+add_compile_definitions (BX_PROJECT_PATH="${PROJECT_PATH_DIR}")
 add_compile_definitions (BX_PATH="${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (BX_BUILD_EDITOR)

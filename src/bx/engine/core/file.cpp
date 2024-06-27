@@ -59,9 +59,8 @@ static List<String> StringSplit(const String& source, const char* delimiter, boo
 void File::Initialize()
 {
 #if defined(BX_PLATFORM_PC) || defined(BX_PLATFORM_LINUX)
-	AddWildcard("[game]", GAME_PATH);
-	AddWildcard("[assets]", GAME_PATH"/assets");
-	AddWildcard("[settings]", GAME_PATH"/settings");
+	AddWildcard("[assets]", BX_PROJECT_PATH"/game/assets");
+	AddWildcard("[settings]", BX_PROJECT_PATH"/game/settings");
 
 	// All platforms
 	if (!Exists("[settings]/.ini"))
@@ -103,6 +102,10 @@ void File::Initialize()
 
 		AddWildcard("[save]", save_path);
 	}
+#endif
+
+#ifdef BX_EDITOR_BUILD
+	AddWildcard("[editor]", BX_PROJECT_PATH"/editor");
 #endif
 }
 

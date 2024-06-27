@@ -91,7 +91,8 @@ bool ImGuiImpl::Initialize(void* device)
     //String fontpath = fileio::get_path("[games]/shared/fonts/FontAwesome5FreeSolid900.otf");
     //io.Fonts->AddFontFromFileTTF(fontpath.c_str(), iconSize * UIScale, &config, icons_ranges);
 
-    const String iniPath = File::GetPath("[save]/imgui.ini");
+#ifdef BX_EDITOR_BUILD
+    const String iniPath = File::GetPath("[editor]/imgui.ini");
     const char* constStr = iniPath.c_str();
     const SizeType pathSize = iniPath.size() + 1;
     char* str = new char[pathSize];
@@ -100,6 +101,10 @@ bool ImGuiImpl::Initialize(void* device)
     str[pathSize - 1] = '\0';
 
     io.IniFilename = str;
+
+#else
+    io.IniFilename = NULL;
+#endif
 
     return true;
 }

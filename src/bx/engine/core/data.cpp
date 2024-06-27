@@ -68,7 +68,7 @@ const String& Data::GetFilepath(DataTarget target)
 	static const String player_path = "[save]/player.json";
 	static const String debug_path = "[save]/debug.json";
 #ifdef BX_EDITOR_BUILD
-	static const String editor_path = "[settings]/editor.json";
+	static const String editor_path = "[editor]/settings.json";
 #endif
 	
 	switch (target)
