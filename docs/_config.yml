@@ -1,0 +1,16 @@
+markdown: kramdown
+remote_theme: just-the-docs/just-the-docs
+title: bx tech stack
+description: Documentation for the bx stack
+baseurl: "/bx" # the subpath of your site, e.g. /blog
+url: "https://bitcache-labs.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
+logo: "img/icon_tiny.webp"
+
+# Aux links for the upper right navigation
+aux_links:
+  "Download":
+    - "https://github.com/BitCache-Labs/bx/releases"
+  "Contribute":
+    - "https://github.com/BitCache-Labs/bx"
+
+footer_content: "bx tech stack"
