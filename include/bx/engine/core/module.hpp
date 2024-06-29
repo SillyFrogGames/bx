@@ -1,24 +1,26 @@
 #pragma once
 
-// TODO: This is meant to be the common entry point for dynamically loaded libraries
-// In the engine source code a few built-in modules are provided, however, they do not use this API and should!
-// There should be considerations for inter-module dependencies, so for now this remains unused.
+#include "bx/engine/core/byte_types.hpp"
 
-using ModuleInitializeFn = void(*)();
-using ModuleBindApiFn = void(*)();
+using ModuleInitializeFn = bool(*)();
 using ModuleReloadFn = void(*)();
 using ModuleShutdownFn = void(*)();
 
 class Module
 {
 public:
-	static void Register(ModuleInitializeFn initialize, ModuleReloadFn bindApi, ModuleReloadFn reload, ModuleShutdownFn shutdown);
+	template <typename T>
+	static void Register(u32 order)
+	{
+		Register(order, T::Initialize, T::Reload, T::Shutdown);
+	}
+
+	static void Register(u32 order, ModuleInitializeFn initialize, ModuleReloadFn reload, ModuleShutdownFn shutdown);
 
 private:
 	friend class Runtime;
 
 	static void Initialize();
-	static void BindApi();
 	static void Reload();
 	static void Shutdown();
 };

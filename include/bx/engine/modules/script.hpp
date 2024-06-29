@@ -9,6 +9,8 @@
 #include "bx/engine/containers/array.hpp"
 #include "bx/engine/containers/list.hpp"
 
+using BindApiFn = void(*)();
+
 typedef struct WrenVM WrenVM;
 typedef struct WrenHandle WrenHandle;
 typedef void (*WrenForeignMethodFn)(WrenVM* vm);
@@ -47,6 +49,8 @@ struct ComponentClassWrapper
 class Script
 {
 public:
+	static void RegisterApi(BindApiFn bindApi);
+
 	static bool HasError();
 	static void ClearError();
 
@@ -85,13 +89,10 @@ public:
 
 private:
 	friend class Runtime;
+	friend class Module;
 
-	static void CreateVm();
-	static void BindApi();
-	static void Configure();
-	static void DestroyVm();
-
-	static void Initialize();
+	static bool Initialize();
+	static void Reload();
 	static void Shutdown();
 
 	static void Update();

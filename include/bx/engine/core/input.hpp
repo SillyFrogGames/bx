@@ -2,6 +2,7 @@
 
 #include "bx/engine/core/type.hpp"
 
+// TODO: Move this to window module
 // TODO: Review this code, needs it's own backend cpp file for GLFW, and similar/merged logic to the Window module
 
 /// <summary>
@@ -210,8 +211,11 @@ public:
 
 private:
 	friend class Runtime;
+	friend class Module;
 
-	static void Initialize(void* device);
-	static void Shutdown(void* device);
+	static bool Initialize();
+	static void Reload();
+	static void Shutdown();
+
 	static void Poll();
 };

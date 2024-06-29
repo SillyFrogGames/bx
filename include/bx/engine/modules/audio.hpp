@@ -31,7 +31,9 @@ public:
 
 private:
 	friend class Runtime;
+	friend class Module;
 
 	static bool Initialize();
+	static void Reload();
 	static void Shutdown();
 };

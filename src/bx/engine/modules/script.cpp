@@ -51,16 +51,11 @@ extern "C" {
 
 // Wren VM state handles
 static WrenVM* s_vm;
-static WrenHandle* s_gameClass = nullptr;
-static WrenHandle* s_configMethod = nullptr;
-static WrenHandle* s_initMethod = nullptr;
-static WrenHandle* s_updateMethod = nullptr;
-static WrenHandle* s_renderMethod = nullptr;
-
 static WrenHandle* s_goNewMethod = nullptr;
-static WrenHandle* s_goEntityMethod = nullptr;
 static WrenHandle* s_goStartMethod = nullptr;
 static WrenHandle* s_goUpdateMethod = nullptr;
+
+static List<BindApiFn> g_bindApis;
 
 static bool s_initialized = false;
 static bool s_error = false;
@@ -197,7 +192,7 @@ static void WrenError(WrenVM* vm, WrenErrorType errorType, const char* module, c
 	s_error = true;
 }
 
-void Script::CreateVm()
+static void CreateVm()
 {
 	s_initialized = false;
 	s_error = false;
@@ -216,35 +211,21 @@ void Script::CreateVm()
 	s_vm = wrenNewVM(&config);
 }
 
-void Script::DestroyVm()
+static void DestroyVm()
 {
 	if (s_vm)
 	{
-		if (s_gameClass)
-		{
-			wrenReleaseHandle(s_vm, s_gameClass);
-			s_gameClass = nullptr;
-		}
-		if (s_configMethod)
-		{
-			wrenReleaseHandle(s_vm, s_configMethod);
-			s_configMethod = nullptr;
-		}
-		if (s_initMethod)
-		{
-			wrenReleaseHandle(s_vm, s_initMethod);
-			s_initMethod = nullptr;
-		}
-		if (s_updateMethod)
-		{
-			wrenReleaseHandle(s_vm, s_updateMethod);
-			s_updateMethod = nullptr;
-		}
-		if (s_renderMethod)
-		{
-			wrenReleaseHandle(s_vm, s_renderMethod);
-			s_renderMethod = nullptr;
-		}
+		// TODO: Release these handles?
+		//static WrenHandle* s_goNewMethod = nullptr;
+		//static WrenHandle* s_goEntityMethod = nullptr;
+		//static WrenHandle* s_goStartMethod = nullptr;
+		//static WrenHandle* s_goUpdateMethod = nullptr;
+		//if (s_gameClass)
+		//{
+		//	wrenReleaseHandle(s_vm, s_gameClass);
+		//	s_gameClass = nullptr;
+		//}
+
 		wrenFreeVM(s_vm);
 		s_vm = nullptr;
 	}
@@ -308,7 +289,7 @@ extern "C" {
 #define LOAD_ENGINE_MODULE(ModuleName) { WrenCompile(s_vm, #ModuleName, ModuleName##_wren_data); }
 #endif
 
-void Script::Configure()
+static void Configure()
 {
 	LOAD_ENGINE_MODULE(core);
 	LOAD_ENGINE_MODULE(device);
@@ -339,68 +320,27 @@ void Script::Configure()
 
 	if (s_initialized && !s_error)
 	{
-		wrenEnsureSlots(s_vm, 1);
-		wrenGetVariable(s_vm, "game", "Game", 0);
-		s_gameClass = wrenGetSlotHandle(s_vm, 0);
-		wrenSetSlotHandle(s_vm, 0, s_gameClass);
-
-		s_configMethod = wrenMakeCallHandle(s_vm, "config()");
-		s_initMethod = wrenMakeCallHandle(s_vm, "init()");
-		s_updateMethod = wrenMakeCallHandle(s_vm, "update()");
-		s_renderMethod = wrenMakeCallHandle(s_vm, "render()");
+		//wrenEnsureSlots(s_vm, 1);
+		//wrenGetVariable(s_vm, "game", "Game", 0);
+		//s_gameClass = wrenGetSlotHandle(s_vm, 0);
+		//wrenSetSlotHandle(s_vm, 0, s_gameClass);
+		//
+		//s_configMethod = wrenMakeCallHandle(s_vm, "config()");
+		//s_initMethod = wrenMakeCallHandle(s_vm, "init()");
+		//s_updateMethod = wrenMakeCallHandle(s_vm, "update()");
+		//s_renderMethod = wrenMakeCallHandle(s_vm, "render()");
 
 		s_goNewMethod = wrenMakeCallHandle(s_vm, "new(_)");
-		s_goEntityMethod = wrenMakeCallHandle(s_vm, "entity");
 		s_goStartMethod = wrenMakeCallHandle(s_vm, "start()");
 		s_goUpdateMethod = wrenMakeCallHandle(s_vm, "update()");
 
-		wrenCall(s_vm, s_configMethod);
+		//wrenCall(s_vm, s_configMethod);
 	}
 }
 
-void Script::Initialize()
+void Script::RegisterApi(BindApiFn bindApi)
 {
-	if (s_initialized && !s_error)
-	{
-		wrenEnsureSlots(s_vm, 1);
-		wrenSetSlotHandle(s_vm, 0, s_gameClass);
-		wrenCall(s_vm, s_initMethod);
-	}
-}
-
-void Script::Shutdown()
-{
-	DestroyVm();
-}
-
-void Script::Update()
-{
-	PROFILE_FUNCTION();
-
-	if (s_initialized && !s_error)
-	{
-		wrenEnsureSlots(s_vm, 1);
-		wrenSetSlotHandle(s_vm, 0, s_gameClass);
-		wrenCall(s_vm, s_updateMethod);
-	}
-}
-
-void Script::Render()
-{
-	PROFILE_FUNCTION();
-
-	if (s_initialized && !s_error)
-	{
-		wrenEnsureSlots(s_vm, 1);
-		wrenSetSlotHandle(s_vm, 0, s_gameClass);
-		wrenCall(s_vm, s_renderMethod);
-	}
-}
-
-void Script::CollectGarbage()
-{
-	PROFILE_FUNCTION();
-	wrenCollectGarbage(s_vm);
+	g_bindApis.emplace_back(bindApi);
 }
 
 bool Script::HasError()
@@ -625,7 +565,7 @@ static void FinalizeGameObjectBase(void* data)
 	obj->~ScriptObj();
 }
 
-void Script::BindApi()
+static void BindApi()
 {
 	Script::BeginModule("core");
 	{
@@ -1405,4 +1345,65 @@ void ScriptArg<void*>::SetListElement(WrenVM* vm, i32 listSlot, i32 index, i32 e
 void ScriptArg<void*>::InsertInList(WrenVM* vm, i32 listSlot, i32 index, i32 elementSlot)
 {
 	wrenInsertInList(vm, listSlot, index, elementSlot);
+}
+
+bool Script::Initialize()
+{
+	//if (s_initialized && !s_error)
+	//{
+	//	wrenEnsureSlots(s_vm, 1);
+	//	wrenSetSlotHandle(s_vm, 0, s_gameClass);
+	//	wrenCall(s_vm, s_initMethod);
+	//}
+
+	CreateVm();
+
+	BindApi();
+	for (const auto& bindApi : g_bindApis)
+		bindApi();
+
+	Configure();
+
+	return true;
+}
+
+void Script::Reload()
+{
+	Shutdown();
+	Initialize();
+}
+
+void Script::Shutdown()
+{
+	DestroyVm();
+}
+
+void Script::Update()
+{
+	PROFILE_FUNCTION();
+
+	//if (s_initialized && !s_error)
+	//{
+	//	wrenEnsureSlots(s_vm, 1);
+	//	wrenSetSlotHandle(s_vm, 0, s_gameClass);
+	//	wrenCall(s_vm, s_updateMethod);
+	//}
+}
+
+void Script::Render()
+{
+	PROFILE_FUNCTION();
+
+	//if (s_initialized && !s_error)
+	//{
+	//	wrenEnsureSlots(s_vm, 1);
+	//	wrenSetSlotHandle(s_vm, 0, s_gameClass);
+	//	wrenCall(s_vm, s_renderMethod);
+	//}
+}
+
+void Script::CollectGarbage()
+{
+	PROFILE_FUNCTION();
+	wrenCollectGarbage(s_vm);
 }

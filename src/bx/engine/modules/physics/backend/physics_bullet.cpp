@@ -155,7 +155,7 @@ public:
     }
 };
 
-void Physics::Initialize()
+bool Physics::Initialize()
 {
     // Initialize Bullet
     btVector3 worldMin(-1000, -1000, -1000);
@@ -175,6 +175,12 @@ void Physics::Initialize()
 
     g_debugDraw = new btDebugDraw();
     g_dynamicsWorld->setDebugDrawer(g_debugDraw);
+
+    return true;
+}
+
+void Physics::Reload()
+{
 }
 
 void Physics::Shutdown()

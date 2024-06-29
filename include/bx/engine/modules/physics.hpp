@@ -135,8 +135,10 @@ public:
 
 private:
 	friend class Runtime;
+	friend class Module;
 
-	static void Initialize();
+	static bool Initialize();
+	static void Reload();
 	static void Shutdown();
 };
 

@@ -1,13 +1,17 @@
-#include "bx/engine/modules/window.hpp"
+#include "bx/engine/modules/window/backend/window_glfw.hpp"
 
 #include "bx/engine/core/macros.hpp"
 #include "bx/engine/core/data.hpp"
 #include "bx/engine/core/profiler.hpp"
 
-#include <GLFW/glfw3.h>
 #include <stdlib.h>
 
 static GLFWwindow* pWindow = nullptr;
+
+GLFWwindow* WindowGLFW::GetWindowPtr()
+{
+	return pWindow;
+}
 
 bool Window::IsOpen()
 {
@@ -51,7 +55,7 @@ static void glfw_window_size_callback(GLFWwindow* window, int width, int height)
 	Screen::SetHeight(height);
 }
 
-bool Window::Create()
+bool Window::Initialize()
 {
 #ifdef __arm__
 	if (putenv((char*)"DISPLAY=:0"))
@@ -144,15 +148,14 @@ bool Window::Create()
 	return true;
 }
 
-void Window::Destroy()
+void Window::Reload()
+{
+}
+
+void Window::Shutdown()
 {
 	glfwDestroyWindow(pWindow);
 	glfwTerminate();
-}
-
-void* Window::GetDevicePtr()
-{
-	return (void*)pWindow;
 }
 
 void Window::PollEvents()
