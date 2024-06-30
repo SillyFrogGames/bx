@@ -776,8 +776,8 @@ static void BindApi()
 			Script::BindFunction<decltype(&Vec3::Plus), &Vec3::Plus>(false, "+(_)");
 			Script::BindFunction<decltype(&Vec3::Negate), &Vec3::Negate>(false, "negate");
 			Script::BindFunction<decltype(&Vec3::Minus), &Vec3::Minus>(false, "-(_)");
-			Script::BindFunction<decltype(&Vec3::Mul), &Vec3::Mul>(false, "*(_)");
-			Script::BindFunction<decltype(&Vec3::Div), &Vec3::Div>(false, "/(_)");
+			Script::BindFunction<decltype(&Vec3::MulF32), &Vec3::MulF32>(false, "*(_)");
+			Script::BindFunction<decltype(&Vec3::DivF32), &Vec3::DivF32>(false, "/(_)");
 			Script::BindFunction<decltype(&Vec3::Dot), &Vec3::Dot>(true, "dot(_,_)");
 			Script::BindFunction<decltype(&Vec3::Normalize), &Vec3::Normalize>(true, "normalize(_)");
 			Script::BindFunction<decltype(&Vec3::Cross), &Vec3::Cross>(true, "cross(_,_)");
