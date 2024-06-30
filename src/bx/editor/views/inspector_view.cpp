@@ -68,8 +68,8 @@ public:
 				const auto& nodeMatrix = trx * boneMatrices[nodeBoneIdx];
 				const auto& parentMatrix = trx * boneMatrices[parentBoneIdx];
 
-				Vec3 a(nodeMatrix.basis[3].x, nodeMatrix.basis[3].y, nodeMatrix.basis[3].z);
-				Vec3 b(parentMatrix.basis[3].x, parentMatrix.basis[3].y, parentMatrix.basis[3].z);
+				Vec3 a(nodeMatrix.columns[3].x, nodeMatrix.columns[3].y, nodeMatrix.columns[3].z);
+				Vec3 b(parentMatrix.columns[3].x, parentMatrix.columns[3].y, parentMatrix.columns[3].z);
 				Graphics::DebugLine(a, b, 0xFF00FF00);
 			});
 	}
