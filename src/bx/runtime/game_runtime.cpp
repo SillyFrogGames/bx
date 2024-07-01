@@ -14,6 +14,7 @@
 #include <bx/engine/modules/window.hpp>
 #include <bx/engine/modules/graphics.hpp>
 #include <bx/engine/modules/physics.hpp>
+#include <bx/engine/modules/audio.hpp>
 #include <bx/engine/modules/script.hpp>
 #include <bx/engine/modules/imgui.hpp>
 
@@ -41,26 +42,7 @@ void Runtime::Close()
 
 void Runtime::Reload()
 {
-	Script::DestroyVm();
-	GameObject::Shutdown();
-	EntityManager::Shutdown();
-	SystemManager::Shutdown();
-
-	Script::CreateVm();
-	Script::BindApi();
-	Module::BindApi();
-
-	Script::Configure();
-	Script::Initialize();
-
-	SystemManager::AddSystem<Dynamics>();
-	SystemManager::AddSystem<Acoustics>();
-	SystemManager::AddSystem<Renderer>();
-	SystemManager::Initialize();
-
-	GameObject::Initialize();
-
-	Application::Reload();
+	Module::Reload();
 }
 
 int Runtime::Launch(int argc, char** argv)
@@ -105,6 +87,7 @@ int Runtime::Launch(int argc, char** argv)
 
 bool Runtime::Initialize()
 {
+	// Initialze core
 #ifdef MEMORY_CUSTOM_CONTAINERS
 	Memory::Initialize();
 #endif
@@ -114,63 +97,39 @@ bool Runtime::Initialize()
 	Data::Initialize();
 	ResourceManager::Initialize();
 
-	Script::CreateVm();
-	Script::BindApi();
-	Module::BindApi();
+	// Register modules
+	Module::Register<Script>(0);
+	Module::Register<Window>(1);
+	Module::Register<Input>(2);
+	Module::Register<Graphics>(3);
+	Module::Register<ImGuiImpl>(4);
+	Module::Register<Physics>(5);
+	Module::Register<Audio>(6);
+	Module::Register<GameObject>(7);
 
-	Script::Configure();
-
-	if (!Window::Create())
+	// Initialize application
+	if (!Application::Initialize())
 	{
-		BX_LOGE("Failed to create window!");
+		BX_LOGE("Failed to initialize application!");
 		return false;
 	}
 
-	Input::Initialize(Window::GetDevicePtr());
-
-	if (!Graphics::Initialize(Window::GetDevicePtr()))
-	{
-		BX_LOGE("Failed to initialize graphics!");
-		return false;
-	}
-
-	if (!ImGuiImpl::Initialize(Window::GetDevicePtr()))
-	{
-		BX_LOGE("Failed to initialize ImGui!");
-		return false;
-	}
-
-	Physics::Initialize();
-
+	// Initialize modules
 	Module::Initialize();
-	Script::Initialize();
 
-	SystemManager::AddSystem<Dynamics>();
-	SystemManager::AddSystem<Acoustics>();
-	SystemManager::AddSystem<Renderer>();
-	SystemManager::Initialize();
-
-	GameObject::Initialize();
-
-	return Application::Initialize();
+	return true;
 }
 
 void Runtime::Shutdown()
 {
-	Application::Shutdown();
-
-	SystemManager::Shutdown();
-
 	Module::Shutdown();
 
-	Script::Shutdown();
-	ImGuiImpl::Shutdown();
-	Graphics::Shutdown();
-	Physics::Shutdown();
-	Input::Shutdown(Window::GetDevicePtr());
-	Window::Destroy();
-	Data::Shutdown();
+	Application::Shutdown();
+
 	ResourceManager::Shutdown();
+	Data::Shutdown();
+	//File::Shutdown();
+	//Time::Shutdown();
 
 #ifdef MEMORY_CUSTOM_CONTAINERS
 	Memory::Shutdown();
