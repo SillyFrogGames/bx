@@ -284,11 +284,11 @@ static bool InitializeDebugDraw()
     return true;
 }
 
-bool Graphics::Initialize(void* device)
+bool Graphics::Initialize()
 {
-    GLFWwindow* glfwWindow = (GLFWwindow*)device;
+#ifdef BX_WINDOW_GLFW_BACKEND
 
-#if defined BX_GRAPHICS_OPENGL_BACKEND
+#ifdef BX_GRAPHICS_OPENGL_BACKEND
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         BX_LOGE("Failed to initialize GLAD GL!");
@@ -304,7 +304,9 @@ bool Graphics::Initialize(void* device)
     }
 #endif
 
-#if defined BX_DEBUG_BUILD || defined BX_EDITOR_BUILD
+#endif
+
+#if defined(BX_DEBUG_BUILD) || defined(BX_EDITOR_BUILD)
     if (!InitializeGlDebug())
         BX_LOGW("GL debug output not supported.");
 
@@ -314,6 +316,10 @@ bool Graphics::Initialize(void* device)
     InitializeDebugDraw();
 
     return true;
+}
+
+void Graphics::Reload()
+{
 }
 
 void Graphics::Shutdown()

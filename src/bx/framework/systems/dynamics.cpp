@@ -51,7 +51,11 @@ void Dynamics::Update()
     EntityManager::ForEach<Transform, RigidBody>(
         [&](Entity entity, Transform& trx, const RigidBody& rb)
         {
-            trx.SetMatrix(Physics::GetRigidBodyMatrix(rb.GetRigidBody()));
+            Vec3 pos; Quat rot; Vec3 scl;
+            auto mat = Physics::GetRigidBodyMatrix(rb.GetRigidBody());
+            Mat4::Decompose(mat, pos, rot, scl);
+            trx.SetPosition(pos);
+            trx.SetRotation(rot);
         });
 
     EntityManager::ForEach<Transform, Collider>(
@@ -63,7 +67,11 @@ void Dynamics::Update()
     EntityManager::ForEach<Transform, CharacterController>(
         [&](Entity entity, Transform& trx, CharacterController& cc)
         {
-            trx.SetMatrix(Physics::GetCharacterControllerMatrix(cc.GetCharacterController()));
+            Vec3 pos; Quat rot; Vec3 scl;
+            auto mat = Physics::GetCharacterControllerMatrix(cc.GetCharacterController());
+            Mat4::Decompose(mat, pos, rot, scl);
+            trx.SetPosition(pos);
+            trx.SetRotation(rot);
         });
 }
 

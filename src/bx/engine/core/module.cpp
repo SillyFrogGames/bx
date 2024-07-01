@@ -3,49 +3,54 @@
 
 struct ModuleHandle
 {
-	ModuleInitializeFn Initialize = nullptr;
-	ModuleBindApiFn BindApi = nullptr;
-	ModuleReloadFn Reload = nullptr;
-	ModuleShutdownFn Shutdown = nullptr;
+	u32 order = 0;
+	ModuleInitializeFn initializeFn = nullptr;
+	ModuleReloadFn reloadFn = nullptr;
+	ModuleShutdownFn shutdownFn = nullptr;
+
+	bool operator<(const ModuleHandle& other) const { return order < other.order; }
 };
 
-static List<ModuleHandle> s_wrenModulesSource;
+static List<ModuleHandle> s_modules;
 
-void Module::Register(ModuleInitializeFn initialize, ModuleReloadFn bindApi, ModuleReloadFn reload, ModuleShutdownFn shutdown)
+void Module::Register(u32 order, ModuleInitializeFn initializeFn, ModuleReloadFn reloadFn, ModuleShutdownFn shutdownFn)
 {
-	ModuleHandle module;
-	module.Initialize = initialize;
-	module.BindApi = bindApi;
-	module.Reload = reload;
-	module.Shutdown = shutdown;
+	ModuleHandle moduleHandle;
+	moduleHandle.order = order;
+	moduleHandle.initializeFn = initializeFn;
+	moduleHandle.reloadFn = reloadFn;
+	moduleHandle.shutdownFn = shutdownFn;
 
-	s_wrenModulesSource.emplace_back(module);
+	auto it = std::lower_bound(s_modules.begin(), s_modules.end(), moduleHandle);
+	s_modules.insert(it, moduleHandle);
 }
 
 void Module::Initialize()
 {
-	for (auto& module : s_wrenModulesSource)
-		if (module.Initialize)
-			module.Initialize();
-}
-
-void Module::BindApi()
-{
-	for (auto& module : s_wrenModulesSource)
-		if (module.BindApi)
-			module.BindApi();
+	for (SizeType i = 0; i < s_modules.size(); ++i)
+	{
+		const auto& handle = s_modules[i];
+		if (handle.initializeFn)
+			handle.initializeFn();
+	}
 }
 
 void Module::Reload()
 {
-	for (auto& module : s_wrenModulesSource)
-		if (module.Reload)
-			module.Reload();
+	for (SizeType i = s_modules.size(); i-- > 0;)
+	{
+		const auto& handle = s_modules[i];
+		if (handle.reloadFn)
+			handle.reloadFn();
+	}
 }
 
 void Module::Shutdown()
 {
-	for (auto& module : s_wrenModulesSource)
-		if (module.Shutdown)
-			module.Shutdown();
+	for (SizeType i = s_modules.size(); i-- > 0;)
+	{
+		const auto& handle = s_modules[i];
+		if (handle.shutdownFn)
+			handle.shutdownFn();
+	}
 }

@@ -7,6 +7,4 @@ private:
 
 	static bool Initialize();
 	static void Shutdown();
-
-	static void Reload();
 };

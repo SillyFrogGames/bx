@@ -4,7 +4,9 @@
 #include "bx/engine/core/guard.hpp"
 #include "bx/engine/core/profiler.hpp"
 
-#include <GLFW/glfw3.h>
+#ifdef BX_WINDOW_GLFW_BACKEND
+#include "bx/engine/modules/window/backend/window_glfw.hpp"
+#endif
 
 static GLFWgamepadstate gamepad_state;
 static GLFWgamepadstate prev_gamepad_state;
@@ -47,22 +49,30 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods)
 		mousebuttons_down_changed[button] = true;
 }
 
-void Input::Initialize(void* device)
+bool Input::Initialize()
 {
-	GLFWwindow* glfwWindow = (GLFWwindow*)device;
+#ifdef BX_WINDOW_GLFW_BACKEND
 	glfwSetJoystickCallback(joystick_callback);
-	glfwSetCursorPosCallback(glfwWindow, cursor_position_callback);
-	glfwSetKeyCallback(glfwWindow, key_callback);
-	glfwSetMouseButtonCallback(glfwWindow, mousebutton_callback);
+	glfwSetCursorPosCallback(WindowGLFW::GetWindowPtr(), cursor_position_callback);
+	glfwSetKeyCallback(WindowGLFW::GetWindowPtr(), key_callback);
+	glfwSetMouseButtonCallback(WindowGLFW::GetWindowPtr(), mousebutton_callback);
+#endif
 
 	Poll();
+
+	return true;
 }
 
-void Input::Shutdown(void* device)
+void Input::Reload()
 {
-	GLFWwindow* glfwWindow = (GLFWwindow*)device;
+}
+
+void Input::Shutdown()
+{
+#ifdef BX_WINDOW_GLFW_BACKEND
 	glfwSetJoystickCallback(NULL);
-	glfwSetCursorPosCallback(glfwWindow, NULL);
+	glfwSetCursorPosCallback(WindowGLFW::GetWindowPtr(), NULL);
+#endif
 }
 
 void Input::Poll()

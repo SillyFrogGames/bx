@@ -209,8 +209,10 @@ public:
 
 private:
 	friend class Runtime;
+	friend class Module;
 
-	static bool Initialize(void* device);
+	static bool Initialize();
+	static void Reload();
 	static void Shutdown();
 
 	static void NewFrame();

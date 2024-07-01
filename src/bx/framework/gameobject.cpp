@@ -9,6 +9,10 @@
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/polymorphic.hpp>
 
+#include "bx/framework/systems/acoustics.hpp"
+#include "bx/framework/systems/dynamics.hpp"
+#include "bx/framework/systems/renderer.hpp"
+
 #include "bx/framework/gameobject.serial.hpp"
 
 #include <cstring>
@@ -100,17 +104,34 @@ void GameObjectBase::Destroy()
 	m_scene.Remove(this);
 }
 
-void GameObject::Initialize()
+bool GameObject::Initialize()
 {
+	EntityManager::Initialize();
+
+	SystemManager::AddSystem<Dynamics>();
+	SystemManager::AddSystem<Acoustics>();
+	SystemManager::AddSystem<Renderer>();
+	SystemManager::Initialize();
+
 	Event::Subscribe<EntityDestroyed, GameObjectReceiver>(g_receiver);
+
+	return true;
+}
+
+void GameObject::Reload()
+{
+	Shutdown();
+	Initialize();
 }
 
 void GameObject::Shutdown()
 {
 	g_gameObjectMetaDataMap.clear();
 	g_gameObjectClasses.clear();
-
 	g_currentScene.m_gameObjects.clear();
+	
+	SystemManager::Shutdown();
+	EntityManager::Shutdown();
 }
 
 void GameObject::Register(const String& className, const GameObjectMetaData& metaData)

@@ -250,9 +250,6 @@ target_include_directories (bx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 if (MSVC)
 	target_compile_options(bx PUBLIC "/ZI")
 	target_link_options(bx PUBLIC "/INCREMENTAL")
-
-	# Hide the console on release builds
-	target_link_options(bx INTERFACE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
 endif ()
 
 if (BX_INSTALL)
@@ -265,4 +262,9 @@ if (BX_INSTALL)
 	#    COMMAND ${CMAKE_COMMAND} -E tar cfv "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.zip" --format=zip -- "${CMAKE_INSTALL_PREFIX}/."
 	#    COMMENT "Creating distributable zip file"
 	#)
+
+	# Hide the console on installed builds
+	if (MSVC)
+		target_link_options(bx INTERFACE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+	endif ()
 endif ()

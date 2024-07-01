@@ -126,6 +126,10 @@ bool Audio::Initialize()
     return true;
 }
 
+void Audio::Reload()
+{
+}
+
 void Audio::Shutdown()
 {
     PaError err = Pa_StopStream(g_stream);

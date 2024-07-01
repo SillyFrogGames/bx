@@ -104,7 +104,8 @@ class GameObject
 {
 public:
 	// TODO: Split these static function into a GameObjectManager?
-	static void Initialize();
+	static bool Initialize();
+	static void Reload();
 	static void Shutdown();
 
 	static void Register(const String& className, const GameObjectMetaData& metaData);

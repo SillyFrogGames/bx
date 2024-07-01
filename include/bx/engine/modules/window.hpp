@@ -19,16 +19,15 @@ class Window
 {
 public:
 	static void GetSize(int* width, int* height);
-
 	static void SetCursorMode(CursorMode mode);
-		
+
 private:
 	friend class Runtime;
+	friend class Module;
 
-	static bool Create();
-	static void Destroy();
-
-	static void* GetDevicePtr();
+	static bool Initialize();
+	static void Reload();
+	static void Shutdown();
 
 	static bool IsOpen();
 	static void PollEvents();

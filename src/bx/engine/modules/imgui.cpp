@@ -3,6 +3,7 @@
 #include "bx/engine/core/macros.hpp"
 #include "bx/engine/core/file.hpp"
 #include "bx/engine/core/profiler.hpp"
+#include "bx/engine/modules/window.hpp"
 #include "bx/engine/modules/graphics.hpp"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -18,10 +19,12 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-bool ImGuiImpl::Initialize(void* device)
-{
-    GLFWwindow* glfwWindow = (GLFWwindow*)device;
+#ifdef BX_WINDOW_GLFW_BACKEND
+#include "bx/engine/modules/window/backend/window_glfw.hpp"
+#endif
 
+bool ImGuiImpl::Initialize()
+{
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -45,11 +48,13 @@ bool ImGuiImpl::Initialize(void* device)
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    if (!ImGui_ImplGlfw_InitForOpenGL(glfwWindow, true))
+#ifdef BX_WINDOW_GLFW_BACKEND
+    if (!ImGui_ImplGlfw_InitForOpenGL(WindowGLFW::GetWindowPtr(), true))
     {
         BX_LOGE("Failed to initialize ImGui GLFW backend!");
         return false;
     }
+#endif
 
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     if (!ImGui_ImplOpenGL3_Init("#version 460 core\n"))
@@ -107,6 +112,10 @@ bool ImGuiImpl::Initialize(void* device)
 #endif
 
     return true;
+}
+
+void ImGuiImpl::Reload()
+{
 }
 
 void ImGuiImpl::Shutdown()
