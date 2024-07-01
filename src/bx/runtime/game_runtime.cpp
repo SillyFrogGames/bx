@@ -18,9 +18,6 @@
 #include <bx/engine/modules/script.hpp>
 #include <bx/engine/modules/imgui.hpp>
 
-#include <bx/framework/systems/renderer.hpp>
-#include <bx/framework/systems/dynamics.hpp>
-#include <bx/framework/systems/acoustics.hpp>
 #include <bx/framework/gameobject.hpp>
 
 static bool s_running = true;
