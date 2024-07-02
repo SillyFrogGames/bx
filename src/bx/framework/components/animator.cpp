@@ -52,7 +52,7 @@ static f32 GetScaleFactor(f32 time, f32 lastTimeStamp, f32 nextTimeStamp)
 Mat4 InterpolatePosition(const Animation::Keyframes& keys, f32 time)
 {
     if (keys.positionKeys.size() == 1)
-        return Mat4::Translate(keys.positionKeys[0].position);
+        return Mat4::Translation(keys.positionKeys[0].position);
 
     SizeType p0Index = GetPositionIndex(keys, time);
     SizeType p1Index = p0Index + 1;
@@ -71,13 +71,13 @@ Mat4 InterpolatePosition(const Animation::Keyframes& keys, f32 time)
     Vec3 finalPosition = keys.positionKeys[p0Index].position;
 #endif
 
-    return Mat4::Translate(finalPosition);
+    return Mat4::Translation(finalPosition);
 }
 
 Mat4 InterpolateRotation(const Animation::Keyframes& keys, f32 time)
 {
     if (keys.rotationKeys.size() == 1)
-        return Mat4::Rotate(keys.rotationKeys[0].rotation);
+        return Mat4::Rotation(keys.rotationKeys[0].rotation);
 
     SizeType p0Index = GetRotationIndex(keys, time);
     SizeType p1Index = p0Index + 1;
@@ -95,7 +95,7 @@ Mat4 InterpolateRotation(const Animation::Keyframes& keys, f32 time)
     Quat finalRotation = keys.rotationKeys[p0Index].rotation;
 #endif
     
-    return Mat4::Rotate(finalRotation.Normalized());
+    return Mat4::Rotation(finalRotation.Normalized());
 }
 
 Mat4 InterpolateScale(const Animation::Keyframes& keys, f32 time)

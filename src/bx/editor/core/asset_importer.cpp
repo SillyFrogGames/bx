@@ -83,7 +83,7 @@ static Mat4 AssimpMat4(const aiMatrix4x4& m)
     Mat4 mm = Mat4::Identity();
     for (u32 i = 0; i < 4; ++i)
         for (u32 j = 0; j < 4; ++j)
-            mm[i][j] = m[j][i];
+            mm(i, j) = m[j][i];
     return mm;
 }
 
