@@ -40,11 +40,612 @@ static glm::quat QuatToGLM(const Quat& q)
 }
 #endif
 
-//#define USE_GLM_IMPL
+#define USE_GLM_IMPL
 
 #ifdef USE_GLM_IMPL
 
+f32 Vec2::At(i32 i) const
+{
+	return data[i];
+}
 
+f32 Vec2::SqrMagnitude() const
+{
+	glm::vec2 v = glm::make_vec2(data);
+	return glm::dot(v, v);
+}
+
+f32 Vec2::Magnitude() const
+{
+	glm::vec2 v = glm::make_vec2(data);
+	return glm::length(v);
+}
+
+Vec2 Vec2::Normalized() const
+{
+	glm::vec2 v = glm::normalize(glm::make_vec2(data));
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Abs() const
+{
+	return Vec2(fabsf(x), fabsf(y));
+}
+
+void Vec2::Set(f32 x, f32 y)
+{
+	data[0] = x;
+	data[1] = y;
+}
+
+Vec2 Vec2::AddScalar(f32 rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) + rhs;
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Add(const Vec2& rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) + glm::make_vec2(rhs.data);
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Negate() const
+{
+	return Vec2(-x, -y);
+}
+
+Vec2 Vec2::SubScalar(f32 rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) - rhs;
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Sub(const Vec2& rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) - glm::make_vec2(rhs.data);
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::MulF32(f32 rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) * rhs;
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Mul(const Vec2& rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) * glm::make_vec2(rhs.data);
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::DivF32(f32 rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) / rhs;
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec2 Vec2::Div(const Vec2& rhs) const
+{
+	glm::vec2 v = glm::make_vec2(data) / glm::make_vec2(rhs.data);
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+f32 Vec2::Dot(const Vec2& a, const Vec2& b)
+{
+	return glm::dot(glm::make_vec2(a.data), glm::make_vec2(b.data));
+}
+
+Vec2 Vec2::Lerp(const Vec2& a, const Vec2& b, f32 t)
+{
+	glm::vec2 v = glm::mix(glm::make_vec2(a.data), glm::make_vec2(b.data), t);
+	return Vec2::FromValuePtr(glm::value_ptr(v));
+}
+
+void Vec2::Normalize(Vec2& v)
+{
+	v = v.Normalized();
+}
+
+Vec2 Vec2::FromValuePtr(f32* vptr)
+{
+	Vec2 v;
+	memcpy(v.data, vptr, sizeof(Vec2));
+	return v;
+}
+
+f32 Vec3::At(i32 i) const
+{
+	return data[i];
+}
+
+f32 Vec3::SqrMagnitude() const
+{
+	glm::vec3 v = glm::make_vec3(data);
+	return glm::dot(v, v);
+}
+
+f32 Vec3::Magnitude() const
+{
+	glm::vec3 v = glm::make_vec3(data);
+	return glm::length(v);
+}
+
+Vec3 Vec3::Normalized() const
+{
+	glm::vec3 v = glm::normalize(glm::make_vec3(data));
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Abs() const
+{
+	return Vec3(fabsf(x), fabsf(y), fabsf(z));
+}
+
+void Vec3::Set(f32 x, f32 y, f32 z)
+{
+	data[0] = x;
+	data[1] = y;
+	data[2] = z;
+}
+
+Vec3 Vec3::AddScalar(f32 rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) + rhs;
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Add(const Vec3& rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) + glm::make_vec3(rhs.data);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Negate() const
+{
+	return Vec3(-x, -y, -z);
+}
+
+Vec3 Vec3::SubScalar(f32 rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) - rhs;
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Sub(const Vec3& rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) - glm::make_vec3(rhs.data);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::MulF32(f32 rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) * rhs;
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Mul(const Vec3& rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) * glm::make_vec3(rhs.data);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::DivF32(f32 rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) / rhs;
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::Div(const Vec3& rhs) const
+{
+	glm::vec3 v = glm::make_vec3(data) / glm::make_vec3(rhs.data);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+f32 Vec3::Dot(const Vec3& a, const Vec3& b)
+{
+	return glm::dot(glm::make_vec3(a.data), glm::make_vec3(b.data));
+}
+
+Vec3 Vec3::Lerp(const Vec3& a, const Vec3& b, f32 t)
+{
+	glm::vec3 v = glm::mix(glm::make_vec3(a.data), glm::make_vec3(b.data), t);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+void Vec3::Normalize(Vec3& v)
+{
+	v = v.Normalized();
+}
+
+Vec3 Vec3::Cross(const Vec3& a, const Vec3& b)
+{
+	glm::vec3 v = glm::cross(glm::make_vec3(a.data), glm::make_vec3(b.data));
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec3 Vec3::FromValuePtr(f32* vptr)
+{
+	Vec3 v;
+	memcpy(v.data, vptr, sizeof(Vec3));
+	return v;
+}
+
+f32 Vec4::At(i32 i) const
+{
+	return data[i];
+}
+
+f32 Vec4::SqrMagnitude() const
+{
+	glm::vec4 v = glm::make_vec4(data);
+	return glm::dot(v, v);
+}
+
+f32 Vec4::Magnitude() const
+{
+	glm::vec4 v = glm::make_vec4(data);
+	return glm::length(v);
+}
+
+Vec4 Vec4::Normalized() const
+{
+	glm::vec4 v = glm::normalize(glm::make_vec4(data));
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Abs() const
+{
+	return Vec4(fabsf(x), fabsf(y), fabsf(z), fabsf(w));
+}
+
+void Vec4::Set(f32 x, f32 y, f32 z, f32 w)
+{
+	data[0] = x;
+	data[1] = y;
+	data[2] = z;
+	data[3] = w;
+}
+
+Vec4 Vec4::AddScalar(f32 rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) + rhs;
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Add(const Vec4& rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) + glm::make_vec4(rhs.data);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Negate() const
+{
+	return Vec4(-x, -y, -z, -w);
+}
+
+Vec4 Vec4::SubScalar(f32 rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) - rhs;
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Sub(const Vec4& rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) - glm::make_vec4(rhs.data);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::MulF32(f32 rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) * rhs;
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Mul(const Vec4& rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) * glm::make_vec4(rhs.data);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::DivF32(f32 rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) / rhs;
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Vec4 Vec4::Div(const Vec4& rhs) const
+{
+	glm::vec4 v = glm::make_vec4(data) / glm::make_vec4(rhs.data);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+f32 Vec4::Dot(const Vec4& a, const Vec4& b)
+{
+	return glm::dot(glm::make_vec4(a.data), glm::make_vec4(b.data));
+}
+
+Vec4 Vec4::Lerp(const Vec4& a, const Vec4& b, f32 t)
+{
+	glm::vec4 v = glm::mix(glm::make_vec4(a.data), glm::make_vec4(b.data), t);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+void Vec4::Normalize(Vec4& v)
+{
+	v = v.Normalized();
+}
+
+Vec4 Vec4::FromValuePtr(f32* vptr)
+{
+	Vec4 v;
+	memcpy(v.data, vptr, sizeof(Vec4));
+	return v;
+}
+
+f32 Color::At(i32 i) const
+{
+	return data[i];
+}
+
+Color Color::FromValuePtr(f32* vptr)
+{
+	Color v;
+	memcpy(v.data, vptr, sizeof(Color));
+	return v;
+}
+
+Vec4i Vec4i::FromValuePtr(i32* vptr)
+{
+	Vec4i v;
+	memcpy(v.data, vptr, sizeof(Vec4i));
+	return v;
+}
+
+f32 Quat::At(i32 i) const
+{
+	return data[i];
+}
+
+Quat Quat::Normalized() const
+{
+	glm::quat q = glm::normalize(QuatToGLM(*this));
+	return QuatFromGLM(q);
+}
+
+f32 Quat::SqrMagnitude() const
+{
+	return x * x + y * y + z * z + w * w;
+}
+
+f32 Quat::Magnitude() const
+{
+	return glm::length(QuatToGLM(*this));
+}
+
+Quat Quat::Inverse() const
+{
+	glm::quat q = glm::inverse(QuatToGLM(*this));
+	return QuatFromGLM(q);
+}
+
+Quat Quat::PlusQuat(const Quat& rhs) const
+{
+	glm::quat q = QuatToGLM(*this) + QuatToGLM(rhs);
+	return QuatFromGLM(q);
+}
+
+Quat Quat::AddScalar(f32 rhs) const
+{
+	return Quat(x + rhs, y + rhs, z + rhs, w + rhs);
+}
+
+Quat Quat::Negate() const
+{
+	return Quat(-x, -y, -z, -w);
+}
+
+Quat Quat::MulQuat(const Quat& rhs) const
+{
+	glm::quat q = QuatToGLM(*this) * QuatToGLM(rhs);
+	return QuatFromGLM(q);
+}
+
+Vec3 Quat::MulVec3(const Vec3& rhs) const
+{
+	glm::vec3 v = QuatToGLM(*this) * glm::make_vec3(rhs.data);
+	return Vec3::FromValuePtr(glm::value_ptr(v));
+}
+
+Quat Quat::MulF32(f32 rhs) const
+{
+	return Quat(x * rhs, y * rhs, z * rhs, w * rhs);
+}
+
+Quat Quat::DivF32(f32 rhs) const
+{
+	f32 invRhs = 1.0 / rhs;
+	return Quat(x * invRhs, y * invRhs, z * invRhs, w * invRhs);
+}
+
+Vec3 Quat::EulerAngles() const
+{
+	glm::quat q = QuatToGLM(*this);
+	glm::vec3 e = glm::degrees(glm::eulerAngles(q));
+	return Vec3::FromValuePtr(glm::value_ptr(e));
+}
+
+Quat Quat::Euler(f32 x, f32 y, f32 z)
+{
+	glm::quat q = glm::quat(glm::radians(glm::vec3(x, y, z)));
+	return QuatFromGLM(q);
+}
+
+Quat Quat::AngleAxis(f32 angleInDegrees, const Vec3& axis)
+{
+	glm::quat q = glm::angleAxis(glm::radians(angleInDegrees), glm::vec3(axis.x, axis.y, axis.z));
+	return QuatFromGLM(q);
+}
+
+f32 Quat::Dot(const Quat& a, const Quat& b)
+{
+	return glm::dot(QuatToGLM(a), QuatToGLM(b));
+}
+
+Quat Quat::Slerp(const Quat& a, const Quat& b, f32 t)
+{
+	glm::quat qa = QuatToGLM(a);
+	glm::quat qb = QuatToGLM(b);
+	glm::quat qs = glm::slerp(qa, qb, t);
+	return QuatFromGLM(qs);
+}
+
+Quat Quat::FromMat4(const Mat4& _matrix)
+{
+	glm::mat4 matrix = glm::make_mat4(_matrix.data);
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+	return QuatFromGLM(rotation);
+}
+
+Quat Quat::FromValuePtr(f32* vptr)
+{
+	Quat q;
+	memcpy(q.data, vptr, sizeof(Quat));
+	return q;
+}
+
+f32 Mat4::At(i32 i) const
+{
+	return data[i];
+}
+
+f32 Mat4::At(i32 i, i32 j) const
+{
+	return basis[i][j];
+}
+
+Mat4 Mat4::Mul(const Mat4& rhs) const
+{
+	glm::mat4 m = glm::make_mat4(data) * glm::make_mat4(rhs.data);
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Vec4 Mat4::MulVec4(const Vec4& rhs) const
+{
+	glm::vec4 v = glm::make_mat4(data) * glm::make_vec4(rhs.data);
+	return Vec4::FromValuePtr(glm::value_ptr(v));
+}
+
+Mat4 Mat4::Transpose() const
+{
+	glm::mat4 m = glm::make_mat4(data);
+	glm::mat4 im = glm::transpose(m);
+	return Mat4::FromValuePtr(glm::value_ptr(im));
+}
+
+Mat4 Mat4::Inverse() const
+{
+	glm::mat4 m = glm::make_mat4(data);
+	glm::mat4 im = glm::inverse(m);
+	return Mat4::FromValuePtr(glm::value_ptr(im));
+}
+
+Mat4 Mat4::Identity()
+{
+	static Mat4 s_identity = Mat4(
+		Vec4(1, 0, 0, 0),
+		Vec4(0, 1, 0, 0),
+		Vec4(0, 0, 1, 0),
+		Vec4(0, 0, 0, 1)
+	);
+	return s_identity;
+}
+
+Mat4 Mat4::Zero()
+{
+	return Mat4(
+		Vec4(0, 0, 0, 0),
+		Vec4(0, 0, 0, 0),
+		Vec4(0, 0, 0, 0),
+		Vec4(0, 0, 0, 0)
+	);
+}
+
+Mat4 Mat4::LookAt(const Vec3& eye, const Vec3& center, const Vec3& up)
+{
+	glm::vec3 e = glm::make_vec3(eye.data);
+	glm::vec3 c = glm::make_vec3(center.data);
+	glm::vec3 u = glm::make_vec3(up.data);
+	glm::mat4 m = glm::lookAt(e, c, u);
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Ortho(f32 left, f32 right, f32 bottom, f32 top, f32 zNear, f32 zFar)
+{
+	glm::mat4 m = glm::ortho(left, right, bottom, top, zNear, zFar);
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Perspective(f32 fov, f32 aspect, f32 zNear, f32 zFar)
+{
+	glm::mat4 m = glm::perspective(glm::radians(fov), aspect, zNear, zFar);
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Translation(const Vec3& translation)
+{
+	glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::make_vec3(translation.data));
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Rotation(f32 angle, const Vec3& axis)
+{
+	glm::mat4 m = glm::mat4(glm::angleAxis(glm::radians(angle), glm::make_vec3(axis.data)));
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Rotation(const Quat& rotation)
+{
+	glm::mat4 m = glm::mat4(QuatToGLM(rotation));
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::Scale(const Vec3& scale)
+{
+	glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::make_vec3(scale.data));
+	return Mat4::FromValuePtr(glm::value_ptr(m));
+}
+
+Mat4 Mat4::TRS(const Vec3& translation, const Quat& rotation, const Vec3& scale)
+{
+	return Mat4::Translation(translation) * Mat4::Rotation(rotation) * Mat4::Scale(scale);
+}
+
+void Mat4::Decompose(const Mat4& matrix, Vec3& pos, Quat& rot, Vec3& scl)
+{
+	glm::mat4 transformation = glm::make_mat4(matrix.data);
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(transformation, scale, rotation, translation, skew, perspective);
+	pos = Vec3::FromValuePtr(glm::value_ptr(translation));
+	rot = QuatFromGLM(rotation);
+	scl = Vec3::FromValuePtr(glm::value_ptr(scale));
+}
+
+Mat4 Mat4::FromValuePtr(f32* vptr)
+{
+	Mat4 m;
+	memcpy(m.data, vptr, sizeof(Mat4));
+	return m;
+}
 
 #else
 
@@ -88,12 +689,12 @@ void Vec2::Set(f32 x, f32 y)
 	data[1] = y;
 }
 
-Vec2 Vec2::PlusF32(f32 rhs) const
+Vec2 Vec2::AddScalar(f32 rhs) const
 {
 	return Vec2(x + rhs, y + rhs);
 }
 
-Vec2 Vec2::Plus(const Vec2& rhs) const
+Vec2 Vec2::Add(const Vec2& rhs) const
 {
 	return Vec2(x + rhs.x, y + rhs.y);
 }
@@ -103,12 +704,12 @@ Vec2 Vec2::Negate() const
 	return Vec2(-x, -y);
 }
 
-Vec2 Vec2::MinusF32(f32 rhs) const
+Vec2 Vec2::SubScalar(f32 rhs) const
 {
 	return Vec2(x - rhs, y - rhs);
 }
 
-Vec2 Vec2::Minus(const Vec2& rhs) const
+Vec2 Vec2::Sub(const Vec2& rhs) const
 {
 	return Vec2(x - rhs.x, y - rhs.y);
 }
@@ -197,12 +798,12 @@ void Vec3::Set(f32 x, f32 y, f32 z)
 	data[2] = z;
 }
 
-Vec3 Vec3::PlusF32(f32 rhs) const
+Vec3 Vec3::AddScalar(f32 rhs) const
 {
 	return Vec3(x + rhs, y + rhs, z + rhs);
 }
 
-Vec3 Vec3::Plus(const Vec3& rhs) const
+Vec3 Vec3::Add(const Vec3& rhs) const
 {
 	return Vec3(x + rhs.x, y + rhs.y, z + rhs.z);
 }
@@ -212,12 +813,12 @@ Vec3 Vec3::Negate() const
 	return Vec3(-x, -y, -z);
 }
 
-Vec3 Vec3::MinusF32(f32 rhs) const
+Vec3 Vec3::SubScalar(f32 rhs) const
 {
 	return Vec3(x - rhs, y - rhs, z - rhs);
 }
 
-Vec3 Vec3::Minus(const Vec3& rhs) const
+Vec3 Vec3::Sub(const Vec3& rhs) const
 {
 	return Vec3(x - rhs.x, y - rhs.y, z - rhs.z);
 }
@@ -316,12 +917,12 @@ void Vec4::Set(f32 x, f32 y, f32 z, f32 w)
 	data[3] = w;
 }
 
-Vec4 Vec4::PlusF32(f32 rhs) const
+Vec4 Vec4::AddScalar(f32 rhs) const
 {
 	return Vec4(x + rhs, y + rhs, z + rhs, w + rhs);
 }
 
-Vec4 Vec4::Plus(const Vec4& rhs) const
+Vec4 Vec4::Add(const Vec4& rhs) const
 {
 	return Vec4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 }
@@ -331,12 +932,12 @@ Vec4 Vec4::Negate() const
 	return Vec4(-x, -y, -z, -w);
 }
 
-Vec4 Vec4::MinusF32(f32 rhs) const
+Vec4 Vec4::SubScalar(f32 rhs) const
 {
 	return Vec4(x - rhs, y - rhs, z - rhs, w - rhs);
 }
 
-Vec4 Vec4::Minus(const Vec4& rhs) const
+Vec4 Vec4::Sub(const Vec4& rhs) const
 {
 	return Vec4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w);
 }
@@ -426,15 +1027,15 @@ f32 Quat::Magnitude() const
 
 Quat Quat::Inverse() const
 {
-	f32 magnitude = Magnitude();
-	if (magnitude > SAFE_DIV_EPSILON)
+	f32 sqrMagnitude = SqrMagnitude();
+	if (sqrMagnitude > SAFE_DIV_EPSILON)
 	{
-		f32 invMagnitude = 1.0 / magnitude;
+		f32 invSqrMagnitude = 1.0 / sqrMagnitude;
 		return Quat(
-			-x * invMagnitude,
-			-y * invMagnitude,
-			-z * invMagnitude,
-			-w * invMagnitude
+			-x * invSqrMagnitude,
+			-y * invSqrMagnitude,
+			-z * invSqrMagnitude,
+			w * invSqrMagnitude
 		);
 	}
 	else
@@ -448,7 +1049,7 @@ Quat Quat::PlusQuat(const Quat& rhs) const
 	return Quat(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w);
 }
 
-Quat Quat::PlusF32(f32 rhs) const
+Quat Quat::AddScalar(f32 rhs) const
 {
 	return Quat(x + rhs, y + rhs, z + rhs, w + rhs);
 }

@@ -116,21 +116,21 @@ struct Vec2
 
 	void Set(f32 x, f32 y);
 
-	Vec2 PlusF32(f32 rhs) const;
-	Vec2 Plus(const Vec2& rhs) const;
-	inline Vec2 operator+(const f32& rhs) const { return PlusF32(rhs); }
+	Vec2 AddScalar(f32 rhs) const;
+	Vec2 Add(const Vec2& rhs) const;
+	inline Vec2 operator+(const f32& rhs) const { return AddScalar(rhs); }
 	inline Vec2& operator+=(const f32& rhs) { *this = *this + rhs; return *this; }
-	inline Vec2 operator+(const Vec2& rhs) const { return Plus(rhs); }
+	inline Vec2 operator+(const Vec2& rhs) const { return Add(rhs); }
 	inline Vec2& operator+=(const Vec2& rhs) { *this = *this + rhs; return *this; }
 
 	Vec2 Negate() const;
 	inline Vec2 operator-() const { return Negate(); }
 
-	Vec2 MinusF32(f32 rhs) const;
-	Vec2 Minus(const Vec2& rhs) const;
-	inline Vec2 operator-(const f32& rhs) const { return MinusF32(rhs); }
+	Vec2 SubScalar(f32 rhs) const;
+	Vec2 Sub(const Vec2& rhs) const;
+	inline Vec2 operator-(const f32& rhs) const { return SubScalar(rhs); }
 	inline Vec2& operator-=(const f32& rhs) { *this = *this - rhs; return *this; }
-	inline Vec2 operator-(const Vec2& rhs) const { return Minus(rhs); }
+	inline Vec2 operator-(const Vec2& rhs) const { return Sub(rhs); }
 	inline Vec2& operator-=(const Vec2& rhs) { *this = *this - rhs; return *this; }
 
 	Vec2 MulF32(f32 rhs) const;
@@ -186,21 +186,21 @@ struct Vec3
 
 	void Set(f32 x, f32 y, f32 z);
 
-	Vec3 PlusF32(f32 rhs) const;
-	Vec3 Plus(const Vec3& rhs) const;
-	inline Vec3 operator+(const f32& rhs) const { return PlusF32(rhs); }
+	Vec3 AddScalar(f32 rhs) const;
+	Vec3 Add(const Vec3& rhs) const;
+	inline Vec3 operator+(const f32& rhs) const { return AddScalar(rhs); }
 	inline Vec3& operator+=(const f32& rhs) { *this = *this + rhs; return *this; }
-	inline Vec3 operator+(const Vec3& rhs) const { return Plus(rhs); }
+	inline Vec3 operator+(const Vec3& rhs) const { return Add(rhs); }
 	inline Vec3& operator+=(const Vec3& rhs) { *this = *this + rhs; return *this; }
 
 	Vec3 Negate() const;
 	inline Vec3 operator-() const { return Negate(); }
 
-	Vec3 MinusF32(f32 rhs) const;
-	Vec3 Minus(const Vec3& rhs) const;
-	inline Vec3 operator-(const f32& rhs) const { return MinusF32(rhs); }
+	Vec3 SubScalar(f32 rhs) const;
+	Vec3 Sub(const Vec3& rhs) const;
+	inline Vec3 operator-(const f32& rhs) const { return SubScalar(rhs); }
 	inline Vec3& operator-=(const f32& rhs) { *this = *this - rhs; return *this; }
-	inline Vec3 operator-(const Vec3& rhs) const { return Minus(rhs); }
+	inline Vec3 operator-(const Vec3& rhs) const { return Sub(rhs); }
 	inline Vec3& operator-=(const Vec3& rhs) { *this = *this - rhs; return *this; }
 
 	Vec3 MulF32(f32 rhs) const;
@@ -259,21 +259,21 @@ struct Vec4
 
 	void Set(f32 x, f32 y, f32 z, f32 w);
 
-	Vec4 PlusF32(f32 rhs) const;
-	Vec4 Plus(const Vec4& rhs) const;
-	inline Vec4 operator+(const f32& rhs) const { return PlusF32(rhs); }
+	Vec4 AddScalar(f32 rhs) const;
+	Vec4 Add(const Vec4& rhs) const;
+	inline Vec4 operator+(const f32& rhs) const { return AddScalar(rhs); }
 	inline Vec4& operator+=(const f32& rhs) { *this = *this + rhs; return *this; }
-	inline Vec4 operator+(const Vec4& rhs) const { return Plus(rhs); }
+	inline Vec4 operator+(const Vec4& rhs) const { return Add(rhs); }
 	inline Vec4& operator+=(const Vec4& rhs) { *this = *this + rhs; return *this; }
 
 	Vec4 Negate() const;
 	inline Vec4 operator-() const { return Negate(); }
 
-	Vec4 MinusF32(f32 rhs) const;
-	Vec4 Minus(const Vec4& rhs) const;
-	inline Vec4 operator-(const f32& rhs) const { return MinusF32(rhs); }
+	Vec4 SubScalar(f32 rhs) const;
+	Vec4 Sub(const Vec4& rhs) const;
+	inline Vec4 operator-(const f32& rhs) const { return SubScalar(rhs); }
 	inline Vec4& operator-=(const f32& rhs) { *this = *this - rhs; return *this; }
-	inline Vec4 operator-(const Vec4& rhs) const { return Minus(rhs); }
+	inline Vec4 operator-(const Vec4& rhs) const { return Sub(rhs); }
 	inline Vec4& operator-=(const Vec4& rhs) { *this = *this - rhs; return *this; }
 
 	Vec4 MulF32(f32 rhs) const;
@@ -378,9 +378,9 @@ struct Quat
 	Quat Inverse() const;
 
 	Quat PlusQuat(const Quat& rhs) const;
-	Quat PlusF32(f32 rhs) const;
+	Quat AddScalar(f32 rhs) const;
 	inline Quat operator+(const Quat& rhs) const { return PlusQuat(rhs); }
-	inline Quat operator+(const f32& rhs) const { return PlusF32(rhs); }
+	inline Quat operator+(const f32& rhs) const { return AddScalar(rhs); }
 
 	Quat Negate() const;
 	inline Quat operator-() const { return Negate(); }
