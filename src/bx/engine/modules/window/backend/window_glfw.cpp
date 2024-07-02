@@ -138,9 +138,10 @@ bool Window::Initialize()
 	glfwSwapInterval(1);
 
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
+	// TODO: is this check relevant? Vulkan functions are not loaded through glfw.
 	if (!glfwVulkanSupported())
 	{
-		ENGINE_LOGE("GLFW: Vulkan Not Supported!");
+		BX_LOGE("GLFW: Vulkan Not Supported!");
 		return false;
 	}
 #endif
