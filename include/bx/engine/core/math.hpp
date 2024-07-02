@@ -8,18 +8,20 @@
 
 namespace Math
 {
-	static constexpr f32 E = 3.14159265358979323846;		// e
-	static constexpr f32 LOG2E = 3.14159265358979323846;	// log2(e)
-	static constexpr f32 LOG10E = 3.14159265358979323846;	// log10(e)
-	static constexpr f32 LN2 = 3.14159265358979323846;		// ln(2)
-	static constexpr f32 LN10 = 3.14159265358979323846;		// ln(10)
+	static constexpr f64 SAVE_DIV_EPSILON = 0.00001;
 
-	static constexpr f32 PI = 3.14159265358979323846;		// pi
-	static constexpr f32 PI_2 = 3.14159265358979323846;		// pi/2
-	static constexpr f32 PI_4 = 3.14159265358979323846;		// pi/4
-	static constexpr f32 INV_PI = 3.14159265358979323846;	// 1/pi
-	static constexpr f32 SQRT2 = 3.14159265358979323846;	// sqrt(2)
-	static constexpr f32 SQRT1_2 = 3.14159265358979323846;	// 1/sqrt(2)
+	static constexpr f64 E = 2.71828182845904523536;		// e
+	static constexpr f64 LOG2E = 1.44269504088896340736;	// log2(e)
+	static constexpr f64 LOG10E = 0.434294481903251827651;	// log10(e)
+	static constexpr f64 LN2 = 0.693147180559945309417;		// ln(2)
+	static constexpr f64 LN10 = 2.30258509299404568402;		// ln(10)
+
+	static constexpr f64 PI = 3.14159265358979323846;		// pi
+	static constexpr f64 PI_2 = 1.57079632679489661923;		// pi/2
+	static constexpr f64 PI_4 = 0.785398163397448309616;	// pi/4
+	static constexpr f64 INV_PI = 0.318309886183790671538;	// 1/pi
+	static constexpr f64 SQRT2 = 1.41421356237309504880;	// sqrt(2)
+	static constexpr f64 SQRT1_2 = 0.707106781186547524401;	// 1/sqrt(2)
 
 
 	template <typename T>
