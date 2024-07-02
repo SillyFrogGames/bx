@@ -45,6 +45,6 @@ namespace cereal
 	template<class Archive>
 	void serialize(Archive& archive, Mat4& data)
 	{
-		archive(make_nvp("x", data.columns[0]), make_nvp("y", data.columns[1]), make_nvp("z", data.columns[2]), make_nvp("w", data.columns[3]));
+		archive(make_nvp("x", data.basis[0]), make_nvp("y", data.basis[1]), make_nvp("z", data.basis[2]), make_nvp("w", data.basis[3]));
 	}
 }

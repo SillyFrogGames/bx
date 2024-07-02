@@ -40,6 +40,14 @@ static glm::quat QuatToGLM(const Quat& q)
 }
 #endif
 
+//#define USE_GLM_IMPL
+
+#ifdef USE_GLM_IMPL
+
+
+
+#else
+
 f32 Vec2::At(i32 i) const
 {
 	return data[i];
@@ -619,7 +627,7 @@ f32 Mat4::At(i32 i) const
 
 f32 Mat4::At(i32 i, i32 j) const
 {
-	return columns[i][j];
+	return basis[i][j];
 }
 
 Mat4 Mat4::Mul(const Mat4& rhs) const
@@ -640,14 +648,14 @@ Mat4 Mat4::Mul(const Mat4& rhs) const
 
 Vec4 Mat4::MulVec4(const Vec4& rhs) const
 {
-	return Vec4(this->columns[0].x * rhs.x + this->columns[1].x * rhs.y +
-		this->columns[2].x * rhs.z + this->columns[3].x * rhs.w,
-		this->columns[0].y * rhs.x + this->columns[1].y * rhs.y +
-		this->columns[2].y * rhs.z + this->columns[3].y * rhs.w,
-		this->columns[0].z * rhs.x + this->columns[1].z * rhs.y +
-		this->columns[2].z * rhs.z + this->columns[3].z * rhs.w,
-		this->columns[0].w * rhs.x + this->columns[1].w * rhs.y +
-		this->columns[2].w * rhs.z + this->columns[3].w * rhs.w);
+	return Vec4(this->basis[0].x * rhs.x + this->basis[1].x * rhs.y +
+		this->basis[2].x * rhs.z + this->basis[3].x * rhs.w,
+		this->basis[0].y * rhs.x + this->basis[1].y * rhs.y +
+		this->basis[2].y * rhs.z + this->basis[3].y * rhs.w,
+		this->basis[0].z * rhs.x + this->basis[1].z * rhs.y +
+		this->basis[2].z * rhs.z + this->basis[3].z * rhs.w,
+		this->basis[0].w * rhs.x + this->basis[1].w * rhs.y +
+		this->basis[2].w * rhs.z + this->basis[3].w * rhs.w);
 }
 
 Mat4 Mat4::Transpose() const
@@ -892,12 +900,12 @@ Mat4 Mat4::TRS(const Vec3& translation, const Quat& rotation, const Vec3& scale)
 
 void Mat4::Decompose(const Mat4& matrix, Vec3& pos, Quat& rot, Vec3& scl)
 {
-	pos = Vec3(matrix.columns[3][0], matrix.columns[3][1], matrix.columns[3][2]);
+	pos = Vec3(matrix.basis[3][0], matrix.basis[3][1], matrix.basis[3][2]);
 	rot = Quat::FromMat4(matrix);
 	scl = Vec3(
-		Vec3(matrix.columns[0][0], matrix.columns[0][1], matrix.columns[0][2]).Magnitude(),
-		Vec3(matrix.columns[1][0], matrix.columns[1][1], matrix.columns[1][2]).Magnitude(),
-		Vec3(matrix.columns[2][0], matrix.columns[2][1], matrix.columns[2][2]).Magnitude()
+		Vec3(matrix.basis[0][0], matrix.basis[0][1], matrix.basis[0][2]).Magnitude(),
+		Vec3(matrix.basis[1][0], matrix.basis[1][1], matrix.basis[1][2]).Magnitude(),
+		Vec3(matrix.basis[2][0], matrix.basis[2][1], matrix.basis[2][2]).Magnitude()
 	);
 }
 
@@ -907,3 +915,5 @@ Mat4 Mat4::FromValuePtr(f32* vptr)
 	memcpy(m.data, vptr, sizeof(Mat4));
 	return m;
 }
+
+#endif // USE_GLM_IMPL

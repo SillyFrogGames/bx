@@ -418,21 +418,21 @@ struct Mat4
 {
 	Mat4() : data{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 } {}
 	Mat4(const Vec4& x, const Vec4& y, const Vec4& z, const Vec4& w)
-		: columns{ x, y, z, w }
+		: basis{ x, y, z, w }
 	{}
 
 	union
 	{
 		f32 data[16];
-		Vec4 columns[4];
+		Vec4 basis[4];
 	};
 
 	f32 At(i32 i) const;
 	f32 At(i32 i, i32 j) const;
 	inline f32& operator[](i32 i) { return data[i]; }
 	inline const f32& operator[](i32 i) const { return data[i]; }
-	f32& operator()(u32 i, u32 j) { return columns[i][j]; }
-	const f32& operator()(u32 i, u32 j) const { return columns[i][j]; }
+	f32& operator()(u32 i, u32 j) { return basis[i][j]; }
+	const f32& operator()(u32 i, u32 j) const { return basis[i][j]; }
 
 	Mat4 Mul(const Mat4& rhs) const;
 	Vec4 MulVec4(const Vec4& rhs) const;
