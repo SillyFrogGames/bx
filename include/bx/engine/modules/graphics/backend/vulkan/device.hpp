@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bx/engine/core/guard.hpp"
+
 #include "vulkan_api.hpp"
 
 namespace Vk
@@ -7,13 +9,11 @@ namespace Vk
     class Instance;
 	class PhysicalDevice;
 
-    class Device {
+    class Device : NoCopy {
     public:
         Device(std::shared_ptr<Instance> instance,
             const PhysicalDevice& physicalDevice, bool debug);
         ~Device();
-        Device(const Device& other) = delete;
-        Device& operator=(const Device& other) = delete;
 
         void WaitIdle() const;
 

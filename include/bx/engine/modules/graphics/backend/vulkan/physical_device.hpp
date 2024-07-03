@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bx/engine/core/guard.hpp"
+
 #include "vulkan_api.hpp"
 
 namespace Vk
@@ -11,7 +13,7 @@ namespace Vk
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR pipelineProperties;
     };
 
-    class PhysicalDevice {
+    class PhysicalDevice : NoCopy {
     public:
         PhysicalDevice(const Instance& instance);
 

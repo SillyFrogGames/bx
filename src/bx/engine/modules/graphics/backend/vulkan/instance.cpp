@@ -80,7 +80,7 @@ namespace Vk
         return this->surface;
     }
 
-    // TODO: ifdef this for different platforms, rn this works only on windows
+#ifdef BX_PLATFORM_PC
     VkSurfaceKHR Instance::CreateSurface(void* window, VkInstance instance) {
         VkWin32SurfaceCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -92,4 +92,7 @@ namespace Vk
             "Failed to create surface.");
         return surface;
     }
+#elif defined BX_PLATFORM_LINUX
+    // TODO
+#endif
 }

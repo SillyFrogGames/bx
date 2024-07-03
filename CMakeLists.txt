@@ -184,6 +184,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/vulkan/device.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/extensions.cpp"
+		"src/bx/engine/modules/graphics/backend/vulkan/fence.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/instance.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/pfn.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/physical_device.cpp"
