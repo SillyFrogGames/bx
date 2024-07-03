@@ -46,6 +46,8 @@ bool Graphics::Initialize()
     std::unique_ptr<CmdQueue> cmdQueue = std::make_unique<CmdQueue>(device, *physicalDevice, QueueType::GRAPHICS);
     std::unique_ptr<DescriptorPool> descriptorPool = std::make_unique<DescriptorPool>(device);
 
+    std::unique_ptr<Swapchain> swapchain = std::make_unique<Swapchain>(512, 512, *instance, device, *physicalDevice);
+
     std::shared_ptr<Fence> fence = std::make_shared<Fence>("my fence", device);
     std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>("my semaphore", device);
 
@@ -53,6 +55,8 @@ bool Graphics::Initialize()
     std::shared_ptr<Image> depthImage = std::make_shared<Image>("my depth image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_FORMAT_D24_UNORM_S8_UINT);
     std::shared_ptr<RenderPass> renderPass = std::make_shared<RenderPass>("my render pass", device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
     std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>("my framebuffer", device, List<std::shared_ptr<Image>>{image, depthImage}, renderPass);
+
+    // TODO: get resize callback to graphics module
 
     return true;
 }

@@ -64,7 +64,7 @@ namespace Vk
         submitInfo.pCommandBuffers = &cmdList->cmdBuffer;
 
         if (!fence)
-            fence = std::make_shared<Fence>("submit cmd list", this->device);
+            fence = std::make_shared<Fence>("Submit Cmd List", this->device);
         vkQueueSubmit(this->queue, 1, &submitInfo, fence->GetFence());
 
         this->busyCmdLists.push(InFlightCmdList{ fence, cmdList });

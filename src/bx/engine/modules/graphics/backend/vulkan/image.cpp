@@ -34,7 +34,7 @@ namespace Vk
         return this->format;
     }
 
-    Image::Image(const std::string& name, std::shared_ptr<Device> device,
+    Image::Image(const String& name, std::shared_ptr<Device> device,
         const PhysicalDevice& physicalDevice, uint32_t width, uint32_t height,
         uint32_t mips, VkImageUsageFlags usage, VkFormat format, uint32_t arrayLayers,
         VkImageType dims, unsigned depth)
@@ -94,6 +94,21 @@ namespace Vk
 
         BX_ASSERT(!vkCreateImageView(device->GetDevice(), &viewInfo, nullptr, &this->imageView),
             "Failed to create image view");
+    }
+
+    Image::Image(const String& name, std::shared_ptr<Device> device, VkImage image, VkImageView imageView,
+        uint32_t width, uint32_t height)
+        : device(device),
+        image(image),
+        imageView(imageView),
+        allocation(VK_NULL_HANDLE),
+        width(width),
+        height(height),
+        depth(1),
+        mips(1),
+        arrayLayers(1) {
+        DebugNames::Set(*device, VK_OBJECT_TYPE_IMAGE, reinterpret_cast<uint64_t>(this->image),
+            name);
     }
 
     Image::~Image() {
