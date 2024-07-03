@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bx/engine/core/guard.hpp"
+#include "bx/engine/containers/string.hpp"
 
 #include "vulkan_api.hpp"
 
@@ -10,7 +11,7 @@ namespace Vk
 
     class Semaphore : NoCopy {
     public:
-        Semaphore(const std::string& name, std::shared_ptr<Device> device);
+        Semaphore(const String& name, std::shared_ptr<Device> device);
         ~Semaphore();
         explicit Semaphore(Semaphore&& other) noexcept;
         Semaphore& operator=(Semaphore&& other) noexcept;

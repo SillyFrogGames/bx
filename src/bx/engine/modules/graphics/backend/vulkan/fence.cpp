@@ -7,7 +7,7 @@
 
 namespace Vk
 {
-    Fence::Fence(const std::string& name, std::shared_ptr<Device> device, bool signaled) : device(device) {
+    Fence::Fence(const String& name, std::shared_ptr<Device> device, bool signaled) : device(device) {
         VkFenceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         createInfo.flags = signaled ? VkFenceCreateFlagBits::VK_FENCE_CREATE_SIGNALED_BIT : 0;

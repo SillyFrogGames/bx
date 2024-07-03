@@ -45,7 +45,7 @@ namespace Vk
     }
 
     void DebugNames::Set(const Device& device, VkObjectType type, uint64_t handle,
-        const std::string& name) {
+        const String& name) {
         VkDebugUtilsObjectNameInfoEXT nameInfo{};
         nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
         nameInfo.objectType = type;

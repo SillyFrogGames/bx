@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bx/engine/containers/list.hpp"
+#include "bx/engine/containers/string.hpp"
 
 #include "vulkan_api.hpp"
 
@@ -20,6 +21,6 @@ namespace Vk
     {
     public:
         static void Set(const Device& device, VkObjectType type, uint64_t handle,
-            const std::string& name);
+            const String& name);
     };
 }
