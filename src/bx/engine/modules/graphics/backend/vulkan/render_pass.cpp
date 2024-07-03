@@ -7,7 +7,7 @@
 
 namespace Vk
 {
-    RenderPass::RenderPass(std::shared_ptr<Device> device,
+    RenderPass::RenderPass(const String& name, std::shared_ptr<Device> device,
         const List<VkFormat>& colorFormats,
         const Optional<VkFormat>& depthFormat)
         : device(device) {
@@ -80,6 +80,9 @@ namespace Vk
         BX_ASSERT(
             !vkCreateRenderPass(device->GetDevice(), &renderPassInfo, nullptr, &this->renderPass),
             "Failed to create render pass.");
+        
+        DebugNames::Set(*device, VkObjectType::VK_OBJECT_TYPE_RENDER_PASS,
+            reinterpret_cast<uint64_t>(this->renderPass), name);
     }
 
     RenderPass::~RenderPass() {

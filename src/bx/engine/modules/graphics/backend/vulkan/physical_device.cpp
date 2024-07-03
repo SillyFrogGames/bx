@@ -52,7 +52,7 @@ namespace Vk
 
         VkPhysicalDeviceProperties deviceProperties;
         vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
-        BX_LOGI("Using Device: %s", deviceProperties.deviceName);
+        BX_LOGI("Using Device: {}", deviceProperties.deviceName);
 
         return std::make_pair(physicalDevice, raytracingSuitable);
     }

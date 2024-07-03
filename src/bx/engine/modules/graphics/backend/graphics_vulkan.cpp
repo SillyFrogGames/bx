@@ -13,7 +13,9 @@
 #include "bx/engine/modules/graphics/backend/vulkan/fence.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/semaphore.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/render_pass.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/image.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/swapchain.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/framebuffer.hpp"
 
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
@@ -41,7 +43,10 @@ bool Graphics::Initialize()
     std::shared_ptr<Vk::Fence> fence = std::make_shared<Vk::Fence>("my fence", device);
     std::shared_ptr<Vk::Semaphore> semaphore = std::make_shared<Vk::Semaphore>("my semaphore", device);
 
-    std::shared_ptr<Vk::RenderPass> renderPass = std::make_shared<Vk::RenderPass>(device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
+    std::shared_ptr<Vk::Image> image = std::make_shared<Vk::Image>("my image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Vk::Image> depthImage = std::make_shared<Vk::Image>("my depth image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_FORMAT_D24_UNORM_S8_UINT);
+    std::shared_ptr<Vk::RenderPass> renderPass = std::make_shared<Vk::RenderPass>("my render pass", device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
+    std::shared_ptr<Vk::Framebuffer> framebuffer = std::make_shared<Vk::Framebuffer>("my framebuffer", device, List<std::shared_ptr<Vk::Image>>{image, depthImage}, renderPass);
 
     return true;
 }

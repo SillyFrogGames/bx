@@ -3,6 +3,7 @@
 #include "bx/engine/core/guard.hpp"
 #include "bx/engine/containers/optional.hpp"
 #include "bx/engine/containers/list.hpp"
+#include "bx/engine/containers/string.hpp"
 
 #include "vulkan_api.hpp"
 
@@ -14,7 +15,8 @@ namespace Vk
 
     class RenderPass : NoCopy {
     public:
-        RenderPass(std::shared_ptr<Device> device,
+        RenderPass(const String& name,
+            std::shared_ptr<Device> device,
             const List<VkFormat>& colorFormats,
             const Optional<VkFormat>& depthFormat);
         ~RenderPass();

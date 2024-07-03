@@ -24,7 +24,7 @@ namespace Vk
                 }
             }
 
-            BX_ASSERT(layerFound, "Validation layer '%s' is not supported.", layerName);
+            BX_ASSERT(layerFound, "Validation layer '{}' is not supported.", layerName);
         }
     }
 
@@ -32,15 +32,15 @@ namespace Vk
         uint64_t srcObject, size_t location, int32_t msgCode,
         const char* pLayerPrefix, const char* pMsg, void* pUserData) {
         if (msgFlags & VK_DEBUG_REPORT_ERROR_BIT_EXT)
-            BX_LOGE("[%s] %s", pLayerPrefix, pMsg);
+            BX_LOGE("[{}] {}", pLayerPrefix, pMsg);
         else if (msgFlags & VK_DEBUG_REPORT_WARNING_BIT_EXT)
-            BX_LOGW("[%s]  %s", pLayerPrefix, pMsg);
+            BX_LOGW("[{}] {}", pLayerPrefix, pMsg);
         else if (msgFlags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
-            BX_LOGI("[%s] %s", pLayerPrefix, pMsg);
+            BX_LOGI("[{}] {}", pLayerPrefix, pMsg);
         else if (msgFlags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
-            BX_LOGW("[%s] %s", pLayerPrefix, pMsg);
+            BX_LOGW("[{}] {}", pLayerPrefix, pMsg);
         else if (msgFlags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
-            BX_LOGI("[%s] %s", pLayerPrefix, pMsg);
+            BX_LOGI("[{}] {}", pLayerPrefix, pMsg);
         return 0;
     }
 
