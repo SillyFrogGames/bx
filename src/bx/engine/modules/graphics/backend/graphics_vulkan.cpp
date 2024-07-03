@@ -7,11 +7,10 @@
 
 #include "bx/engine/modules/window.hpp"
 
+#include "bx/engine/modules/graphics/backend/vulkan/instance.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/physical_device.hpp"
+
 #ifdef BX_WINDOW_GLFW_BACKEND
-#define GLFW_INCLUDE_NONE
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#include <vulkan/vulkan.h>
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
 
@@ -30,7 +29,8 @@ bool Graphics::Initialize()
     return false;
 #endif
 
-
+    std::unique_ptr<Vk::Instance> instance = std::make_unique<Vk::Instance>((void*)glfwWindow, true);
+    std::unique_ptr<Vk::PhysicalDevice> physicalDevice = std::make_unique<Vk::PhysicalDevice>(*instance);
 
     return true;
 }

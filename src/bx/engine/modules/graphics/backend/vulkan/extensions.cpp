@@ -54,4 +54,22 @@ namespace Vk
 
         return supported;
     }
+
+#if defined BX_PLATFORM_PC || defined BX_PLATFORM_LINUX
+    List<const char*> PlatformInstanceExtensions() {
+        std::vector<const char*> extensions{};
+
+#ifdef BX_WINDOW_GLFW_BACKEND
+        uint32_t glfwExtensionCount = 0;
+        const char** ppGlfwExtensions;
+        ppGlfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+        extensions.resize(glfwExtensionCount);
+        for (size_t i = 0; i < static_cast<size_t>(glfwExtensionCount); i++) {
+            extensions[i] = ppGlfwExtensions[i];
+        }
+#endif
+
+        return extensions;
+    }
+#endif
 }

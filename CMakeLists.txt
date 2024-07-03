@@ -87,7 +87,6 @@ endif ()
 message ("CMake build type: ${CMAKE_BUILD_TYPE}")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 	add_compile_definitions (BX_DEBUG_BUILD)
-
 else ()
     add_compile_definitions (BX_RELEASE_BUILD)
 endif ()
@@ -186,6 +185,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 		"src/bx/engine/modules/graphics/backend/vulkan/extensions.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/instance.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/pfn.cpp"
+		"src/bx/engine/modules/graphics/backend/vulkan/physical_device.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/validation.cpp"
 		"src/bx/engine/modules/graphics/backend/graphics_vulkan.cpp"
 	)
