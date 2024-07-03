@@ -16,6 +16,9 @@
 #include "bx/engine/modules/graphics/backend/vulkan/image.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/swapchain.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/framebuffer.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/cmd_queue.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/cmd_list.hpp"
+using namespace Vk;
 
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
@@ -36,17 +39,18 @@ bool Graphics::Initialize()
     return false;
 #endif
 
-    std::shared_ptr<Vk::Instance> instance = std::make_shared<Vk::Instance>((void*)glfwWindow, true);
-    std::unique_ptr<Vk::PhysicalDevice> physicalDevice = std::make_unique<Vk::PhysicalDevice>(*instance);
-    std::shared_ptr<Vk::Device> device = std::make_shared<Vk::Device>(instance, *physicalDevice, true);
+    std::shared_ptr<Instance> instance = std::make_shared<Instance>((void*)glfwWindow, true);
+    std::unique_ptr<PhysicalDevice> physicalDevice = std::make_unique<PhysicalDevice>(*instance);
+    std::shared_ptr<Device> device = std::make_shared<Device>(instance, *physicalDevice, true);
+    std::unique_ptr<CmdQueue> cmdQueue = std::make_unique<CmdQueue>(device, *physicalDevice, QueueType::GRAPHICS);
 
-    std::shared_ptr<Vk::Fence> fence = std::make_shared<Vk::Fence>("my fence", device);
-    std::shared_ptr<Vk::Semaphore> semaphore = std::make_shared<Vk::Semaphore>("my semaphore", device);
+    std::shared_ptr<Fence> fence = std::make_shared<Fence>("my fence", device);
+    std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>("my semaphore", device);
 
-    std::shared_ptr<Vk::Image> image = std::make_shared<Vk::Image>("my image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_FORMAT_R8G8B8A8_SRGB);
-    std::shared_ptr<Vk::Image> depthImage = std::make_shared<Vk::Image>("my depth image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_FORMAT_D24_UNORM_S8_UINT);
-    std::shared_ptr<Vk::RenderPass> renderPass = std::make_shared<Vk::RenderPass>("my render pass", device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
-    std::shared_ptr<Vk::Framebuffer> framebuffer = std::make_shared<Vk::Framebuffer>("my framebuffer", device, List<std::shared_ptr<Vk::Image>>{image, depthImage}, renderPass);
+    std::shared_ptr<Image> image = std::make_shared<Image>("my image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_FORMAT_R8G8B8A8_SRGB);
+    std::shared_ptr<Image> depthImage = std::make_shared<Image>("my depth image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_FORMAT_D24_UNORM_S8_UINT);
+    std::shared_ptr<RenderPass> renderPass = std::make_shared<RenderPass>("my render pass", device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
+    std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>("my framebuffer", device, List<std::shared_ptr<Image>>{image, depthImage}, renderPass);
 
     return true;
 }
