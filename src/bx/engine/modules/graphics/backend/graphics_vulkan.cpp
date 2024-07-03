@@ -12,6 +12,8 @@
 #include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/fence.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/semaphore.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/render_pass.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/swapchain.hpp"
 
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
@@ -38,6 +40,8 @@ bool Graphics::Initialize()
 
     std::shared_ptr<Vk::Fence> fence = std::make_shared<Vk::Fence>("my fence", device);
     std::shared_ptr<Vk::Semaphore> semaphore = std::make_shared<Vk::Semaphore>("my semaphore", device);
+
+    std::shared_ptr<Vk::RenderPass> renderPass = std::make_shared<Vk::RenderPass>(device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
 
     return true;
 }
