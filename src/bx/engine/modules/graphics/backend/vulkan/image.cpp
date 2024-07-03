@@ -5,11 +5,8 @@
 #include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/physical_device.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/validation.hpp"
-
-// TODO: move to some vk format utils file
-bool IsDepthFormat(VkFormat format) {
-    return format == VK_FORMAT_D32_SFLOAT || format == VK_FORMAT_D24_UNORM_S8_UINT;
-}
+#include "bx/engine/modules/graphics/backend/vulkan/image_format.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/resource_state_tracker.hpp"
 
 namespace Vk
 {

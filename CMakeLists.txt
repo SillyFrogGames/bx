@@ -189,6 +189,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 		"src/bx/engine/modules/graphics/backend/vulkan/instance.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/pfn.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/physical_device.cpp"
+		"src/bx/engine/modules/graphics/backend/vulkan/resource_state_tracker.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/semaphore.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/swapchain.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/validation.cpp"
