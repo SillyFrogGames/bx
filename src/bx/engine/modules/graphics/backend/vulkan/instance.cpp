@@ -18,9 +18,9 @@ namespace Vk
     VkInstance CreateInstance(bool debug) {
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "DLR App";
+        appInfo.pApplicationName = "BX App";
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "DLR";
+        appInfo.pEngineName = "BX";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.apiVersion = VULKAN_VERSION;
 
