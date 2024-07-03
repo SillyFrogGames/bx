@@ -10,7 +10,7 @@ namespace Vk
 
     class Fence : NoCopy {
     public:
-        Fence(std::shared_ptr<Device> device, bool signaled = false);
+        Fence(const std::string& name, std::shared_ptr<Device> device, bool signaled = false);
         ~Fence();
         explicit Fence(Fence&& other) noexcept;
         Fence& operator=(Fence&& other) noexcept;

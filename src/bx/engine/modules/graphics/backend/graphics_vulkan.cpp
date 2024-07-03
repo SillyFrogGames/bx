@@ -10,6 +10,8 @@
 #include "bx/engine/modules/graphics/backend/vulkan/instance.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/physical_device.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/fence.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/semaphore.hpp"
 
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
@@ -33,6 +35,9 @@ bool Graphics::Initialize()
     std::shared_ptr<Vk::Instance> instance = std::make_shared<Vk::Instance>((void*)glfwWindow, true);
     std::unique_ptr<Vk::PhysicalDevice> physicalDevice = std::make_unique<Vk::PhysicalDevice>(*instance);
     std::shared_ptr<Vk::Device> device = std::make_shared<Vk::Device>(instance, *physicalDevice, true);
+
+    std::shared_ptr<Vk::Fence> fence = std::make_shared<Vk::Fence>("my fence", device);
+    std::shared_ptr<Vk::Semaphore> semaphore = std::make_shared<Vk::Semaphore>("my semaphore", device);
 
     return true;
 }

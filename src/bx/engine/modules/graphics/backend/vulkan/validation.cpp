@@ -2,6 +2,9 @@
 
 #include "bx/engine/core/macros.hpp"
 
+#include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/pfn.hpp"
+
 namespace Vk
 {
     void CheckValidationLayerSupport() {
@@ -39,5 +42,16 @@ namespace Vk
         else if (msgFlags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)
             BX_LOGI("[%s] %s", pLayerPrefix, pMsg);
         return 0;
+    }
+
+    void DebugNames::Set(const Device& device, VkObjectType type, uint64_t handle,
+        const std::string& name) {
+        VkDebugUtilsObjectNameInfoEXT nameInfo{};
+        nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+        nameInfo.objectType = type;
+        nameInfo.objectHandle = handle;
+        nameInfo.pObjectName = name.c_str();
+
+        Pfn::vkSetDebugUtilsObjectNameEXT(device.GetDevice(), &nameInfo);
     }
 }

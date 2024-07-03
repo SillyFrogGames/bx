@@ -3,16 +3,20 @@
 #include "bx/engine/core/macros.hpp"
 
 #include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/validation.hpp"
 
 namespace Vk
 {
-    Fence::Fence(std::shared_ptr<Device> device, bool signaled) : device(device) {
+    Fence::Fence(const std::string& name, std::shared_ptr<Device> device, bool signaled) : device(device) {
         VkFenceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         createInfo.flags = signaled ? VkFenceCreateFlagBits::VK_FENCE_CREATE_SIGNALED_BIT : 0;
 
         BX_ASSERT(!vkCreateFence(device->GetDevice(), &createInfo, nullptr, &this->fence),
             "Failed to create fence.");
+        
+        DebugNames::Set(*device, VkObjectType::VK_OBJECT_TYPE_FENCE,
+            reinterpret_cast<uint64_t>(this->fence), name);
     }
 
     Fence::Fence(Fence&& other) noexcept : fence(other.fence), device(other.device) {
