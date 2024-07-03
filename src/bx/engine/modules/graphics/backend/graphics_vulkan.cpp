@@ -18,6 +18,7 @@
 #include "bx/engine/modules/graphics/backend/vulkan/framebuffer.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/cmd_queue.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/cmd_list.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/descriptor_pool.hpp"
 using namespace Vk;
 
 #ifdef BX_WINDOW_GLFW_BACKEND
@@ -43,6 +44,7 @@ bool Graphics::Initialize()
     std::unique_ptr<PhysicalDevice> physicalDevice = std::make_unique<PhysicalDevice>(*instance);
     std::shared_ptr<Device> device = std::make_shared<Device>(instance, *physicalDevice, true);
     std::unique_ptr<CmdQueue> cmdQueue = std::make_unique<CmdQueue>(device, *physicalDevice, QueueType::GRAPHICS);
+    std::unique_ptr<DescriptorPool> descriptorPool = std::make_unique<DescriptorPool>(device);
 
     std::shared_ptr<Fence> fence = std::make_shared<Fence>("my fence", device);
     std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>("my semaphore", device);
