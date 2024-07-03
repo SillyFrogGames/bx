@@ -24,6 +24,9 @@ add_subdirectory (glm)
 # Portaudio lib
 add_subdirectory (portaudio)
 
+# VulkanMemoryAllocator lib
+add_subdirectory (VulkanMemoryAllocator)
+
 # Wren lib
 add_library (wren STATIC
 	"wren/src/optional/wren_opt_meta.c"
@@ -114,8 +117,9 @@ if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
 elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
     # Vulkan
 	find_package(Vulkan REQUIRED)
+	find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 	add_library(vulkan INTERFACE)
-	target_link_libraries(vulkan INTERFACE Vulkan::Vulkan)# Vulkan::glslang Vulkan::glslang-spirv)
+	target_link_libraries(vulkan INTERFACE Vulkan::Vulkan GPUOpen::VulkanMemoryAllocator)# Vulkan::glslang Vulkan::glslang-spirv)
 	
 	# Glslang
 	#set (ENABLE_OPT OFF)

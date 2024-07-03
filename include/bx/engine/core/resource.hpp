@@ -195,7 +195,7 @@ public:
 		BX_ENSURE(it != m_database.end());
 
 		it->second.refCount++;
-		BX_LOGD("Resource ({}) increment ref count {}", handle, it->second.refCount);
+		//BX_LOGD("Resource ({}) increment ref count {}", handle, it->second.refCount);
 	}
 
 	inline void DecreaseRefCount(ResourceHandle handle, UnloadFn unloadFn)
@@ -207,7 +207,7 @@ public:
 
 		BX_ENSURE(it->second.refCount > 0);
 		it->second.refCount--;
-		BX_LOGD("Resource ({}) decrement ref count {}", handle, it->second.refCount);
+		//BX_LOGD("Resource ({}) decrement ref count {}", handle, it->second.refCount);
 
 		if (it->second.refCount == 0)
 		{

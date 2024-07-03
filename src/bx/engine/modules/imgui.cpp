@@ -70,8 +70,9 @@ bool ImGuiImpl::Initialize()
     //if (!ImGui_ImplVulkan_Init())
 #endif
     {
-        BX_LOGE("Failed to initialize ImGui OpenGL backend!");
-        return false;
+        // TODO: reenable
+        //BX_LOGE("Failed to initialize ImGui OpenGL backend!");
+        //return false;
     }
 
     //ImGui::CreateContext();
