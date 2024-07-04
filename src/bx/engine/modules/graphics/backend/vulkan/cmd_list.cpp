@@ -4,6 +4,14 @@
 
 #include "bx/engine/modules/graphics/backend/vulkan/device.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/cmd_queue.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/buffer.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/image.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/graphics_pipeline.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/rect2d.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/render_pass.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/framebuffer.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/descriptor_set.hpp"
+#include "bx/engine/modules/graphics/backend/vulkan/resource_state_tracker.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/validation.hpp"
 
 namespace Vk
@@ -40,16 +48,16 @@ namespace Vk
     void CmdList::Reset() {
         vkResetCommandBuffer(this->cmdBuffer, 0);
 
-        /*this->boundGraphicsPipeline.reset();
-        this->boundComputePipeline.reset();
+        this->boundGraphicsPipeline.reset();
+        //this->boundComputePipeline.reset();
         this->trackedRenderPasses.clear();
         this->trackedBuffers.clear();
         this->trackedImages.clear();
-        this->trackedDescriptorSets.clear();*/
+        this->trackedDescriptorSets.clear();
     }
 
-    /*void CmdList::CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Buffer> dst) {
-        DLR_ASSERT(src->Size() == dst->Size(), "Copy buffers src and dst must have the same size.");
+    void CmdList::CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Buffer> dst) {
+        BX_ASSERT(src->Size() == dst->Size(), "Copy buffers src and dst must have the same size.");
 
         VkBufferCopy copyRegion{};
         copyRegion.size = src->Size();
@@ -80,12 +88,12 @@ namespace Vk
     }
 
     void CmdList::CopyImages(std::shared_ptr<Image> src, std::shared_ptr<Image> dst) {
-        this->TransitionImageLayout(src, ImageLayout::TRANSFER_SRC_OPTIMAL,
-            ResourceAccessBits::ACCESS_TRANSFER_READ_BIT,
-            PipelineStageBits::PIPELINE_STAGE_TRANSFER_BIT);
-        this->TransitionImageLayout(dst, ImageLayout::TRANSFER_DST_OPTIMAL,
-            ResourceAccessBits::ACCESS_TRANSFER_WRITE_BIT,
-            PipelineStageBits::PIPELINE_STAGE_TRANSFER_BIT);
+        this->TransitionImageLayout(src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            VK_ACCESS_TRANSFER_READ_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT);
+        this->TransitionImageLayout(dst, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_ACCESS_TRANSFER_WRITE_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT);
 
         VkImageBlit blit{};
         blit.srcOffsets[0] = { 0, 0, 0 };
@@ -115,9 +123,9 @@ namespace Vk
 
     void CmdList::CopyImagesIntoCubemap(const std::array<std::shared_ptr<Image>, 6>& images,
         std::shared_ptr<Image> cubemap) {
-        this->TransitionImageLayout(cubemap, ImageLayout::TRANSFER_DST_OPTIMAL,
-            ResourceAccessBits::ACCESS_TRANSFER_WRITE_BIT,
-            PipelineStageBits::PIPELINE_STAGE_TRANSFER_BIT);
+        this->TransitionImageLayout(cubemap, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_ACCESS_TRANSFER_WRITE_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT);
 
         VkImageCopy imageCopy{};
         imageCopy.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -132,9 +140,9 @@ namespace Vk
         uint32_t mipHeight = cubemap->Height();
 
         for (size_t i = 0; i < images.size(); i++) {
-            this->TransitionImageLayout(images[i], ImageLayout::TRANSFER_SRC_OPTIMAL,
-                ResourceAccessBits::ACCESS_TRANSFER_READ_BIT,
-                PipelineStageBits::PIPELINE_STAGE_TRANSFER_BIT);
+            this->TransitionImageLayout(images[i], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                VK_ACCESS_TRANSFER_READ_BIT,
+                VK_PIPELINE_STAGE_TRANSFER_BIT);
         }
 
         for (uint32_t mip = 0; mip < images[0]->Mips(); mip++) {
@@ -157,9 +165,9 @@ namespace Vk
                 mipHeight /= 2;
         }
 
-        this->TransitionImageLayout(cubemap, ImageLayout::SHADER_READ_ONLY_OPTIMAL,
-            ResourceAccessBits::ACCESS_SHADER_READ_BIT,
-            PipelineStageBits::PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
+        this->TransitionImageLayout(cubemap, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_ACCESS_SHADER_READ_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
     }
 
     void CmdList::GenerateMips(std::shared_ptr<Image> image) {
@@ -238,12 +246,12 @@ namespace Vk
         this->trackedImages.push_back(image);
     }
 
-    void CmdList::TransitionImageLayout(std::shared_ptr<Image> image, ImageLayout layout,
-        ResourceAccess access, PipelineStage pipelineStage) {
+    void CmdList::TransitionImageLayout(std::shared_ptr<Image> image, VkImageLayout layout,
+        VkAccessFlags access, VkPipelineStageFlags pipelineStage) {
         ImageState imageState;
-        imageState.layout = GetVkImageLayout(layout);
-        imageState.accessFlags = GetVkAccessFlags(access);
-        imageState.stageFlags = GetVkPipelineStageFlags(pipelineStage);
+        imageState.layout = layout;
+        imageState.accessFlags = access;
+        imageState.stageFlags = pipelineStage;
 
         ResourceStateTracker::TransitionImage(this->cmdBuffer, *image, imageState);
         this->trackedImages.push_back(image);
@@ -293,7 +301,7 @@ namespace Vk
         this->trackedBuffers.push_back(indexBuffer);
     }
 
-    void CmdList::BuildBLAS(VkAccelerationStructureGeometryKHR geometry,
+    /*void CmdList::BuildBLAS(VkAccelerationStructureGeometryKHR geometry,
         std::shared_ptr<Buffer> scratchBuffer,
         std::shared_ptr<Buffer> resultBuffer, VkAccelerationStructureKHR blas,
         uint32_t indexCount) {
@@ -316,10 +324,10 @@ namespace Vk
 
         this->trackedBuffers.push_back(scratchBuffer);
         this->trackedBuffers.push_back(resultBuffer);
-    }
+    }*/
 
     void CmdList::BeginRenderPass(std::shared_ptr<RenderPass> renderPass,
-        const Framebuffer& framebuffer, const glm::vec4& clearColor) {
+        const Framebuffer& framebuffer, const Color& clearColor) {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass->GetRenderPass();
@@ -344,16 +352,14 @@ namespace Vk
     }
 
     void CmdList::BindDescriptorSet(std::shared_ptr<DescriptorSet> descriptorSet, uint32_t set,
-        PipelineType pipelineType) {
+        VkPipelineBindPoint pipelineType) {
         VkDescriptorSet descriptorSets[] = { descriptorSet->GetDescriptorSet() };
 
-        VkPipelineBindPoint bindPoint = (pipelineType == PipelineType::GRAPHICS)
-            ? VK_PIPELINE_BIND_POINT_GRAPHICS
-            : VK_PIPELINE_BIND_POINT_COMPUTE;
-        VkPipelineLayout layout = (pipelineType == PipelineType::GRAPHICS)
+        VkPipelineLayout layout = this->boundGraphicsPipeline->GetLayout();
+        /*VkPipelineLayout layout = (pipelineType == VK_PIPELINE_BIND_POINT_GRAPHICS)
             ? this->boundGraphicsPipeline->GetLayout()
-            : this->boundComputePipeline->GetLayout();
-        vkCmdBindDescriptorSets(this->cmdBuffer, bindPoint, layout, set, 1, descriptorSets, 0,
+            : this->boundComputePipeline->GetLayout();*/
+        vkCmdBindDescriptorSets(this->cmdBuffer, pipelineType, layout, set, 1, descriptorSets, 0,
             nullptr);
 
         trackedDescriptorSets.push_back(descriptorSet);
@@ -366,12 +372,12 @@ namespace Vk
         this->boundGraphicsPipeline = graphicsPipeline;
     }
 
-    void CmdList::BindComputePipeline(std::shared_ptr<ComputePipeline> computePipeline) {
+    /*void CmdList::BindComputePipeline(std::shared_ptr<ComputePipeline> computePipeline) {
         vkCmdBindPipeline(this->cmdBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
             computePipeline->GetPipeline());
 
         this->boundComputePipeline = computePipeline;
-    }
+    }*/
 
     void CmdList::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex,
         uint32_t firstInstance) {
@@ -389,9 +395,9 @@ namespace Vk
     }
 
     void CmdList::PushConstant(const std::string& name, void* constant, size_t size,
-        GraphicsStageFlags stageFlags) {
+        VkShaderStageFlags stageFlags) {
         vkCmdPushConstants(this->cmdBuffer, this->boundGraphicsPipeline->GetLayout(),
-            GetVkShaderStageFlags(stageFlags), 0, static_cast<uint32_t>(size),
+            stageFlags, 0, static_cast<uint32_t>(size),
             constant);
-    }*/
+    }
 }
