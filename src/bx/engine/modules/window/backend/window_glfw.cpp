@@ -7,6 +7,8 @@
 #include <stdlib.h>
 
 static GLFWwindow* pWindow = nullptr;
+static b8 wasResized = false;
+static b8 isActive = true;
 
 GLFWwindow* WindowGLFW::GetWindowPtr()
 {
@@ -21,6 +23,16 @@ bool Window::IsOpen()
 void Window::GetSize(int* width, int* height)
 {
 	glfwGetFramebufferSize(pWindow, width, height);
+}
+
+b8 Window::WasResized()
+{
+	return wasResized;
+}
+
+b8 Window::IsActive()
+{
+	return isActive;
 }
 
 void Window::SetCursorMode(CursorMode mode)
@@ -51,6 +63,9 @@ static void glfw_error_callback(int i, const char* c)
 
 static void glfw_window_size_callback(GLFWwindow* window, int width, int height)
 {
+	wasResized = true;
+	isActive = width > 2 && height > 2;
+
 	Screen::SetWidth(width);
 	Screen::SetHeight(height);
 }
@@ -162,6 +177,8 @@ void Window::Shutdown()
 void Window::PollEvents()
 {
 	PROFILE_FUNCTION();
+	wasResized = false;
+
 	glfwPollEvents();
 
 	if (glfwGetKey(pWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)

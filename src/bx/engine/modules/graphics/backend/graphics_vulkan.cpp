@@ -25,6 +25,22 @@ using namespace Vk;
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
 
+constexpr bool ENABLE_VALIDATION =
+#ifdef _DEBUG
+true;
+#else
+false;
+#endif
+
+static std::shared_ptr<Instance> s_instance;
+static std::unique_ptr<PhysicalDevice> s_physicalDevice;
+static std::shared_ptr<Device> s_device;
+static std::unique_ptr<CmdQueue> s_cmdQueue;
+static std::unique_ptr<DescriptorPool> s_descriptorPool;
+static std::unique_ptr<Swapchain> s_swapchain;
+
+static std::shared_ptr<Fence> s_presentFence;
+static std::shared_ptr<CmdList> s_cmdList;
 
 bool Graphics::Initialize()
 {
@@ -40,23 +56,23 @@ bool Graphics::Initialize()
     return false;
 #endif
 
-    std::shared_ptr<Instance> instance = std::make_shared<Instance>((void*)glfwWindow, true);
-    std::unique_ptr<PhysicalDevice> physicalDevice = std::make_unique<PhysicalDevice>(*instance);
-    std::shared_ptr<Device> device = std::make_shared<Device>(instance, *physicalDevice, true);
-    std::unique_ptr<CmdQueue> cmdQueue = std::make_unique<CmdQueue>(device, *physicalDevice, QueueType::GRAPHICS);
-    std::unique_ptr<DescriptorPool> descriptorPool = std::make_unique<DescriptorPool>(device);
+    i32 width, height;
+    Window::GetSize(&width, &height);
 
-    std::unique_ptr<Swapchain> swapchain = std::make_unique<Swapchain>(512, 512, *instance, device, *physicalDevice);
+    s_instance = std::make_shared<Instance>((void*)glfwWindow, ENABLE_VALIDATION);
+    s_physicalDevice = std::make_unique<PhysicalDevice>(*s_instance);
+    s_device = std::make_shared<Device>(s_instance, *s_physicalDevice, ENABLE_VALIDATION);
+    s_cmdQueue = std::make_unique<CmdQueue>(s_device, *s_physicalDevice, QueueType::GRAPHICS);
+    s_descriptorPool = std::make_unique<DescriptorPool>(s_device);
+    s_swapchain = std::make_unique<Swapchain>(static_cast<u32>(width), static_cast<u32>(height), *s_instance, s_device, *s_physicalDevice);
 
-    std::shared_ptr<Fence> fence = std::make_shared<Fence>("my fence", device);
+    /*std::shared_ptr<Fence> fence = std::make_shared<Fence>("my fence", device);
     std::shared_ptr<Semaphore> semaphore = std::make_shared<Semaphore>("my semaphore", device);
 
     std::shared_ptr<Image> image = std::make_shared<Image>("my image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_FORMAT_R8G8B8A8_SRGB);
     std::shared_ptr<Image> depthImage = std::make_shared<Image>("my depth image", device, *physicalDevice, 512, 512, 1, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_FORMAT_D24_UNORM_S8_UINT);
     std::shared_ptr<RenderPass> renderPass = std::make_shared<RenderPass>("my render pass", device, List<VkFormat>{VK_FORMAT_R8G8B8A8_SRGB}, Optional<VkFormat>::Some(VK_FORMAT_D24_UNORM_S8_UINT));
-    std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>("my framebuffer", device, List<std::shared_ptr<Image>>{image, depthImage}, renderPass);
-
-    // TODO: get resize callback to graphics module
+    std::shared_ptr<Framebuffer> framebuffer = std::make_shared<Framebuffer>("my framebuffer", device, List<std::shared_ptr<Image>>{image, depthImage}, renderPass);*/
 
     return true;
 }
@@ -73,12 +89,50 @@ void Graphics::Reload()
 
 void Graphics::NewFrame()
 {
-    
+    // Recylce finished old cmd lists
+    s_cmdQueue->ProcessCmdLists();
+
+    if (Window::IsActive())
+    {
+        // Recreate swapchain, make sure the old swapchain has been destructed first using `reset()`
+        if (Window::WasResized())
+        {
+            i32 width, height;
+            Window::GetSize(&width, &height);
+
+            s_swapchain.reset();
+            s_swapchain = std::make_unique<Swapchain>(static_cast<u32>(width), static_cast<u32>(height), *s_instance, s_device, *s_physicalDevice);
+        }
+
+        // Wait for the next image and acquire a recycled present fence
+        s_presentFence = s_swapchain->NextImage();
+
+        // All cmds of the entire frame will be recorded into a single cmd list
+        // This is because we designed the graphics module api to act like it's immediate
+        s_cmdList = s_cmdQueue->GetCmdList();
+    }
 }
 
 void Graphics::EndFrame()
 {
-    
+    if (Window::IsActive())
+    {
+        // TODO: all rendering can happen before the image is available if we create a seperate present blit pipeline
+        // This can also act as a hdr to sdr conversion and enable us to render in hdr
+
+        // Execute all rendering cmds when the image is available
+        List<Semaphore*> waitSemaphores{ &s_swapchain->GetImageAvailableSemaphore() };
+        List<VkPipelineStageFlags> presentWaitStages{};
+        List<Semaphore*> presentSignalSemaphores{
+            &s_swapchain->GetRenderFinishedSemaphore() };
+        s_cmdQueue->SubmitCmdList(s_cmdList, s_presentFence, waitSemaphores, presentWaitStages,
+            presentSignalSemaphores);
+
+        // Present when rendering is finished, indicated by the `presentSignalSemaphores`
+        s_swapchain->Present(*s_cmdQueue, *s_presentFence, presentSignalSemaphores);
+    }
+
+    s_cmdList.reset();
 }
 
 TextureFormat Graphics::GetColorBufferFormat()
