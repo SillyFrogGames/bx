@@ -202,7 +202,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 		"src/bx/engine/modules/graphics/backend/graphics_vulkan.cpp"
 	)
 
-    set (BX_LIBS ${BX_LIBS} vulkan glslang SPIRV)
+    set (BX_LIBS ${BX_LIBS} vulkan glslang SPIRV imgui_vulkan)
 endif ()
 
 # Setup physics backend

@@ -119,6 +119,11 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 	find_package(Vulkan REQUIRED)
 	add_library(vulkan INTERFACE)
 	target_link_libraries(vulkan INTERFACE Vulkan::Vulkan GPUOpen::VulkanMemoryAllocator)# Vulkan::glslang Vulkan::glslang-spirv)
+
+	# ImGui Vulkan
+	add_library (imgui_vulkan STATIC "imgui/backends/imgui_impl_vulkan.cpp")
+	target_include_directories (imgui_vulkan PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+	target_link_libraries(imgui_vulkan vulkan)
 	
 	# Glslang
 	#set (ENABLE_OPT OFF)

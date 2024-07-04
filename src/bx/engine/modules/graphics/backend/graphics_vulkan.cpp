@@ -79,7 +79,7 @@ bool Graphics::Initialize()
 
 void Graphics::Shutdown()
 {
-    
+    s_device->WaitIdle();
 }
 
 void Graphics::Reload()
@@ -120,9 +120,12 @@ void Graphics::EndFrame()
         // TODO: all rendering can happen before the image is available if we create a seperate present blit pipeline
         // This can also act as a hdr to sdr conversion and enable us to render in hdr
 
+        // Swapchain present pass
+
+
         // Execute all rendering cmds when the image is available
         List<Semaphore*> waitSemaphores{ &s_swapchain->GetImageAvailableSemaphore() };
-        List<VkPipelineStageFlags> presentWaitStages{};
+        List<VkPipelineStageFlags> presentWaitStages{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         List<Semaphore*> presentSignalSemaphores{
             &s_swapchain->GetRenderFinishedSemaphore() };
         s_cmdQueue->SubmitCmdList(s_cmdList, s_presentFence, waitSemaphores, presentWaitStages,
@@ -217,4 +220,24 @@ void Graphics::DrawIndexed(const DrawIndexedAttribs& attribs) {}
 // TODO: obliterate this obomination
 void Graphics::DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, const List<DebugVertex>& vertices)
 {
+}
+
+// TODO: this can go when there's a imgui render impl using the higher level graphics module api
+
+#include <backends/imgui_impl_vulkan.h>
+ImGui_ImplVulkan_InitInfo GraphicsVulkan::ImGuiInitInfo()
+{
+    ImGui_ImplVulkan_InitInfo info{};
+    info.Instance = s_instance->GetInstance();
+    info.PhysicalDevice = s_physicalDevice->GetPhysicalDevice();
+    info.Device = s_device->GetDevice();
+    info.QueueFamily = s_physicalDevice->GraphicsFamily();
+    info.Queue = s_cmdQueue->GetQueue();
+    info.DescriptorPool = s_descriptorPool->GetPool();
+    info.RenderPass = s_swapchain->GetRenderPass()->GetRenderPass(); // TODO: this breaks on resize
+    info.MinImageCount = 2; // TODO: should this be properly queried from the swapchain?
+    info.ImageCount = 2;
+    info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+    info.MinAllocationSize = 1024 * 1024;
+    return info;
 }

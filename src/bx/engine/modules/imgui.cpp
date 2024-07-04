@@ -22,6 +22,8 @@
 #endif
 
 #ifdef BX_GRAPHICS_VULKAN_BACKEND
+#include "bx/engine/modules/graphics/backend/graphics_vulkan.hpp"
+
 #include <backends/imgui_impl_vulkan.h>
 #elif defined BX_GRAPHICS_OPENGL_BACKEND
 #include <backends/imgui_impl_opengl3.h>
@@ -67,7 +69,7 @@ bool ImGuiImpl::Initialize()
     if (!ImGui_ImplOpenGL3_Init("#version 300 es\n"))
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
     // TODO!
-    //if (!ImGui_ImplVulkan_Init())
+    if (!ImGui_ImplVulkan_Init(&GraphicsVulkan::ImGuiInitInfo()))
 #endif
     {
         // TODO: reenable
@@ -132,7 +134,7 @@ void ImGuiImpl::Shutdown()
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui_ImplOpenGL3_Shutdown();
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
-    // TODO
+    ImGui_ImplVulkan_Shutdown();
 #endif
 
     ImGui_ImplGlfw_Shutdown();
@@ -145,7 +147,7 @@ void ImGuiImpl::NewFrame()
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui_ImplOpenGL3_NewFrame();
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
-    // TODO
+    ImGui_ImplVulkan_NewFrame();
 #endif
     ImGui::NewFrame();
 }
@@ -160,7 +162,7 @@ void ImGuiImpl::EndFrame()
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
-    // TODO
+    //ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
 #endif
 
     // Update and Render additional Platform Windows
