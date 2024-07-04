@@ -27,11 +27,11 @@ namespace Vk
 
     Shader::Shader(const String& name, std::shared_ptr<Device> device, VkShaderStageFlagBits stage, const String& src)
         : device(device) {
-        List<u32> code = SpirVCompiler::Compile(name, GlslangStageFromVkStage(stage), src);
+        List<u32> code = SpirVCompiler::Instance().Compile(name, GlslangStageFromVkStage(stage), src);
 
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        createInfo.codeSize = code.size();
+        createInfo.codeSize = code.size() * 4;
         createInfo.pCode = reinterpret_cast<const u32*>(code.data());
 
         BX_ASSERT(!vkCreateShaderModule(device->GetDevice(), &createInfo, nullptr, &this->shader),

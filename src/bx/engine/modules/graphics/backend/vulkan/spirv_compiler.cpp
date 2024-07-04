@@ -127,22 +127,38 @@ static const TBuiltInResource DefaultTBuiltInResource =
 
 namespace Vk
 {
+    SpirVCompiler& SpirVCompiler::Instance()
+    {
+        static SpirVCompiler instance{};
+        return instance;
+    }
+
+    SpirVCompiler::SpirVCompiler()
+    {
+        glslang_initialize_process();
+    }
+
+    SpirVCompiler::~SpirVCompiler()
+    {
+        glslang_finalize_process();
+    }
+
     List<u32> SpirVCompiler::Compile(const String& name, glslang_stage_t stage, const String& src)
     {
         glslang_input_t input{};
         input.language = GLSLANG_SOURCE_GLSL;
         input.stage = stage;
         input.client = GLSLANG_CLIENT_VULKAN;
-        input.client_version = GLSLANG_TARGET_VULKAN_1_2;
+        input.client_version = GLSLANG_TARGET_VULKAN_1_0;
         input.target_language = GLSLANG_TARGET_SPV;
-        input.target_language_version = GLSLANG_TARGET_SPV_1_5;
+        input.target_language_version = GLSLANG_TARGET_SPV_1_0;
         input.code = src.c_str();
         input.default_version = 100;
         input.default_profile = GLSLANG_CORE_PROFILE;
         input.force_default_version_and_profile = false;
         input.forward_compatible = false;
         input.messages = GLSLANG_MSG_DEFAULT_BIT;
-        input.resource = reinterpret_cast<const glslang_resource_t*>(&DefaultTBuiltInResource);// glslang_default_resource();
+        input.resource = reinterpret_cast<const glslang_resource_t*>(&DefaultTBuiltInResource);
 
         glslang_shader_t* shader = glslang_shader_create(&input);
 

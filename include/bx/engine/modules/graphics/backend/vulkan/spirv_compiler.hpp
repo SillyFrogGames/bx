@@ -14,6 +14,12 @@ namespace Vk
     class SpirVCompiler
     {
     public:
-        static List<u32> Compile(const String& name, glslang_stage_t stage, const String& src);
+        static SpirVCompiler& Instance();
+        ~SpirVCompiler();
+
+        List<u32> Compile(const String& name, glslang_stage_t stage, const String& src);
+
+    private:
+        SpirVCompiler();
     };
 }

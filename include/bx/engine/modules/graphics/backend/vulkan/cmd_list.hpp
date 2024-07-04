@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bx/engine/core/guard.hpp"
+#include "bx/engine/core/math.hpp"
 #include "bx/engine/containers/string.hpp"
 
 #include "vulkan_api.hpp"
@@ -14,6 +15,7 @@ namespace Vk
     class GraphicsPipeline;
     struct Rect2D;
     class Framebuffer;
+    class RenderPass;
     class DescriptorSet;
 
     class CmdList : NoCopy {
@@ -21,10 +23,6 @@ namespace Vk
         ~CmdList();
         CmdList(const CmdList& other) = delete;
         CmdList& operator=(const CmdList& other) = delete;
-
-        void Begin();
-        void End();
-        void Reset();
 
         void CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Buffer> dst);
         void CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Image> dst);
@@ -76,6 +74,10 @@ namespace Vk
         const CmdQueue& cmdQueue;
 
         VkCommandBuffer cmdBuffer;
+
+        void Begin();
+        void End();
+        void Reset();
 
         void PushConstant(const std::string& name, void* constant, size_t size,
             VkShaderStageFlags stageFlags);
