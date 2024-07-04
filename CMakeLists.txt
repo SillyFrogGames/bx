@@ -182,6 +182,7 @@ if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
 
 elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 	set (BX_SRCS ${BX_SRCS}
+		"src/bx/engine/modules/graphics/backend/vulkan/buffer.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/cmd_list.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/cmd_queue.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/descriptor_pool.cpp"
