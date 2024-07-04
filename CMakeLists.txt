@@ -186,6 +186,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 		"src/bx/engine/modules/graphics/backend/vulkan/cmd_list.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/cmd_queue.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/descriptor_pool.cpp"
+		"src/bx/engine/modules/graphics/backend/vulkan/descriptor_set_layout.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/device.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/extensions.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/fence.cpp"

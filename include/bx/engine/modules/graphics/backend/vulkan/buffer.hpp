@@ -12,14 +12,12 @@ namespace Vk
 
     enum class BufferLocation { GPU_ONLY, CPU_TO_GPU };
 
-    class Buffer {
+    class Buffer : NoCopy {
     public:
         Buffer(const String& name, std::shared_ptr<Device> device,
             const PhysicalDevice& physicalDevice, VkBufferUsageFlags usage, uint64_t size,
             BufferLocation location);
         ~Buffer();
-        explicit Buffer(const Buffer& other) = delete;
-        Buffer& operator=(const Buffer& other) = delete;
         explicit Buffer(Buffer&& other) noexcept;
         Buffer& operator=(Buffer&& other) noexcept;
 
