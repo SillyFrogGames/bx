@@ -57,6 +57,7 @@ namespace Vk
         std::shared_ptr<Image> image, std::shared_ptr<Sampler> sampler) {
         VkDescriptorImageInfo imageInfo{};
         if (type == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) {
+            // TODO: this assumption may break, storage images are allowed to be read in a fragment shader, query resource state tracker for accurate states
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
         }
         else {
