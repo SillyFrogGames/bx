@@ -14,7 +14,6 @@ namespace Vk
 
         BX_ASSERT(!vkCreateFence(device->GetDevice(), &createInfo, nullptr, &this->fence),
             "Failed to create fence.");
-        
         DebugNames::Set(*device, VkObjectType::VK_OBJECT_TYPE_FENCE,
             reinterpret_cast<uint64_t>(this->fence), name);
     }
