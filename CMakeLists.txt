@@ -192,6 +192,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 		"src/bx/engine/modules/graphics/backend/vulkan/extensions.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/fence.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/framebuffer.cpp"
+		"src/bx/engine/modules/graphics/backend/vulkan/graphics_pipeline.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/image.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/instance.cpp"
 		"src/bx/engine/modules/graphics/backend/vulkan/pfn.cpp"
