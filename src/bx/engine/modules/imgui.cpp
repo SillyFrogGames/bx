@@ -68,13 +68,11 @@ bool ImGuiImpl::Initialize()
 #elif defined BX_GRAPHICS_OPENGLES_BACKEND
     if (!ImGui_ImplOpenGL3_Init("#version 300 es\n"))
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
-    // TODO!
     if (!ImGui_ImplVulkan_Init(&GraphicsVulkan::ImGuiInitInfo()))
 #endif
     {
-        // TODO: reenable
-        //BX_LOGE("Failed to initialize ImGui OpenGL backend!");
-        //return false;
+        BX_LOGE("Failed to initialize ImGui OpenGL backend!");
+        return false;
     }
 
     //ImGui::CreateContext();
@@ -162,7 +160,7 @@ void ImGuiImpl::EndFrame()
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
-    //ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), GraphicsVulkan::RawCommandBuffer());
 #endif
 
     // Update and Render additional Platform Windows

@@ -4,6 +4,7 @@
 #include "bx/engine/core/macros.hpp"
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/modules/window.hpp"
+#include <bx/engine/modules/imgui.hpp>
 
 // TODO: Temp should be replaced by Window.hpp completely
 #include <GLFW/glfw3.h>
@@ -367,6 +368,8 @@ void Graphics::NewFrame()
 void Graphics::EndFrame()
 {
     PROFILE_FUNCTION();
+
+    ImGuiImpl::EndFrame();
 
     RebalanceMap(s_shaders);
     RebalanceMap(s_buffers);

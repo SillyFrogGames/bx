@@ -485,7 +485,12 @@ void SceneView::Present(bool& show)
     ImVec2 gizmoPos = ImVec2(windowPos.x + cursorPos.x, windowPos.y + cursorPos.y);
 
     Render(contentRegionAvail);
+#ifdef BX_GRAPHICS_VULKAN_BACKEND
+    // TODO: ???
+    //ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
+#elif defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
+#endif
     ImGui::SetCursorScreenPos(gizmoPos);
 
     const String& scene = Data::GetString("Current Scene", "", DataTarget::EDITOR);

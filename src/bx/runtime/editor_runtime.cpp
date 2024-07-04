@@ -100,7 +100,7 @@ int Runtime::Launch(int argc, char** argv)
 		
 		Toolbar::Present();
 		
-		ImGuiImpl::EndFrame();
+		// ImGuiImpl::EndFrame();
 		Graphics::EndFrame();
 
 		Window::Display();

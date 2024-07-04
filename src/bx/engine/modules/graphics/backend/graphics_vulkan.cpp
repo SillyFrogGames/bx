@@ -7,6 +7,7 @@
 #include "bx/engine/containers/array.hpp"
 
 #include "bx/engine/modules/window.hpp"
+#include "bx/engine/modules/imgui.hpp"
 
 #include "bx/engine/modules/graphics/backend/vulkan/instance.hpp"
 #include "bx/engine/modules/graphics/backend/vulkan/physical_device.hpp"
@@ -250,7 +251,7 @@ void Graphics::EndFrame()
             0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, s_colorImage, s_sampler);
         s_cmdList->BindDescriptorSet(s_presentDescriptorSets[currentFrame], 0);
         s_cmdList->Draw(3);
-        // TODO: draw imgui
+        ImGuiImpl::EndFrame();
         s_cmdList->EndRenderPass();
         s_cmdList->TransitionImageLayout(
             s_colorImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
@@ -374,4 +375,9 @@ ImGui_ImplVulkan_InitInfo GraphicsVulkan::ImGuiInitInfo()
     info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
     info.MinAllocationSize = 1024 * 1024;
     return info;
+}
+
+VkCommandBuffer GraphicsVulkan::RawCommandBuffer()
+{
+    return s_cmdList->GetCommandBuffer();
 }

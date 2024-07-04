@@ -21,8 +21,8 @@ namespace Vk
     class CmdList : NoCopy {
     public:
         ~CmdList();
-        CmdList(const CmdList& other) = delete;
-        CmdList& operator=(const CmdList& other) = delete;
+
+        VkCommandBuffer GetCommandBuffer() const;
 
         void CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Buffer> dst);
         void CopyBuffers(std::shared_ptr<Buffer> src, std::shared_ptr<Image> dst);
