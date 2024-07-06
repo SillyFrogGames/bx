@@ -24,7 +24,6 @@ namespace Vk
         static void RemoveGlobalImageState(VkImage image);
 
     private:
-        HashMap<VkImage, ImageState> imageStates;
         static HashMap<VkImage, ImageState> globalImageStates;
     };
 }

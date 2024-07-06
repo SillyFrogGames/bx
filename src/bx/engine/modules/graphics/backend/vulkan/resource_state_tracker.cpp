@@ -42,7 +42,10 @@ namespace Vk
     }
 
     void ResourceStateTracker::AddGlobalImageState(VkImage image, ImageState state) {
-        globalImageStates[image] = state;
+        if (globalImageStates.find(image) == globalImageStates.end())
+            globalImageStates.insert(std::make_pair(image, state));
+        else
+            BX_LOGW("Adding image state to tracker twice.");
     }
 
     void ResourceStateTracker::RemoveGlobalImageState(VkImage image) {

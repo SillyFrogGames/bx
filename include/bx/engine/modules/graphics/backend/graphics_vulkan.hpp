@@ -12,4 +12,5 @@ public:
     static ImGui_ImplVulkan_InitInfo ImGuiInitInfo();
 
     static VkCommandBuffer RawCommandBuffer();
+    static void WaitIdle();
 };

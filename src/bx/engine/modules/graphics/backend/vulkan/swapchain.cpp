@@ -181,7 +181,7 @@ namespace Vk
             imageState.stageFlags = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
             imageState.accessFlags =
                 VkAccessFlagBits::VK_ACCESS_SHADER_READ_BIT;  // VkAccessFlagBits::VK_ACCESS_NONE;
-            ResourceStateTracker::AddGlobalImageState(this->images[0]->GetImage(), imageState);
+            ResourceStateTracker::AddGlobalImageState(this->images[i]->GetImage(), imageState);
         }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {

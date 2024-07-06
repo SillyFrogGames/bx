@@ -69,33 +69,42 @@ void main() {
 }
 )""";
 
-static std::shared_ptr<Instance> s_instance;
-static std::unique_ptr<PhysicalDevice> s_physicalDevice;
-static std::shared_ptr<Device> s_device;
-static std::unique_ptr<CmdQueue> s_cmdQueue;
-static std::shared_ptr<DescriptorPool> s_descriptorPool;
-static std::unique_ptr<Swapchain> s_swapchain;
+struct State : NoCopy
+{
+    ~State()
+    {
+        device->WaitIdle();
+    }
 
-static std::shared_ptr<Image> s_colorImage;
-static std::shared_ptr<Image> s_depthImage;
-static std::unique_ptr<Framebuffer> s_framebuffer;
-static std::shared_ptr<RenderPass> s_renderPass;
-static std::shared_ptr<Sampler> s_sampler;
+    std::shared_ptr<Instance> instance;
+    std::unique_ptr<PhysicalDevice> physicalDevice;
+    std::shared_ptr<Device> device;
+    std::unique_ptr<CmdQueue> cmdQueue;
+    std::shared_ptr<DescriptorPool> descriptorPool;
+    std::unique_ptr<Swapchain> swapchain;
 
-std::shared_ptr<GraphicsPipeline> s_presentPipeline;
-std::shared_ptr<DescriptorSetLayout> s_presentDescriptorSetLayout;
-Array<std::shared_ptr<DescriptorSet>, Swapchain::MAX_FRAMES_IN_FLIGHT> s_presentDescriptorSets = { nullptr, nullptr };
+    std::shared_ptr<Image> colorImage;
+    std::shared_ptr<Image> depthImage;
+    std::unique_ptr<Framebuffer> framebuffer;
+    std::shared_ptr<RenderPass> renderPass;
+    std::shared_ptr<Sampler> sampler;
 
-static std::shared_ptr<Fence> s_presentFence;
-static std::shared_ptr<CmdList> s_cmdList;
+    std::shared_ptr<GraphicsPipeline> presentPipeline;
+    std::shared_ptr<DescriptorSetLayout> presentDescriptorSetLayout;
+    Array<std::shared_ptr<DescriptorSet>, Swapchain::MAX_FRAMES_IN_FLIGHT> presentDescriptorSets = { nullptr, nullptr };
+
+    std::shared_ptr<Fence> presentFence;
+    std::shared_ptr<CmdList> cmdList;
+};
+static std::unique_ptr<State> s;
 
 void BuildSwapchain()
 {
     i32 width, height;
     Window::GetSize(&width, &height);
 
-    s_swapchain.reset();
-    s_swapchain = std::make_unique<Swapchain>(static_cast<u32>(width), static_cast<u32>(height), *s_instance, s_device, *s_physicalDevice);
+    s->swapchain.reset();
+    s->swapchain = std::make_unique<Swapchain>(static_cast<u32>(width), static_cast<u32>(height), *s->instance, s->device, *s->physicalDevice);
 }
 
 void BuildRenderTargets()
@@ -103,21 +112,21 @@ void BuildRenderTargets()
     i32 width, height;
     Window::GetSize(&width, &height);
 
-    s_colorImage = std::make_shared<Image>(
-        "Color Image", s_device, *s_physicalDevice, width, height, 1,
+    s->colorImage = std::make_shared<Image>(
+        "Color Image", s->device, *s->physicalDevice, width, height, 1,
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
         VK_IMAGE_USAGE_STORAGE_BIT,
         VK_FORMAT_R16G16B16A16_SFLOAT);
-    s_depthImage = std::make_shared<Image>(
-        "Depth Image", s_device, *s_physicalDevice, width, height, 1,
+    s->depthImage = std::make_shared<Image>(
+        "Depth Image", s->device, *s->physicalDevice, width, height, 1,
         VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_FORMAT_D24_UNORM_S8_UINT);
 
-    s_renderPass = std::make_shared<RenderPass>("Main Render Pass",
-        s_device, List<VkFormat>{s_colorImage->Format()},
-        Optional<VkFormat>::Some(s_depthImage->Format()));
-    List<std::shared_ptr<Image>> images{ s_colorImage, s_depthImage };
-    s_framebuffer = std::make_unique<Framebuffer>("Main Framebuffer", s_device, images, s_renderPass);
+    s->renderPass = std::make_shared<RenderPass>("Main Render Pass",
+        s->device, List<VkFormat>{s->colorImage->Format()},
+        Optional<VkFormat>::Some(s->depthImage->Format()));
+    List<std::shared_ptr<Image>> images{ s->colorImage, s->depthImage };
+    s->framebuffer = std::make_unique<Framebuffer>("Main Framebuffer", s->device, images, s->renderPass);
 }
 
 void BuildDescriptors()
@@ -128,37 +137,39 @@ void BuildDescriptors()
     presentBinding0.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     presentBinding0.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    s_presentDescriptorSetLayout = std::make_shared<DescriptorSetLayout>(
+    s->presentDescriptorSetLayout = std::make_shared<DescriptorSetLayout>(
         "Present Descriptor Set Layout 0",
-        s_device, List<VkDescriptorSetLayoutBinding>{presentBinding0});
+        s->device, List<VkDescriptorSetLayoutBinding>{presentBinding0});
 
-    for (size_t i = 0; i < s_presentDescriptorSets.size(); i++) {
-        s_presentDescriptorSets[i] = std::make_shared<DescriptorSet>(
+    for (size_t i = 0; i < s->presentDescriptorSets.size(); i++) {
+        s->presentDescriptorSets[i] = std::make_shared<DescriptorSet>(
             "Present Descriptor Set 0",
-            s_device, s_descriptorPool, s_presentDescriptorSetLayout);
+            s->device, s->descriptorPool, s->presentDescriptorSetLayout);
     }
 }
 
 void BuildPipelines()
 {
     std::shared_ptr<Shader> presentVertexShader =
-        std::make_shared<Shader>("present vert", s_device, VK_SHADER_STAGE_VERTEX_BIT, PRESENT_VERT_SRC);
+        std::make_shared<Shader>("present vert", s->device, VK_SHADER_STAGE_VERTEX_BIT, PRESENT_VERT_SRC);
     std::shared_ptr<Shader> presentFragmentShader =
-        std::make_shared<Shader>("present frag", s_device, VK_SHADER_STAGE_FRAGMENT_BIT, PRESENT_FRAG_SRC);
+        std::make_shared<Shader>("present frag", s->device, VK_SHADER_STAGE_FRAGMENT_BIT, PRESENT_FRAG_SRC);
 
     GraphicsPipelineInfo presentInfo{};
     presentInfo.ignoreDepth = true;
     presentInfo.inputVertices = false;
     std::vector<const Shader*> presentShaders = { presentVertexShader.get(),
                                                  presentFragmentShader.get() };
-    s_presentPipeline = std::make_shared<GraphicsPipeline>(
-        s_device, presentShaders, s_swapchain->GetRenderPass(),
-        std::vector<std::shared_ptr<DescriptorSetLayout>>{s_presentDescriptorSetLayout},
+    s->presentPipeline = std::make_shared<GraphicsPipeline>(
+        s->device, presentShaders, s->swapchain->GetRenderPass(),
+        std::vector<std::shared_ptr<DescriptorSetLayout>>{s->presentDescriptorSetLayout},
         std::vector<PushConstantRange>{}, presentInfo);
 }
 
 bool Graphics::Initialize()
 {
+    s = std::make_unique<State>();
+
 #ifdef BX_WINDOW_GLFW_BACKEND
     GLFWwindow* glfwWindow = WindowGLFW::GetWindowPtr();
 
@@ -171,12 +182,12 @@ bool Graphics::Initialize()
     return false;
 #endif
 
-    s_instance = std::make_shared<Instance>((void*)glfwWindow, ENABLE_VALIDATION);
-    s_physicalDevice = std::make_unique<PhysicalDevice>(*s_instance);
-    s_device = std::make_shared<Device>(s_instance, *s_physicalDevice, ENABLE_VALIDATION);
-    s_cmdQueue = std::make_unique<CmdQueue>(s_device, *s_physicalDevice, QueueType::GRAPHICS);
-    s_descriptorPool = std::make_shared<DescriptorPool>(s_device);
-    s_sampler = std::make_shared<Sampler>("Sampler", s_device, *s_physicalDevice,
+    s->instance = std::make_shared<Instance>((void*)glfwWindow, ENABLE_VALIDATION);
+    s->physicalDevice = std::make_unique<PhysicalDevice>(*s->instance);
+    s->device = std::make_shared<Device>(s->instance, *s->physicalDevice, ENABLE_VALIDATION);
+    s->cmdQueue = std::make_unique<CmdQueue>(s->device, *s->physicalDevice, QueueType::GRAPHICS);
+    s->descriptorPool = std::make_shared<DescriptorPool>(s->device);
+    s->sampler = std::make_shared<Sampler>("Sampler", s->device, *s->physicalDevice,
         SamplerInfo{});
 
     BuildSwapchain();
@@ -189,7 +200,7 @@ bool Graphics::Initialize()
 
 void Graphics::Shutdown()
 {
-    s_device->WaitIdle();
+    s.reset();
 }
 
 void Graphics::Reload()
@@ -199,7 +210,7 @@ void Graphics::Reload()
 
 void Graphics::NewFrame()
 {
-    s_cmdQueue->ProcessCmdLists();
+    s->cmdQueue->ProcessCmdLists();
 
     if (Window::IsActive())
     {
@@ -210,11 +221,11 @@ void Graphics::NewFrame()
             BuildPipelines();
         }
 
-        s_presentFence = s_swapchain->NextImage();
+        s->presentFence = s->swapchain->NextImage();
 
         // All cmds of the entire frame will be recorded into a single cmd list
         // This is because we designed the graphics module api to act like it's immediate
-        s_cmdList = s_cmdQueue->GetCmdList();
+        s->cmdList = s->cmdQueue->GetCmdList();
     }
 }
 
@@ -225,52 +236,52 @@ void Graphics::EndFrame()
         // TODO: all rendering can happen before the image is available if we create a seperate present blit pipeline
         // This can also act as a hdr to sdr conversion and enable us to render in hdr
 
-        Rect2D swapchainExtent = s_swapchain->Extent();
-        size_t currentFrame = static_cast<size_t>(s_swapchain->GetCurrentFrameIdx());
+        Rect2D swapchainExtent = s->swapchain->Extent();
+        size_t currentFrame = static_cast<size_t>(s->swapchain->GetCurrentFrameIdx());
 
         // Swapchain present pass
-        s_cmdList->BeginRenderPass(s_renderPass, *s_framebuffer,
+        s->cmdList->BeginRenderPass(s->renderPass, *s->framebuffer,
             Color(0.6f, 0.8f, 1.0f, 1.0f));
-        Rect2D imgExtent(static_cast<float>(s_colorImage->Width()),
-            static_cast<float>(s_colorImage->Height()));
-        s_cmdList->SetScissor(imgExtent);
-        s_cmdList->SetViewport(imgExtent);
+        Rect2D imgExtent(static_cast<float>(s->colorImage->Width()),
+            static_cast<float>(s->colorImage->Height()));
+        s->cmdList->SetScissor(imgExtent);
+        s->cmdList->SetViewport(imgExtent);
         // TODO: render da shit
-        s_cmdList->EndRenderPass();
+        s->cmdList->EndRenderPass();
 
-        s_cmdList->TransitionImageLayout(s_colorImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        s->cmdList->TransitionImageLayout(s->colorImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             VK_ACCESS_SHADER_READ_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
-        s_cmdList->BeginRenderPass(s_swapchain->GetRenderPass(),
-            s_swapchain->GetCurrentFramebuffer(),
+        s->cmdList->BeginRenderPass(s->swapchain->GetRenderPass(),
+            s->swapchain->GetCurrentFramebuffer(),
             Color(0.1f, 0.1f, 0.1f, 1.0f));
-        s_cmdList->SetScissor(swapchainExtent);
-        s_cmdList->SetViewport(swapchainExtent);
-        s_cmdList->BindGraphicsPipeline(s_presentPipeline);
-        s_presentDescriptorSets[currentFrame]->SetImage(
-            0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, s_colorImage, s_sampler);
-        s_cmdList->BindDescriptorSet(s_presentDescriptorSets[currentFrame], 0);
-        s_cmdList->Draw(3);
+        s->cmdList->SetScissor(swapchainExtent);
+        s->cmdList->SetViewport(swapchainExtent);
+        s->cmdList->BindGraphicsPipeline(s->presentPipeline);
+        s->presentDescriptorSets[currentFrame]->SetImage(
+            0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, s->colorImage, s->sampler);
+        s->cmdList->BindDescriptorSet(s->presentDescriptorSets[currentFrame], 0);
+        s->cmdList->Draw(3);
         ImGuiImpl::EndFrame();
-        s_cmdList->EndRenderPass();
-        s_cmdList->TransitionImageLayout(
-            s_colorImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        s->cmdList->EndRenderPass();
+        s->cmdList->TransitionImageLayout(
+            s->colorImage, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
             VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
             VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 
         // Execute all rendering cmds when the image is available
-        List<Semaphore*> waitSemaphores{ &s_swapchain->GetImageAvailableSemaphore() };
+        List<Semaphore*> waitSemaphores{ &s->swapchain->GetImageAvailableSemaphore() };
         List<VkPipelineStageFlags> presentWaitStages{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         List<Semaphore*> presentSignalSemaphores{
-            &s_swapchain->GetRenderFinishedSemaphore() };
-        s_cmdQueue->SubmitCmdList(s_cmdList, s_presentFence, waitSemaphores, presentWaitStages,
+            &s->swapchain->GetRenderFinishedSemaphore() };
+        s->cmdQueue->SubmitCmdList(s->cmdList, s->presentFence, waitSemaphores, presentWaitStages,
             presentSignalSemaphores);
 
         // Present when rendering is finished, indicated by the `presentSignalSemaphores`
-        s_swapchain->Present(*s_cmdQueue, *s_presentFence, presentSignalSemaphores);
+        s->swapchain->Present(*s->cmdQueue, *s->presentFence, presentSignalSemaphores);
     }
 
-    s_cmdList.reset();
+    s->cmdList.reset();
 }
 
 TextureFormat Graphics::GetColorBufferFormat()
@@ -363,13 +374,13 @@ void Graphics::DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, 
 ImGui_ImplVulkan_InitInfo GraphicsVulkan::ImGuiInitInfo()
 {
     ImGui_ImplVulkan_InitInfo info{};
-    info.Instance = s_instance->GetInstance();
-    info.PhysicalDevice = s_physicalDevice->GetPhysicalDevice();
-    info.Device = s_device->GetDevice();
-    info.QueueFamily = s_physicalDevice->GraphicsFamily();
-    info.Queue = s_cmdQueue->GetQueue();
-    info.DescriptorPool = s_descriptorPool->GetPool();
-    info.RenderPass = s_swapchain->GetRenderPass()->GetRenderPass(); // TODO: this breaks on resize
+    info.Instance = s->instance->GetInstance();
+    info.PhysicalDevice = s->physicalDevice->GetPhysicalDevice();
+    info.Device = s->device->GetDevice();
+    info.QueueFamily = s->physicalDevice->GraphicsFamily();
+    info.Queue = s->cmdQueue->GetQueue();
+    info.DescriptorPool = s->descriptorPool->GetPool();
+    info.RenderPass = s->swapchain->GetRenderPass()->GetRenderPass(); // TODO: this breaks on resize
     info.MinImageCount = 2; // TODO: should this be properly queried from the swapchain?
     info.ImageCount = 2;
     info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
@@ -379,5 +390,10 @@ ImGui_ImplVulkan_InitInfo GraphicsVulkan::ImGuiInitInfo()
 
 VkCommandBuffer GraphicsVulkan::RawCommandBuffer()
 {
-    return s_cmdList->GetCommandBuffer();
+    return s->cmdList->GetCommandBuffer();
+}
+
+void GraphicsVulkan::WaitIdle()
+{
+    s->device->WaitIdle();
 }

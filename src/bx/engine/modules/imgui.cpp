@@ -132,6 +132,7 @@ void ImGuiImpl::Shutdown()
 #if defined BX_GRAPHICS_OPENGL_BACKEND
     ImGui_ImplOpenGL3_Shutdown();
 #elif defined BX_GRAPHICS_VULKAN_BACKEND
+    GraphicsVulkan::WaitIdle();
     ImGui_ImplVulkan_Shutdown();
 #endif
 
