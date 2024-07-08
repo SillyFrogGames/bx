@@ -51,17 +51,17 @@ static ImVec2 g_sceneSize;
 
 static bool g_physicsDebugDraw = false;
 
-static GraphicsHandle g_vertShader = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_pixelShader = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_pipeline = INVALID_GRAPHICS_HANDLE;
-
-static GraphicsHandle g_constantBuffer = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_modelBuffer = INVALID_GRAPHICS_HANDLE;
-
-static GraphicsHandle g_resources = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_renderTarget = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_renderTargetIDs = INVALID_GRAPHICS_HANDLE;
-static GraphicsHandle g_depthStencil = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_vertShader = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_pixelShader = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_pipeline = INVALID_GRAPHICS_HANDLE;
+//
+//static GraphicsHandle g_constantBuffer = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_modelBuffer = INVALID_GRAPHICS_HANDLE;
+//
+//static GraphicsHandle g_resources = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_renderTarget = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_renderTargetIDs = INVALID_GRAPHICS_HANDLE;
+//static GraphicsHandle g_depthStencil = INVALID_GRAPHICS_HANDLE;
 
 struct SceneConstantData
 {
@@ -74,16 +74,16 @@ struct SceneModelData
     EntityId entityId = INVALID_ENTITY_ID;
 };
 
-struct SceneDrawCommandData
-{
-    SceneModelData model;
-    
-    GraphicsHandle vbuffers = INVALID_GRAPHICS_HANDLE;
-    GraphicsHandle ibuffer = INVALID_GRAPHICS_HANDLE;
-    u32 numIndices = 0;
-};
-
-static List<SceneDrawCommandData> g_drawCmds;
+//struct SceneDrawCommandData
+//{
+//    SceneModelData model;
+//    
+//    GraphicsHandle vbuffers = INVALID_GRAPHICS_HANDLE;
+//    GraphicsHandle ibuffer = INVALID_GRAPHICS_HANDLE;
+//    u32 numIndices = 0;
+//};
+//
+//static List<SceneDrawCommandData> g_drawCmds;
 
 void SceneView::Initialize()
 {
@@ -98,102 +98,102 @@ void SceneView::Initialize()
     g_sceneTrx.SetPosition(Vec3(cpx, cpy, cpz));
     g_sceneTrx.SetRotation(Quat::Euler(g_eulerAngles.x, g_eulerAngles.y, g_eulerAngles.z));
 
-    // Create shaders
-    {
-        static const char* vsrc =
-            "layout (location = 0) in vec3 Position;\n"
-            "layout (std140) uniform ConstantBuffer\n"
-            "{\n"
-            "   mat4 ViewProjMtx;\n"
-            "};\n"
-            "layout (std140) uniform ModelBuffer\n"
-            "{\n"
-            "   mat4 WorldMeshMtx;\n"
-            "   uvec2 EntityID; \n"
-            "};\n"
-            "flat out uvec2 Frag_EntityID;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = ViewProjMtx * WorldMeshMtx * vec4(Position, 1.0);\n"
-            "   Frag_EntityID = EntityID;\n"
-            "};";
+    //// Create shaders
+    //{
+    //    static const char* vsrc =
+    //        "layout (location = 0) in vec3 Position;\n"
+    //        "layout (std140) uniform ConstantBuffer\n"
+    //        "{\n"
+    //        "   mat4 ViewProjMtx;\n"
+    //        "};\n"
+    //        "layout (std140) uniform ModelBuffer\n"
+    //        "{\n"
+    //        "   mat4 WorldMeshMtx;\n"
+    //        "   uvec2 EntityID; \n"
+    //        "};\n"
+    //        "flat out uvec2 Frag_EntityID;\n"
+    //        "void main()\n"
+    //        "{\n"
+    //        "   gl_Position = ViewProjMtx * WorldMeshMtx * vec4(Position, 1.0);\n"
+    //        "   Frag_EntityID = EntityID;\n"
+    //        "};";
 
-        static const char* psrc =
-            "layout (location = 0) out uvec2 Out_Color;\n"
-            "flat in uvec2 Frag_EntityID;\n"
-            "void main()\n"
-            "{\n"
-            "   Out_Color = Frag_EntityID;\n"
-            "};";
+    //    static const char* psrc =
+    //        "layout (location = 0) out uvec2 Out_Color;\n"
+    //        "flat in uvec2 Frag_EntityID;\n"
+    //        "void main()\n"
+    //        "{\n"
+    //        "   Out_Color = Frag_EntityID;\n"
+    //        "};";
 
-        ShaderInfo info;
+    //    ShaderInfo info;
 
-        info.shaderType = ShaderType::VERTEX;
-        info.source = vsrc;
-        g_vertShader = Graphics::CreateShader(info);
+    //    info.shaderType = ShaderType::VERTEX;
+    //    info.source = vsrc;
+    //    g_vertShader = Graphics::CreateShader(info);
 
-        info.shaderType = ShaderType::PIXEL;
-        info.source = psrc;
-        g_pixelShader = Graphics::CreateShader(info);
-    }
+    //    info.shaderType = ShaderType::PIXEL;
+    //    info.source = psrc;
+    //    g_pixelShader = Graphics::CreateShader(info);
+    //}
 
-    // Create pipeline
-    {
-        PipelineInfo info;
+    //// Create pipeline
+    //{
+    //    PipelineInfo info;
 
-        info.numRenderTargets = 1;
-        info.renderTargetFormats[0] = Graphics::GetColorBufferFormat();
-        info.depthStencilFormat = Graphics::GetDepthBufferFormat();
+    //    info.numRenderTargets = 1;
+    //    info.renderTargetFormats[0] = Graphics::GetColorBufferFormat();
+    //    info.depthStencilFormat = Graphics::GetDepthBufferFormat();
 
-        info.topology = PipelineTopology::TRIANGLES;
-        info.faceCull = PipelineFaceCull::CCW;
-        info.depthEnable = true;
+    //    info.topology = PipelineTopology::TRIANGLES;
+    //    info.faceCull = PipelineFaceCull::CCW;
+    //    info.depthEnable = true;
 
-        LayoutElement layoutElems[] =
-        {
-            LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 }
-        };
+    //    LayoutElement layoutElems[] =
+    //    {
+    //        LayoutElement { 0, 0, 3, GraphicsValueType::FLOAT32, false, 0, 0 }
+    //    };
 
-        info.layoutElements = layoutElems;
-        info.numElements = 1;
+    //    info.layoutElements = layoutElems;
+    //    info.numElements = 1;
 
-        info.vertShader = g_vertShader;
-        info.pixelShader = g_pixelShader;
+    //    info.vertShader = g_vertShader;
+    //    info.pixelShader = g_pixelShader;
 
-        g_pipeline = Graphics::CreatePipeline(info);
-    }
+    //    g_pipeline = Graphics::CreatePipeline(info);
+    //}
 
-    // Create buffers
-    {
-        BufferInfo info;
+    //// Create buffers
+    //{
+    //    BufferInfo info;
 
-        info.type = BufferType::UNIFORM_BUFFER;
-        info.usage = BufferUsage::DYNAMIC;
-        info.access = BufferAccess::WRITE;
-        g_constantBuffer = Graphics::CreateBuffer(info);
+    //    info.type = BufferType::UNIFORM_BUFFER;
+    //    info.usage = BufferUsage::DYNAMIC;
+    //    info.access = BufferAccess::WRITE;
+    //    g_constantBuffer = Graphics::CreateBuffer(info);
 
-        info.type = BufferType::UNIFORM_BUFFER;
-        info.usage = BufferUsage::DYNAMIC;
-        info.access = BufferAccess::WRITE;
-        g_modelBuffer = Graphics::CreateBuffer(info);
-    }
+    //    info.type = BufferType::UNIFORM_BUFFER;
+    //    info.usage = BufferUsage::DYNAMIC;
+    //    info.access = BufferAccess::WRITE;
+    //    g_modelBuffer = Graphics::CreateBuffer(info);
+    //}
 
-    // Create resources
-    {
-        ResourceBindingElement resourceElems[] =
-        {
-            ResourceBindingElement { ShaderType::VERTEX, "ConstantBuffer", 1, ResourceBindingType::UNIFORM_BUFFER, ResourceBindingAccess::STATIC },
-            ResourceBindingElement { ShaderType::VERTEX, "ModelBuffer", 1, ResourceBindingType::UNIFORM_BUFFER, ResourceBindingAccess::STATIC }
-        };
+    //// Create resources
+    //{
+    //    ResourceBindingElement resourceElems[] =
+    //    {
+    //        ResourceBindingElement { ShaderType::VERTEX, "ConstantBuffer", 1, ResourceBindingType::UNIFORM_BUFFER, ResourceBindingAccess::STATIC },
+    //        ResourceBindingElement { ShaderType::VERTEX, "ModelBuffer", 1, ResourceBindingType::UNIFORM_BUFFER, ResourceBindingAccess::STATIC }
+    //    };
 
-        ResourceBindingInfo resourceBindingInfo;
-        resourceBindingInfo.resources = resourceElems;
-        resourceBindingInfo.numResources = 2;
+    //    ResourceBindingInfo resourceBindingInfo;
+    //    resourceBindingInfo.resources = resourceElems;
+    //    resourceBindingInfo.numResources = 2;
 
-        g_resources = Graphics::CreateResourceBinding(resourceBindingInfo);
-        Graphics::BindResource(g_resources, "ConstantBuffer", g_constantBuffer);
-        Graphics::BindResource(g_resources, "ModelBuffer", g_modelBuffer);
-    }
+    //    g_resources = Graphics::CreateResourceBinding(resourceBindingInfo);
+    //    Graphics::BindResource(g_resources, "ConstantBuffer", g_constantBuffer);
+    //    Graphics::BindResource(g_resources, "ModelBuffer", g_modelBuffer);
+    //}
 }
 
 void SceneView::Shutdown()
@@ -267,34 +267,34 @@ static void Render(const ImVec2& size)
         g_sceneCam.SetZNear(0.1f);
         g_sceneCam.SetZFar(1000.0f);
 
-        // Check if there are old render targets
-        if (g_renderTargetIDs != INVALID_GRAPHICS_HANDLE)
-            Graphics::DestroyTexture(g_renderTargetIDs);
+        //// Check if there are old render targets
+        //if (g_renderTargetIDs != INVALID_GRAPHICS_HANDLE)
+        //    Graphics::DestroyTexture(g_renderTargetIDs);
 
-        if (g_renderTarget != INVALID_GRAPHICS_HANDLE)
-            Graphics::DestroyTexture(g_renderTarget);
+        //if (g_renderTarget != INVALID_GRAPHICS_HANDLE)
+        //    Graphics::DestroyTexture(g_renderTarget);
 
-        if (g_depthStencil != INVALID_GRAPHICS_HANDLE)
-            Graphics::DestroyTexture(g_depthStencil);
+        //if (g_depthStencil != INVALID_GRAPHICS_HANDLE)
+        //    Graphics::DestroyTexture(g_depthStencil);
 
-        // Create render targets
-        {
-            TextureInfo info;
-            info.width = (u32)g_sceneSize.x;
-            info.height = (u32)g_sceneSize.y;
+        //// Create render targets
+        //{
+        //    TextureInfo info;
+        //    info.width = (u32)g_sceneSize.x;
+        //    info.height = (u32)g_sceneSize.y;
 
-            info.format = TextureFormat::RG32_UINT;
-            info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
-            g_renderTargetIDs = Graphics::CreateTexture(info);
+        //    info.format = TextureFormat::RG32_UINT;
+        //    info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
+        //    g_renderTargetIDs = Graphics::CreateTexture(info);
 
-            info.format = TextureFormat::RGBA8_UNORM;
-            info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
-            g_renderTarget = Graphics::CreateTexture(info);
+        //    info.format = TextureFormat::RGBA8_UNORM;
+        //    info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
+        //    g_renderTarget = Graphics::CreateTexture(info);
 
-            info.format = TextureFormat::D24_UNORM_S8_UINT;
-            info.flags = TextureFlags::DEPTH_STENCIL;
-            g_depthStencil = Graphics::CreateTexture(info);
-        }
+        //    info.format = TextureFormat::D24_UNORM_S8_UINT;
+        //    info.flags = TextureFlags::DEPTH_STENCIL;
+        //    g_depthStencil = Graphics::CreateTexture(info);
+        //}
     }
 
     g_sceneCam.Update();
@@ -333,13 +333,13 @@ static void Render(const ImVec2& size)
             Physics::SetCharacterControllerMatrix(cc.GetCharacterController(), trx.GetMatrix());
         });
 
-    auto& renderer = SystemManager::GetSystem<Renderer>();
+    /*auto& renderer = SystemManager::GetSystem<Renderer>();
     renderer.UpdateAnimators();
     renderer.UpdateCameras();
     renderer.UpdateLights();
     renderer.CollectDrawCommands();
 
-    g_drawCmds.clear();
+   g_drawCmds.clear();
 
     EntityManager::ForEach<Transform, MeshFilter>(
         [&](Entity entity, const Transform& trx, const MeshFilter& mf)
@@ -358,49 +358,49 @@ static void Render(const ImVec2& size)
 
                 g_drawCmds.emplace_back(cmd);
             }
-        });
+        });*/
 
-    const f32 viewport[] = { 0.0f, 0.0f, g_sceneSize.x, g_sceneSize.y };
-    Graphics::SetViewport(viewport);
+    //const f32 viewport[] = { 0.0f, 0.0f, g_sceneSize.x, g_sceneSize.y };
+    //Graphics::SetViewport(viewport);
 
-    // Render to the normal color render target
-    Graphics::SetRenderTarget(g_renderTarget, g_depthStencil);
+    //// Render to the normal color render target
+    //Graphics::SetRenderTarget(g_renderTarget, g_depthStencil);
 
-    const f32 clearColor[] = { 0, 0, 0, 1 };
-    Graphics::ClearRenderTarget(g_renderTarget, clearColor);
-    Graphics::ClearDepthStencil(g_depthStencil, GraphicsClearFlags::DEPTH, 1.0f, 0);
+    //const f32 clearColor[] = { 0, 0, 0, 1 };
+    //Graphics::ClearRenderTarget(g_renderTarget, clearColor);
+    //Graphics::ClearDepthStencil(g_depthStencil, GraphicsClearFlags::DEPTH, 1.0f, 0);
 
-    renderer.BindConstants(g_sceneCam.GetView(), g_sceneCam.GetProjection(), g_sceneCam.GetViewProjection());
-    renderer.DrawCommands();
+    //renderer.BindConstants(g_sceneCam.GetView(), g_sceneCam.GetProjection(), g_sceneCam.GetViewProjection());
+    //renderer.DrawCommands();
 
-    Physics::DebugDraw();
+    //Physics::DebugDraw();
 
-    Graphics::UpdateDebugLines();
-    Graphics::DrawDebugLines(g_sceneCam.GetViewProjection());
+    //Graphics::UpdateDebugLines();
+    //Graphics::DrawDebugLines(g_sceneCam.GetViewProjection());
 
-    // Render to the ID render target
-    Graphics::SetRenderTarget(g_renderTargetIDs, g_depthStencil);
+    //// Render to the ID render target
+    //Graphics::SetRenderTarget(g_renderTargetIDs, g_depthStencil);
 
-    Graphics::SetPipeline(g_pipeline);
-    Graphics::ClearRenderTarget(g_renderTargetIDs, clearColor);
-    Graphics::ClearDepthStencil(g_depthStencil, GraphicsClearFlags::DEPTH, 1.0f, 0);
+    //Graphics::SetPipeline(g_pipeline);
+    //Graphics::ClearRenderTarget(g_renderTargetIDs, clearColor);
+    //Graphics::ClearDepthStencil(g_depthStencil, GraphicsClearFlags::DEPTH, 1.0f, 0);
 
-    BufferData bufferData;
-    SceneConstantData constants;
-    constants.viewProjMtx = g_sceneCam.GetViewProjection();
-    bufferData.dataSize = sizeof(SceneConstantData);
-    bufferData.pData = &constants;
-    Graphics::UpdateBuffer(g_constantBuffer, bufferData);
+    //BufferData bufferData;
+    //SceneConstantData constants;
+    //constants.viewProjMtx = g_sceneCam.GetViewProjection();
+    //bufferData.dataSize = sizeof(SceneConstantData);
+    //bufferData.pData = &constants;
+    //Graphics::UpdateBuffer(g_constantBuffer, bufferData);
 
-    for (auto& cmd : g_drawCmds)
-    {
-        bufferData.dataSize = sizeof(SceneModelData);
-        bufferData.pData = &cmd.model;
-        Graphics::UpdateBuffer(g_modelBuffer, bufferData);
-        
-        const u64 offset = 0;
-        renderer.DrawCommand(g_pipeline, 1, &g_resources, 1, &cmd.vbuffers, &offset, cmd.ibuffer, cmd.numIndices);
-    }
+    //for (auto& cmd : g_drawCmds)
+    //{
+    //    bufferData.dataSize = sizeof(SceneModelData);
+    //    bufferData.pData = &cmd.model;
+    //    Graphics::UpdateBuffer(g_modelBuffer, bufferData);
+    //    
+    //    const u64 offset = 0;
+    //    renderer.DrawCommand(g_pipeline, 1, &g_resources, 1, &cmd.vbuffers, &offset, cmd.ibuffer, cmd.numIndices);
+    //}
 }
 
 static void CopySceneClipboard()
@@ -489,7 +489,7 @@ void SceneView::Present(bool& show)
     // TODO: ???
     //ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
 #elif defined BX_GRAPHICS_OPENGL_BACKEND
-    ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
+    //ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
 #endif
     ImGui::SetCursorScreenPos(gizmoPos);
 
