@@ -23,10 +23,16 @@ struct HShader
 	static const HShader null;
 };
 
-struct HPipeline
+struct HGraphicsPipeline
 {
 	u64 id;
-	static const HPipeline null;
+	static const HGraphicsPipeline null;
+};
+
+struct HComputePipeline
+{
+	u64 id;
+	static const HComputePipeline null;
 };
 
 ENUM(GraphicsClearFlags,
@@ -42,6 +48,12 @@ ENUM(ShaderType,
 	COMPUTE
 );
 
+ENUM(ShaderStageFlags,
+	VERTEX = BX_BIT(0),
+	FRAGMENT = BX_BIT(1),
+	COMPUTE = BX_BIT(2)
+);
+
 ENUM(BufferUsageFlags,
 	MAP_READ = BX_BIT(0),
 	MAP_WRITE = BX_BIT(1),
@@ -53,7 +65,8 @@ ENUM(BufferUsageFlags,
 	STORAGE = BX_BIT(7),
 	INDIRECT = BX_BIT(8)
 );
-ENUM(BufferAccess,
+
+ENUM(StorageTextureAccess,
 	READ,
 	WRITE,
 	READ_WRITE
@@ -139,14 +152,6 @@ ENUM(TextureUsageFlags,
 	RENDER_ATTACHMENT = BX_BIT(4)
 );
 
-ENUM(ResourceBindingType,
-	BUFFER,
-	SAMPLER,
-	TEXTURE,
-	STORAGE_TEXTURE,
-	ACCELERATION_STRUCTURE
-);
-
 ENUM(GraphicsPipelineTopology,
 	POINT_LIST,
 	LINE_LIST,
@@ -170,7 +175,89 @@ ENUM(VertexFormat,
 	SNORM_8X4,
 	UINT_16X2,
 	UINT_16X4,
+	SINT_16X2,
+	SINT_16X4,
+	UNORM_16X2,
+	UNORM_16X4,
+	SNORM_16X2,
+	SNORM_16X4,
+	FLOAT_16X2,
+	FLOAT_16X4,
+	FLOAT_32,
+	FLOAT_32X2,
+	FLOAT_32X3,
+	FLOAT_32X4,
+	UINT_32,
+	UINT_32X2,
+	UINT_32X3,
+	UINT_32X4,
+	SINT_32,
+	SINT_32X2,
+	SINT_32X3,
+	SINT_32X4,
 );
+
+ENUM(BlendFactor,
+	ZERO,
+	ONE,
+	SRC,
+	ONE_MINUS_SRC,
+	SRC_ALPHA,
+	ONE_MINUS_SRC_ALPHA,
+	DST,
+	ONE_MINUS_DST,
+	DST_ALPHA,
+	ONE_MINUS_DST_ALPHA,
+	SRC_ALPHA_SATURATED,
+	CONSTANT,
+	ONE_MINUS_CONSTANT
+);
+
+ENUM(BlendOperation,
+	ADD,
+	SUBTRACT,
+	REVERSE_SUBTRACT,
+	MIN,
+	MAX
+);
+
+ENUM(BindingType,
+	UNIFORM_BUFFER,
+	STORAGE_BUFFER,
+	SAMPLER,
+	TEXTURE,
+	STORAGE_TEXTURE,
+	ACCELERATION_STRUCTURE
+);
+
+ENUM(TextureSampleType,
+	FLOAT,
+	DEPTH,
+	UINT,
+	SINT
+);
+
+ENUM(TextureViewDimension,
+	D1,
+	D2,
+	D2_ARRAY,
+	CUBE,
+	CUBE_ARRAY,
+	D3
+);
+
+ENUM(TextureDimension,
+	D1,
+	D2,
+	D3
+);
+
+struct Extend3D
+{
+	u32 width;
+	u32 height;
+	u32 depthOrArrayLayers = 1;
+};
 
 struct VertexAttribute
 {
@@ -185,137 +272,152 @@ struct VertexBufferLayout
 	List<VertexAttribute> attributes;
 };
 
+struct BlendComponent
+{
+	static BlendComponent Replace()
+	{
+		BlendComponent component{};
+		component.srcFactor = BlendFactor::ONE;
+		component.dstFactor = BlendFactor::ZERO;
+		return component;
+	}
+
+	static BlendComponent AlphaBlending()
+	{
+		BlendComponent component{};
+		component.srcFactor = BlendFactor::SRC_ALPHA;
+		component.dstFactor = BlendFactor::ONE_MINUS_SRC_ALPHA;
+		return component;
+	}
+
+	BlendFactor srcFactor;
+	BlendFactor dstFactor;
+	BlendOperation operation = BlendOperation::ADD;
+};
+
+struct BlendState
+{
+	BlendComponent color;
+	BlendComponent alpha;
+};
+
+struct ColorTargetState
+{
+	TextureFormat format = TextureFormat::RGBA8_UNORM_SRGB;
+	Optional<BlendState> blend = Optional<BlendState>::None();
+};
+
+struct BindingTypeDescriptor
+{
+	BindingType type;
+
+	union
+	{
+		struct
+		{
+			u32 _padding[4];
+		} uniformBuffer;
+
+		struct
+		{
+			b8 readOnly = true;
+			u32 _padding[3];
+		} storageBuffer;
+
+		struct
+		{
+			u32 _padding[4];
+		} sampler;
+
+		struct
+		{
+			TextureSampleType sampleType = TextureSampleType::FLOAT;
+			TextureViewDimension viewDimension = TextureViewDimension::D2;
+			b8 multisampled = false;
+			u32 _padding[1];
+		} texture;
+
+		struct
+		{
+			StorageTextureAccess access = StorageTextureAccess::READ;
+			TextureFormat format = TextureFormat::RGBA8_UNORM_SRGB;
+			TextureViewDimension viewDimension = TextureViewDimension::D2;
+			u32 _padding[1];
+		} storageTexture;
+
+		struct
+		{
+			u32 _padding[4];
+		} accelerationStructure;
+	};
+};
+
+struct BindGroupLayoutEntry
+{
+	u32 binding;
+	ShaderStageFlags visibility;
+	BindingTypeDescriptor type;
+	Optional<u32> count = Optional<u32>::None();
+};
+
+struct PipelineLayoutDescriptor
+{
+	List<BindGroupLayoutEntry> bindGroupLayouts = List<BindGroupLayoutEntry>{};
+};
+
 struct GraphicsPipelineCreateInfo
 {
+	Optional<String> name = Optional<String>::None();
+
 	HShader vertexShader = HShader::null;
 	HShader fragmentShader = HShader::null;
 	// TODO
 	// HShader geometryShader = HShader::null;
 	// HShader tessalationShader = HShader::null;
 
-	// vertex layout
-	// color targets
+	List<VertexBufferLayout> vertexBuffers = List<VertexBufferLayout>{};
+	Optional<ColorTargetState> colorTarget = Optional<ColorTargetState>::None();
 	GraphicsPipelineTopology topology = GraphicsPipelineTopology::TRIANGLE_LIST;
 	Optional<GraphicsPipelineFaceCull> faceCull = Optional<GraphicsPipelineFaceCull>::None();
-	// pipeline layout
+	PipelineLayoutDescriptor layout;
 	Optional<TextureFormat> depthFormat = Optional<TextureFormat>::None();
+};
+
+struct ComputePipelineCreateInfo
+{
+	Optional<String> name = Optional<String>::None();
+
+	HShader shader = HShader::null;
+	PipelineLayoutDescriptor layout;
+	HashMap<String, f64> constants = HashMap<String, f64>{};
 };
 
 struct ShaderCreateInfo
 {
-	ShaderType shaderType = ShaderType::VERTEX;
+	Optional<String> name = Optional<String>::None();
+
+	ShaderType shaderType;
 	String src;
 };
 
 struct BufferCreateInfo
 {
+	Optional<String> name = Optional<String>::None();
+
 	BufferUsageFlags usageFlags = 0;
-	BufferAccess access = BufferAccess::READ_WRITE;
-	u32 strideBytes = 0;
+	u64 size;
 };
 
 struct TextureCreateInfo
 {
+	Optional<String> name = Optional<String>::None();
+
+	Extend3D size = Extend3D{};
+	u32 mipLevelCount = 1;
+	u32 sampleCount = 1;
+	TextureDimension dimension = TextureDimension::D2;
 	TextureFormat format = TextureFormat::RGBA8_UNORM_SRGB;
 	TextureUsageFlags usageFlags = 0;
-	u32 width = 0;
-	u32 height = 0;
-	// TODO
-	// u32 depth = 1;
-	// u32 mips = 1;
-};
-
-struct BufferData
-{
-	BufferData() {}
-	BufferData(const void* pData, u32 dataSize)
-		: pData(pData)
-		, dataSize(dataSize) {}
-
-	const void* pData = nullptr;
-	u32 dataSize = 0;
-};
-
-struct ResourceBindingElement
-{
-	ResourceBindingElement() {}
-	ResourceBindingElement(ShaderType shaderType, const char* name, u32 count, ResourceBindingType type, ResourceBindingAccess access)
-		: shaderType(shaderType)
-		, name(name)
-		, count(count)
-		, type(type)
-		, access(access) {}
-
-	ShaderType shaderType = ShaderType::UNKNOWN;
-	const char* name = nullptr;
-	u32 count = 0;
-	ResourceBindingType type = ResourceBindingType::UNKNOWN;
-	ResourceBindingAccess access = ResourceBindingAccess::STATIC;
-};
-
-struct ResourceBindingInfo
-{
-	const ResourceBindingElement* resources = nullptr;
-	u32 numResources = 0;
-};
-
-struct LayoutElement
-{
-	LayoutElement() {}
-	LayoutElement(u32 inputIndex, u32 bufferSlot, u32 numComponents, GraphicsValueType valueType, bool isNormalized, u32 relativeOffset, u32 instanceDataStepRate)
-		: inputIndex(inputIndex)
-		, bufferSlot(bufferSlot)
-		, numComponents(numComponents)
-		, valueType(valueType)
-		, isNormalized(isNormalized)
-		, relativeOffset(relativeOffset)
-		, instanceDataStepRate(instanceDataStepRate) {}
-
-	u32 inputIndex = 0;
-	u32 bufferSlot = 0;
-	u32 numComponents = 0;
-	GraphicsValueType valueType = GraphicsValueType::FLOAT32;
-	bool isNormalized = false;
-	u32 relativeOffset = 0;
-	u32 instanceDataStepRate = 0;
-};
-
-struct PipelineInfo
-{
-	u32 numRenderTargets = 0;
-	TextureFormat renderTargetFormats[8] = { TextureFormat::UNKNOWN };
-	TextureFormat depthStencilFormat = TextureFormat::UNKNOWN;
-
-	PipelineTopology topology = PipelineTopology::UNDEFINED;
-	PipelineFaceCull faceCull = PipelineFaceCull::NONE;
-
-	bool depthEnable = true;
-	bool blendEnable = false;
-
-	GraphicsHandle vertShader = INVALID_GRAPHICS_HANDLE;
-	GraphicsHandle pixelShader = INVALID_GRAPHICS_HANDLE;
-
-	const LayoutElement* layoutElements = nullptr;
-	u32 numElements = 0;
-};
-
-struct DrawAttribs
-{
-	DrawAttribs() {}
-	DrawAttribs(u32 numVertices)
-		: numVertices(numVertices) {}
-
-	u32 numVertices = 0;
-};
-
-struct DrawIndexedAttribs
-{
-	DrawIndexedAttribs() {}
-	DrawIndexedAttribs(GraphicsValueType indexType, u32 numIndices)
-		: indexType(indexType), numIndices(numIndices) {}
-
-	GraphicsValueType indexType = GraphicsValueType::UINT32;
-	u32 numIndices = 0;
 };
 
 struct DebugVertex
