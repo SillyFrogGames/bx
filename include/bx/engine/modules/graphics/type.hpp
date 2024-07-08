@@ -11,10 +11,22 @@ struct HBuffer
 	static const HBuffer null;
 };
 
+struct HSampler
+{
+	u64 id;
+	static const HSampler null;
+};
+
 struct HTexture
 {
 	u64 id;
 	static const HTexture null;
+};
+
+struct HTextureView
+{
+	u64 id;
+	static const HTextureView null;
 };
 
 struct HShader
@@ -35,11 +47,23 @@ struct HComputePipeline
 	static const HComputePipeline null;
 };
 
-ENUM(GraphicsClearFlags,
-	COLOR = BX_BIT(0),
-	DEPTH = BX_BIT(1),
-	STENCIL = BX_BIT(2)
-);
+struct HRenderPass
+{
+	u64 id;
+	static const HRenderPass null;
+};
+
+struct HBindGroupLayout
+{
+	u64 id;
+	static const HBindGroupLayout null;
+};
+
+struct HBindGroup
+{
+	u64 id;
+	static const HBindGroup null;
+};
 
 ENUM(ShaderType,
 	VERTEX,
@@ -152,6 +176,24 @@ ENUM(TextureUsageFlags,
 	RENDER_ATTACHMENT = BX_BIT(4)
 );
 
+ENUM(SamplerBorderColor,
+	TRANSPARENT_BLACK,
+	OPAQUE_BLACK,
+	OPAQUE_WHITE
+);
+
+ENUM(AddressMode,
+	CLAMP_TO_EDGE,
+	REPEAT,
+	MIRROR_REPEAT,
+	CLAMP_TO_BORDER
+);
+
+ENUM(FilterMode,
+	NEAREST,
+	LINEAR
+);
+
 ENUM(GraphicsPipelineTopology,
 	POINT_LIST,
 	LINE_LIST,
@@ -230,6 +272,15 @@ ENUM(BindingType,
 	ACCELERATION_STRUCTURE
 );
 
+ENUM(BindingResourceType,
+	BUFFER,
+	BUFFER_ARRAY,
+	SAMPLER,
+	SAMPLER_ARRAY,
+	TEXTURE_VIEW,
+	TEXTURE_VIEW_ARRAY
+);
+
 ENUM(TextureSampleType,
 	FLOAT,
 	DEPTH,
@@ -250,6 +301,21 @@ ENUM(TextureDimension,
 	D1,
 	D2,
 	D3
+);
+
+ENUM(LoadOp,
+	CLEAR,
+	LOAD
+);
+
+ENUM(StoreOp,
+	STORE,
+	DISCARD
+);
+
+ENUM(IndexFormat,
+	UINT16,
+	UINT32
 );
 
 struct Extend3D
@@ -360,6 +426,42 @@ struct BindGroupLayoutEntry
 	Optional<u32> count = Optional<u32>::None();
 };
 
+struct BufferBinding
+{
+	HBuffer buffer = HBuffer::null;
+	u64 offset = 0;
+	Optional<u64> size = Optional<u64>::None();
+};
+
+struct BindingResource
+{
+	BindingResourceType type;
+
+	union
+	{
+		BufferBinding buffer;
+		List<BufferBinding> bufferArray;
+		HSampler sampler;
+		List<HSampler> samplerArray;
+		HTextureView textureView;
+		List<HTextureView> textureViewArray;
+	};
+};
+
+struct BindGroupEntry
+{
+	u32 binding;
+	BindingResource resource;
+};
+
+struct BindGroupCreateInfo
+{
+	Optional<String> name = Optional<String>::None();
+
+	HBindGroupLayout layout = HBindGroupLayout::null;
+	List<BindGroupEntry> entries = List<BindGroupEntry>{};
+};
+
 struct PipelineLayoutDescriptor
 {
 	List<BindGroupLayoutEntry> bindGroupLayouts = List<BindGroupLayoutEntry>{};
@@ -408,6 +510,21 @@ struct BufferCreateInfo
 	u64 size;
 };
 
+struct SamplerCreateInfo
+{
+	Optional<String> name = Optional<String>::None();
+
+	AddressMode addressModeU = AddressMode::CLAMP_TO_EDGE;
+	AddressMode addressModeV = AddressMode::CLAMP_TO_EDGE;
+	AddressMode addressModeW = AddressMode::CLAMP_TO_EDGE;
+	FilterMode magFilter;
+	FilterMode minFilter;
+	f32 lodMinClamp = 0.0f;
+	f32 lodMaxClamp = 32.0f;
+	u16 anisotropyClamp = 1;
+	Optional<SamplerBorderColor> borderColor = Optional<SamplerBorderColor>::None();
+};
+
 struct TextureCreateInfo
 {
 	Optional<String> name = Optional<String>::None();
@@ -418,6 +535,50 @@ struct TextureCreateInfo
 	TextureDimension dimension = TextureDimension::D2;
 	TextureFormat format = TextureFormat::RGBA8_UNORM_SRGB;
 	TextureUsageFlags usageFlags = 0;
+};
+
+struct ImageDataLayout
+{
+	u64 offset;
+	// This value is required if there are multiple rows (i.e. height or depth is more than one pixel or pixel block for compressed textures)
+	Optional<u32> bytesPerRow = Optional<u32>::None();
+	// Required if there are multiple images (i.e. the depth is more than one).
+	Optional<u32> rowsPerImage = Optional<u32>::None();
+};
+
+struct BufferSlice
+{
+	HBuffer buffer = HBuffer::null;
+	u64 offset = 0;
+	Optional<u64> size = Optional<u64>::None();
+};
+
+struct Operations
+{
+	LoadOp load = LoadOp::LOAD;
+	StoreOp store = StoreOp::STORE;
+};
+
+struct RenderPassColorAttachment
+{
+	HTextureView view;
+	Optional<HTextureView> resolveTarget = Optional<HTextureView>::None();
+	Operations ops = Operations{};
+};
+
+struct RenderPassDepthStencilAttachment
+{
+	HTextureView view;
+	Optional<Operations> depthOps = Optional<Operations>::None();
+	Optional<Operations> stencilOps = Optional<Operations>::None();
+};
+
+struct RenderPassDescriptor
+{
+	Optional<String> name = Optional<String>::None();
+
+	List<RenderPassColorAttachment> colorAttachments = List<RenderPassColorAttachment>{};
+	Optional<RenderPassColorAttachment> depthStencilAttachment = Optional<RenderPassColorAttachment>::None();
 };
 
 struct DebugVertex

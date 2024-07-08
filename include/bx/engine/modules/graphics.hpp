@@ -5,7 +5,7 @@
 class Graphics
 {
 public:
-	static TextureFormat GetColorBufferFormat();
+	/*static TextureFormat GetColorBufferFormat();
 	static TextureFormat GetDepthBufferFormat();
 
 	static GraphicsHandle GetCurrentBackBufferRT();
@@ -44,7 +44,57 @@ public:
 	static void SetIndexBuffer(const GraphicsHandle buffer, i32 i);
 
 	static void Draw(const DrawAttribs& attribs);
-	static void DrawIndexed(const DrawIndexedAttribs& attribs);
+	static void DrawIndexed(const DrawIndexedAttribs& attribs);*/
+
+	// Swapchain
+	static TextureFormat GetSwapchainFormat();
+
+	// Resource creation and destruction
+	static HTexture CreateTexture(const TextureCreateInfo& createInfo);
+	static HTexture CreateTextureWithData(const TextureCreateInfo& createInfo, const u8* data);
+	static void DestroyTexture(HTexture texture);
+
+	static HTextureView CreateTextureView(HTexture texture);
+	static void DestroyTextureView(HTextureView textureView);
+
+	static HSampler CreateSampler(const SamplerCreateInfo& create);
+	static void DestroySampler(HSampler sampler);
+
+	static HBuffer CreateBuffer(const BufferCreateInfo& createInfo);
+	static HBuffer CreateBufferWithData(const BufferCreateInfo& createInfo, const u8* data);
+	static void DestroyBuffer(HBuffer buffer);
+
+	static HShader CreateShader(const ShaderCreateInfo& createInfo);
+	static void DestroyShader(HShader shader);
+	
+	static HGraphicsPipeline CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
+	static void DestroyGraphicsPipeline(HGraphicsPipeline graphicsPipeline);
+	static HComputePipeline CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
+	static void DestroyComputePipeline(HComputePipeline graphicsPipeline);
+
+	static HBindGroupLayout GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup);
+	static HBindGroupLayout GetBindGroupLayout(HComputePipeline computePipeline, u32 bindGroup);
+	static HBindGroup CreateBindGroup(const BindGroupCreateInfo& createInfo);
+	static void DestroyBindGroup(HBindGroup bindGroup);
+
+	// Cmds
+	static HRenderPass BeginRenderPass(const RenderPassDescriptor& descriptor);
+	static void SetGraphicsPipeline(HRenderPass renderPass, HGraphicsPipeline graphicsPipeline);
+	static void SetVertexBuffer(HRenderPass renderPass, u32 slot, const BufferSlice& bufferSlice);
+	static void SetIndexBuffer(HRenderPass renderPass, const BufferSlice& bufferSlice, IndexFormat format);
+	static void SetBindGroup(HRenderPass renderPass, u32 index, HBindGroup bindGroup);
+	static void Draw(HRenderPass renderPass, u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
+	static void DrawIndexed(HRenderPass renderPass, u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
+	static void EndRenderPass(HRenderPass renderPass);
+
+	// Write data to buffer, write is queued untill `FlushBufferWrites` is called or when the frame is finished.
+	// Data is copied over immediately and can be freed after calling
+	static void WriteBuffer(HBuffer buffer, u64 offset, const u8* data);
+	static void FlushBufferWrites();
+	// Write data to texture, write is queued untill `FlushTextureWrites` is called or when the frame is finished.
+	// Data is copied over immediately and can be freed after calling
+	static void WriteTexture(HTexture texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void FlushTextureWrites();
 
 	// Debug draw utilities
 	static void DebugLine(const Vec3& a, const Vec3& b, u32 color = 0xFFFFFFFF, f32 lifespan = 0.0f);
