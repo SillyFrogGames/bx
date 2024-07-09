@@ -473,14 +473,10 @@ struct BindingResource
 
 	BindingResourceType type;
 
-	union
-	{
-		BufferBinding buffer;
-		HSampler sampler;
-		HTextureView textureView;
-	};
-
-	// TODO: can this be unioned somehow?
+	// TODO: can this be unioned somehow? std::vector seems to have trouble and the custom Optional<T> as well
+	BufferBinding buffer;
+	HSampler sampler;
+	HTextureView textureView;
 	List<BufferBinding> bufferArray;
 	List<HSampler> samplerArray;
 	List<HTextureView> textureViewArray;

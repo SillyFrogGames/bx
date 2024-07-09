@@ -29,7 +29,7 @@ public:
 		const List<Vec2>& uvs,
 		const List<Vec4i>& bones,
 		const List<Vec4>& weights,
-		const List<u32>& triangles)
+		const List<u32>& indices)
 		: m_transform(transform)
 		, m_vertices(vertices)
 		, m_colors(colors)
@@ -38,7 +38,7 @@ public:
 		, m_uvs(uvs)
 		, m_bones(bones)
 		, m_weights(weights)
-		, m_triangles(triangles)
+		, m_indices(indices)
 	{}
 
 	inline const Mat4& GetMatrix() const { return m_transform; }

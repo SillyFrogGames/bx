@@ -53,6 +53,7 @@ bool Resource<Material>::Load(const String& filename, Material& data)
 template<>
 void Resource<Material>::Unload(Material& data)
 {
+    Graphics::DestroyBindGroup(data.m_bindGroup);
 }
 
 BindGroupLayoutDescriptor Material::GetBindGroupLayout()

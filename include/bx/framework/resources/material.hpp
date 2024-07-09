@@ -13,7 +13,7 @@ class Material
 {
 public:
 	inline const Resource<Shader>& GetShader() const { return m_shader; }
-	inline void SetShader(Resource<Shader> shader) { m_shader = shader; BuildPipeline(); }
+	inline void SetShader(Resource<Shader> shader) { m_shader = shader; /*TODO: some dirty flag to query in renderer and rebuild pipelines*/ }
 
 	inline const Vec4& GetColor() const { return m_color; }
 	inline void SetColor(const Vec4& color) { m_color = color; }

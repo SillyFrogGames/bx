@@ -10,6 +10,41 @@ template <typename T>
 class Optional
 {
 public:
+	Optional(const Optional<T>& other)
+	{
+		if (other.IsSome())
+			data = new T(*other.data);
+		else
+			data = nullptr;
+	}
+
+	Optional<T>& operator=(const Optional<T>& other)
+	{
+		if (other.IsSome())
+			data = new T(*other.data);
+		else
+			data = nullptr;
+		return *this;
+	}
+
+	Optional(Optional<T>&& other)
+	{
+		data = other.data;
+		other.data = nullptr;
+	}
+
+	Optional<T>& operator=(Optional<T>&& other)
+	{
+		data = other.data;
+		other.data = nullptr;
+		return *this;
+	}
+
+	~Optional()
+	{
+		delete data;
+	}
+
 	template <typename ...Params>
 	static Optional<T> Some(Params&&... params)
 	{
@@ -23,40 +58,35 @@ public:
 
 	b8 IsSome() const
 	{
-		return isSome;
+		return data;
 	}
 
 	b8 IsNone() const
 	{
-		return !isSome;
+		return !data;
 	}
 
 	T& Unwrap()
 	{
-		BX_ASSERT(isSome, "Unwrap on a None value.");
-		return data;
+		BX_ASSERT(data, "Unwrap on a None value.");
+		return *data;
 	}
 
 	const T& Unwrap() const
 	{
-		BX_ASSERT(isSome, "Unwrap on a None value.");
-		return data;
+		BX_ASSERT(data, "Unwrap on a None value.");
+		return *data;
 	}
 
 private:
 	Optional()
-		: isSome(false)
+		: data(nullptr)
 	{}
 
 	template <typename ...Params>
 	Optional(Params&&... params)
-		: data(std::forward<Params>(params)...), isSome(true)
+		: data(new T(std::forward<Params>(params)...))
 	{}
 
-	// TODO: Optional<T> does not support copying, even if T itself does
-	// Replacing unique_ptr with a raw ptr and calling copy constructors when relevant can add the ability to copy Optional<T> when T implements copy constructors
-	// std::unique_ptr<T> data;
-
-	T data;
-	b8 isSome;
+	T* data;
 };

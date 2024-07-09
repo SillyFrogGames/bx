@@ -82,7 +82,7 @@ class ResourceDatabase : public IResourceDatabase
 public:
 	using LoadFn = bool(*)(const String&, TData&);
 	using SaveFn = bool(*)(const String&, const TData&);
-	using UnloadFn = void(*)(const TData&);
+	using UnloadFn = void(*)(TData&);
 
 	inline void Shutdown() override
 	{
@@ -259,14 +259,14 @@ public:
 	}
 
 	Resource(const Resource& other)
-		: m_handle(other.m_handle), m_uuid(other.uuid)
+		: m_handle(other.m_handle), m_uuid(other.m_uuid)
 	{
 		if (IsValid())
 			IncreaseRefCount();
 	}
 
 	Resource(Resource&& other) noexcept
-		: m_handle(other.m_handle), m_uuid(other.uuid)
+		: m_handle(other.m_handle), m_uuid(other.m_uuid)
 	{
 		other.m_handle = RESOURCE_HANDLE_INVALID;
 		other.m_uuid = 0;
