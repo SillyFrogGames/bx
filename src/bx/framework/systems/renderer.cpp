@@ -47,8 +47,10 @@ struct LightData
 
 struct State : NoCopy
 {
+    HashMap<UUID, HGraphicsPipeline> shaderPipelines;
+
     HTexture colorTarget = HTexture::null;
-    HTexture depthTarget;
+    HTexture depthTarget = HTexture::null;
 };
 static std::unique_ptr<State> s;
 
@@ -59,6 +61,61 @@ struct ModelData
     Vec4i lightIndices = Vec4i(-1, -1, -1, -1);
 };
 
+void BuildShaderPipelines()
+{
+    VertexBufferLayout vertexBufferLayout{};
+    vertexBufferLayout.stride = sizeof(Mesh::Vertex);
+    vertexBufferLayout.attributes = {
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, position), 32 * 3 / 4),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, color), 32 * 4 / 4),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, normal), 32 * 3 / 4),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, tangent), 32 * 3 / 4),
+        VertexAttribute(VertexFormat::FLOAT_32X2, offsetof(Mesh::Vertex, uv), 32 * 2 / 4),
+        VertexAttribute(VertexFormat::SINT_32X4,  offsetof(Mesh::Vertex, bones), 32 * 3 / 4),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, weights), 32 * 3 / 4)
+    };
+
+    PipelineLayoutDescriptor pipelineLayoutDescriptor{};
+    pipelineLayoutDescriptor.bindGroupLayouts = {
+        BindGroupLayoutEntry(0, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
+        BindGroupLayoutEntry(1, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
+        BindGroupLayoutEntry(2, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
+        BindGroupLayoutEntry(3, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Sampler()),
+        BindGroupLayoutEntry(4, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::UniformBuffer()),
+    };
+
+    ColorTargetState colorTargetState{};
+    colorTargetState.format = Graphics::GetTextureCreateInfo(s->colorTarget).format;
+
+    TextureFormat depthFormat = Graphics::GetTextureCreateInfo(s->depthTarget).format;
+
+    EntityManager::ForEach<Transform, MeshFilter, MeshRenderer>(
+        [&](Entity entity, const Transform& trx, const MeshFilter& mf, const MeshRenderer& mr)
+        {
+            if (mr.GetMaterialCount() == 0)
+                return;
+
+            for (const auto& material : mr.GetMaterials())
+            {
+                if (!material)
+                    continue;
+
+                const Material& materialData = material.GetData();
+                const Resource<Shader>& shaderResource = materialData.GetShader();
+                const Shader& shader = shaderResource.GetData();
+
+                GraphicsPipelineCreateInfo createInfo{};
+                createInfo.name = Optional<String>::Some("Shader Pipeline");
+                createInfo.vertexShader = shader.GetVertexShader();
+                createInfo.fragmentShader = shader.GetFragmentShader();
+                createInfo.vertexBuffers = { vertexBufferLayout };
+                createInfo.colorTarget = Optional<ColorTargetState>::Some(colorTargetState);
+                createInfo.cullMode = Optional<Face>::Some(Face::BACK);
+                createInfo.layout = pipelineLayoutDescriptor;
+                createInfo.depthFormat = Optional<TextureFormat>::Some(depthFormat);
+            }
+        });
+}
 
 void Renderer::Initialize()
 {
@@ -77,7 +134,19 @@ void Renderer::Update()
         i32 w, h;
         Window::GetSize(&w, &h);
 
+        TextureCreateInfo colorTargetCreateInfo{};
+        colorTargetCreateInfo.name = Optional<String>::Some("Color Target");
+        colorTargetCreateInfo.size = Extend3D(w, h, 1);
+        colorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
+        colorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);
 
+        TextureCreateInfo depthTargetCreateInfo{};
+        depthTargetCreateInfo.name = Optional<String>::Some("Depth Target");
+        depthTargetCreateInfo.size = Extend3D(w, h, 1);
+        depthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
+        depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
     }
 }
 

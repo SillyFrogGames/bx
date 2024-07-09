@@ -11,8 +11,8 @@ public:
 	const String& GetSource() const { return m_source; }
 	void SetSource(const String& src) { m_source = src; }
 
-	GraphicsHandle GetVertex() const { return m_vertex; }
-	GraphicsHandle GetPixel() const { return m_pixel; }
+	HShader GetVertexShader() const { return m_vertexShader; }
+	HShader GetFragmentShader() const { return m_fragmentShader; }
 
 private:
 	template <typename T>
@@ -24,6 +24,6 @@ private:
 	List<String> m_includes;
 	List<String> m_macros;
 	String m_source;
-	GraphicsHandle m_vertex = INVALID_GRAPHICS_HANDLE;
-	GraphicsHandle m_pixel = INVALID_GRAPHICS_HANDLE;
+	HShader m_vertexShader = HShader::null;
+	HShader m_fragmentShader = HShader::null;
 };

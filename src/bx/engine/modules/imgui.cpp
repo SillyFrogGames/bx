@@ -153,9 +153,9 @@ void ImGuiImpl::NewFrame()
 
 void ImGuiImpl::EndFrame()
 {
-    GraphicsHandle renderTarget = Graphics::GetCurrentBackBufferRT();
+    /*GraphicsHandle renderTarget = Graphics::GetCurrentBackBufferRT();
     GraphicsHandle depthStencil = Graphics::GetDepthBuffer();
-    Graphics::SetRenderTarget(renderTarget, depthStencil);
+    Graphics::SetRenderTarget(renderTarget, depthStencil);*/
 
     ImGui::Render();
 #if defined BX_GRAPHICS_OPENGL_BACKEND

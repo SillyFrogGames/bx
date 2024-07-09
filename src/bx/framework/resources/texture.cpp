@@ -54,7 +54,7 @@ bool Resource<Texture>::Load(const String& filename, Texture& data)
 }
 
 template<>
-void Resource<Texture>::Unload(const Texture& data)
+void Resource<Texture>::Unload(Texture& data)
 {
     // TODO
 }

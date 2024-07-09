@@ -30,58 +30,58 @@
 
 #define MAX_BOUND_VERTEX_BUFFERS                        16
 
-struct ShaderImpl
-{
-    GLuint handle = 0;
-};
-
-struct BufferImpl
-{
-    GLuint handle = 0;
-    GLenum target = 0;
-    GLenum usage = 0;
-    GLsizei stride = 0;
-};
-
-struct TextureImpl
-{
-    GLuint texture = 0;
-    GLuint sampler = 0;
-    GLuint fbo = 0;
-    GLuint rbo = 0;
-
-    GLuint64 handle = 0;
-};
-
-struct ResourceBindingImpl
-{
-    struct Data
-    {
-        ShaderType shaderType = ShaderType::UNKNOWN;
-        u32 count = 0;
-        ResourceBindingType type = ResourceBindingType::UNKNOWN;
-        ResourceBindingAccess access = ResourceBindingAccess::STATIC;
-
-        GraphicsHandle handle = INVALID_GRAPHICS_HANDLE;
-    };
-    HashMap<String, Data> resources;
-};
-
-struct PipelineImpl
-{
-    GLuint program = 0;
-    GLuint vao = 0;
-
-    GLenum faceCull = GL_CCW;
-
-    bool depthEnable = true;
-    bool blendEnable = true;
-
-    GLuint bufferCount = 0;
-};
+//struct ShaderImpl
+//{
+//    GLuint handle = 0;
+//};
+//
+//struct BufferImpl
+//{
+//    GLuint handle = 0;
+//    GLenum target = 0;
+//    GLenum usage = 0;
+//    GLsizei stride = 0;
+//};
+//
+//struct TextureImpl
+//{
+//    GLuint texture = 0;
+//    GLuint sampler = 0;
+//    GLuint fbo = 0;
+//    GLuint rbo = 0;
+//
+//    GLuint64 handle = 0;
+//};
+//
+//struct ResourceBindingImpl
+//{
+//    struct Data
+//    {
+//        ShaderType shaderType = ShaderType::UNKNOWN;
+//        u32 count = 0;
+//        ResourceBindingType type = ResourceBindingType::UNKNOWN;
+//        ResourceBindingAccess access = ResourceBindingAccess::STATIC;
+//
+//        GraphicsHandle handle = INVALID_GRAPHICS_HANDLE;
+//    };
+//    HashMap<String, Data> resources;
+//};
+//
+//struct PipelineImpl
+//{
+//    GLuint program = 0;
+//    GLuint vao = 0;
+//
+//    GLenum faceCull = GL_CCW;
+//
+//    bool depthEnable = true;
+//    bool blendEnable = true;
+//
+//    GLuint bufferCount = 0;
+//};
 
 class GraphicsOpenGL
 {
 public:
-    static GLuint GetTextureHandle(GraphicsHandle texture);
+    static GLuint GetTextureHandle(HTexture texture);
 };

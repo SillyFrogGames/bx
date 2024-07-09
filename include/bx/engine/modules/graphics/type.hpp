@@ -4,6 +4,9 @@
 #include "bx/engine/core/type.hpp"
 #include "bx/engine/core/macros.hpp"
 #include "bx/engine/containers/optional.hpp"
+#include "bx/engine/containers/list.hpp"
+#include "bx/engine/containers/string.hpp"
+#include "bx/engine/containers/hash_map.hpp"
 
 struct HBuffer
 {
@@ -194,16 +197,20 @@ ENUM(FilterMode,
 	LINEAR
 );
 
-ENUM(GraphicsPipelineTopology,
+ENUM(PrimitiveTopology,
 	POINT_LIST,
 	LINE_LIST,
 	LINE_STRIP,
 	TRIANGLE_LIST,
 	TRIANGLE_STRIP,
 );
-ENUM(GraphicsPipelineFaceCull,
-	CW,
-	CCW
+ENUM(FrontFace,
+	CCW,
+	CW
+);
+ENUM(Face,
+	FRONT,
+	BACK
 );
 
 ENUM(VertexFormat,
@@ -320,13 +327,20 @@ ENUM(IndexFormat,
 
 struct Extend3D
 {
-	u32 width;
-	u32 height;
+	Extend3D() = default;
+	Extend3D(u32 width, u32 height, u32 depthOrArrayLayers)
+		: width(width), height(height), depthOrArrayLayers(depthOrArrayLayers) {}
+
+	u32 width = 1;
+	u32 height = 1;
 	u32 depthOrArrayLayers = 1;
 };
 
 struct VertexAttribute
 {
+	VertexAttribute(VertexFormat format, u32 offset, u32 location)
+		: format(format), offset(offset), location(location) {}
+
 	VertexFormat format;
 	u32 offset;
 	u32 location;
@@ -375,6 +389,13 @@ struct ColorTargetState
 
 struct BindingTypeDescriptor
 {
+	static BindingTypeDescriptor UniformBuffer();
+	static BindingTypeDescriptor StorageBuffer(b8 readOnly = true);
+	static BindingTypeDescriptor Sampler();
+	static BindingTypeDescriptor Texture(TextureSampleType sampleType, TextureViewDimension viewDimension = TextureViewDimension::D2, b8 multisampled = false);
+	static BindingTypeDescriptor StorageTexture(StorageTextureAccess access, TextureFormat format, TextureViewDimension viewDimension = TextureViewDimension::D2);
+	static BindingTypeDescriptor AccelerationStructure();
+
 	BindingType type;
 
 	union
@@ -420,6 +441,9 @@ struct BindingTypeDescriptor
 
 struct BindGroupLayoutEntry
 {
+	BindGroupLayoutEntry(u32 binding, ShaderStageFlags visibility, BindingTypeDescriptor type, const Optional<u32>& count = Optional<u32>::None())
+		: binding(binding), visibility(visibility), type(type), count(count) {}
+
 	u32 binding;
 	ShaderStageFlags visibility;
 	BindingTypeDescriptor type;
@@ -479,8 +503,9 @@ struct GraphicsPipelineCreateInfo
 
 	List<VertexBufferLayout> vertexBuffers = List<VertexBufferLayout>{};
 	Optional<ColorTargetState> colorTarget = Optional<ColorTargetState>::None();
-	GraphicsPipelineTopology topology = GraphicsPipelineTopology::TRIANGLE_LIST;
-	Optional<GraphicsPipelineFaceCull> faceCull = Optional<GraphicsPipelineFaceCull>::None();
+	PrimitiveTopology topology = PrimitiveTopology::TRIANGLE_LIST;
+	FrontFace frontFace = FrontFace::CCW;
+	Optional<Face> cullMode = Optional<Face>::None();
 	PipelineLayoutDescriptor layout;
 	Optional<TextureFormat> depthFormat = Optional<TextureFormat>::None();
 };

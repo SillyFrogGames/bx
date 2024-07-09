@@ -80,7 +80,7 @@ bool Resource<Mesh>::Load(const String& filename, Mesh& data)
 }
 
 template<>
-void Resource<Mesh>::Unload(const Mesh& data)
+void Resource<Mesh>::Unload(Mesh& data)
 {
     Graphics::DestroyBuffer(data.m_vbuffers);
     Graphics::DestroyBuffer(data.m_ibuffer);

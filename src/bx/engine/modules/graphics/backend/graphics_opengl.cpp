@@ -29,10 +29,11 @@ static T& GetImpl(GraphicsHandle handle, HashMap<GraphicsHandle, T>& map)
     return it->second;
 }
 
-GLuint GraphicsOpenGL::GetTextureHandle(GraphicsHandle texture)
+GLuint GraphicsOpenGL::GetTextureHandle(HTexture texture)
 {
-    const auto& texture_impl = GetImpl(texture, s_textures);
-    return texture_impl.texture;
+    /*const auto& texture_impl = GetImpl(texture, s_textures);
+    return texture_impl.texture;*/
+    return 0;
 }
 
 #define GRAPHICS_BINDLESS

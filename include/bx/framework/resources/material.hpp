@@ -22,9 +22,6 @@ public:
 	inline void RemoveTexture(const String& name) { m_textures.erase(m_textures.find(name)); }
 	inline const HashMap<String, Resource<Texture>>& GetTextures() const { return m_textures; }
 
-	inline GraphicsHandle GetPipeline() const { return m_pipeline; }
-	inline GraphicsHandle GetResources() const { return m_resources; }
-
 private:
 	void BuildPipeline();
 
@@ -39,9 +36,6 @@ private:
 	friend class Inspector;
 
 private:
-	GraphicsHandle m_pipeline = INVALID_GRAPHICS_HANDLE;
-	GraphicsHandle m_resources = INVALID_GRAPHICS_HANDLE;
-
 	Resource<Shader> m_shader;
 
 	Vec4 m_color = Vec4(1, 1, 1, 1);

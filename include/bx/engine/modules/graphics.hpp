@@ -50,32 +50,38 @@ public:
 	static TextureFormat GetSwapchainFormat();
 
 	// Resource creation and destruction
+	static const TextureCreateInfo& GetTextureCreateInfo(HTexture texture);
 	static HTexture CreateTexture(const TextureCreateInfo& createInfo);
 	static HTexture CreateTextureWithData(const TextureCreateInfo& createInfo, const u8* data);
-	static void DestroyTexture(HTexture texture);
+	static void DestroyTexture(HTexture& texture);
 
 	static HTextureView CreateTextureView(HTexture texture);
-	static void DestroyTextureView(HTextureView textureView);
+	static void DestroyTextureView(HTextureView& textureView);
 
+	static const SamplerCreateInfo& GetSamplerCreateInfo(HSampler sampler);
 	static HSampler CreateSampler(const SamplerCreateInfo& create);
-	static void DestroySampler(HSampler sampler);
+	static void DestroySampler(HSampler& sampler);
 
+	static const BufferCreateInfo& GetBufferCreateInfo(HBuffer buffer);
 	static HBuffer CreateBuffer(const BufferCreateInfo& createInfo);
 	static HBuffer CreateBufferWithData(const BufferCreateInfo& createInfo, const u8* data);
-	static void DestroyBuffer(HBuffer buffer);
+	static void DestroyBuffer(HBuffer& buffer);
 
+	static const ShaderCreateInfo& GetShaderCreateInfo(HShader shader);
 	static HShader CreateShader(const ShaderCreateInfo& createInfo);
-	static void DestroyShader(HShader shader);
+	static void DestroyShader(HShader& shader);
 	
+	static const GraphicsPipelineCreateInfo& GetGraphicsPipelineCreateInfo(HGraphicsPipeline graphicsPipeline);
 	static HGraphicsPipeline CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
-	static void DestroyGraphicsPipeline(HGraphicsPipeline graphicsPipeline);
+	static void DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline);
+	static const ComputePipelineCreateInfo& GetComputePipelineCreateInfo(HComputePipeline computePipeline);
 	static HComputePipeline CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
-	static void DestroyComputePipeline(HComputePipeline graphicsPipeline);
+	static void DestroyComputePipeline(HComputePipeline& graphicsPipeline);
 
 	static HBindGroupLayout GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup);
 	static HBindGroupLayout GetBindGroupLayout(HComputePipeline computePipeline, u32 bindGroup);
 	static HBindGroup CreateBindGroup(const BindGroupCreateInfo& createInfo);
-	static void DestroyBindGroup(HBindGroup bindGroup);
+	static void DestroyBindGroup(HBindGroup& bindGroup);
 
 	// Cmds
 	static HRenderPass BeginRenderPass(const RenderPassDescriptor& descriptor);
@@ -85,7 +91,7 @@ public:
 	static void SetBindGroup(HRenderPass renderPass, u32 index, HBindGroup bindGroup);
 	static void Draw(HRenderPass renderPass, u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
 	static void DrawIndexed(HRenderPass renderPass, u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
-	static void EndRenderPass(HRenderPass renderPass);
+	static void EndRenderPass(HRenderPass& renderPass);
 
 	// Write data to buffer, write is queued untill `FlushBufferWrites` is called or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
