@@ -104,15 +104,21 @@ void BuildShaderPipelines()
                 const Resource<Shader>& shaderResource = materialData.GetShader();
                 const Shader& shader = shaderResource.GetData();
 
-                GraphicsPipelineCreateInfo createInfo{};
-                createInfo.name = Optional<String>::Some("Shader Pipeline");
-                createInfo.vertexShader = shader.GetVertexShader();
-                createInfo.fragmentShader = shader.GetFragmentShader();
-                createInfo.vertexBuffers = { vertexBufferLayout };
-                createInfo.colorTarget = Optional<ColorTargetState>::Some(colorTargetState);
-                createInfo.cullMode = Optional<Face>::Some(Face::BACK);
-                createInfo.layout = pipelineLayoutDescriptor;
-                createInfo.depthFormat = Optional<TextureFormat>::Some(depthFormat);
+                if (s->shaderPipelines.find(shaderResource.GetUUID()) == s->shaderPipelines.end())
+                {
+                    GraphicsPipelineCreateInfo createInfo{};
+                    createInfo.name = Optional<String>::Some("Shader Pipeline");
+                    createInfo.vertexShader = shader.GetVertexShader();
+                    createInfo.fragmentShader = shader.GetFragmentShader();
+                    createInfo.vertexBuffers = { vertexBufferLayout };
+                    createInfo.colorTarget = Optional<ColorTargetState>::Some(colorTargetState);
+                    createInfo.cullMode = Optional<Face>::Some(Face::BACK);
+                    createInfo.layout = pipelineLayoutDescriptor;
+                    createInfo.depthFormat = Optional<TextureFormat>::Some(depthFormat);
+
+                    HGraphicsPipeline graphicsPipeline = Graphics::CreateGraphicsPipeline(createInfo);
+                    s->shaderPipelines.insert(std::make_pair(shaderResource.GetUUID(), graphicsPipeline));
+                }
             }
         });
 }

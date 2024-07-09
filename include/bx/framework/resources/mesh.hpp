@@ -65,11 +65,11 @@ public:
 	inline const List<Vec4>& GetWeights() const { return m_weights; }
 	inline void SetWeights(const List<Vec4>& weights) { m_weights = weights; }
 
-	inline const List<u32>& GetTriangles() const { return m_triangles; }
-	inline void SetTriangles(const List<u32>& triangles) { m_triangles = triangles; }
+	inline const List<u32>& GetIndices() const { return m_indices; }
+	inline void SetIndices(const List<u32>& indices) { m_indices = indices; }
 
-	inline GraphicsHandle GetVertexBuffers() const { return m_vbuffers; }
-	inline GraphicsHandle GetIndexBuffer() const { return m_ibuffer; }
+	inline HBuffer GetVertexBuffers() const { return m_vertexBuffer; }
+	inline HBuffer GetIndexBuffer() const { return m_indexBuffer; }
 
 private:
 	template <typename T>
@@ -86,8 +86,8 @@ private:
 	List<Vec2> m_uvs;
 	List<Vec4i> m_bones;
 	List<Vec4> m_weights;
-	List<u32> m_triangles;
+	List<u32> m_indices;
 
-	GraphicsHandle m_vbuffers = INVALID_GRAPHICS_HANDLE;
-	GraphicsHandle m_ibuffer = INVALID_GRAPHICS_HANDLE;
+	HBuffer m_vertexBuffer = HBuffer::null;
+	HBuffer m_indexBuffer = HBuffer::null;
 };

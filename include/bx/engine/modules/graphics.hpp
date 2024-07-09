@@ -52,7 +52,12 @@ public:
 	// Resource creation and destruction
 	static const TextureCreateInfo& GetTextureCreateInfo(HTexture texture);
 	static HTexture CreateTexture(const TextureCreateInfo& createInfo);
-	static HTexture CreateTextureWithData(const TextureCreateInfo& createInfo, const u8* data);
+	template <typename T>
+	static HTexture CreateTextureWithData(const TextureCreateInfo& createInfo, const T& data)
+	{
+		CreateTextureWithDataPtr(createInfo, static_cast<const void*>(&data));
+	}
+	static HTexture CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data);
 	static void DestroyTexture(HTexture& texture);
 
 	static HTextureView CreateTextureView(HTexture texture);
@@ -64,7 +69,12 @@ public:
 
 	static const BufferCreateInfo& GetBufferCreateInfo(HBuffer buffer);
 	static HBuffer CreateBuffer(const BufferCreateInfo& createInfo);
-	static HBuffer CreateBufferWithData(const BufferCreateInfo& createInfo, const u8* data);
+	template <typename T>
+	static HTexture CreateBufferWithData(const BufferCreateInfo& createInfo, const T& data)
+	{
+		CreateBufferWithDataPtr(createInfo, static_cast<const void*>(&data));
+	}
+	static HBuffer CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, const void* data);
 	static void DestroyBuffer(HBuffer& buffer);
 
 	static const ShaderCreateInfo& GetShaderCreateInfo(HShader shader);

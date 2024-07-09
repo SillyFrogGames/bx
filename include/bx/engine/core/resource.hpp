@@ -300,6 +300,7 @@ public:
 		return *this;
 	}
 
+	inline UUID GetUUID() const { return m_uuid; }
 	inline ResourceHandle GetHandle() const { return m_handle; }
 	inline bool IsValid() const { return m_handle != RESOURCE_HANDLE_INVALID; }
 
