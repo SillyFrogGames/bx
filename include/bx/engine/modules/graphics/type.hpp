@@ -450,8 +450,13 @@ struct BindGroupLayoutEntry
 	Optional<u32> count = Optional<u32>::None();
 };
 
+
+
 struct BufferBinding
 {
+	BufferBinding(HBuffer buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
+		: buffer(buffer), offset(offset), size(size) {}
+
 	HBuffer buffer = HBuffer::null;
 	u64 offset = 0;
 	Optional<u64> size = Optional<u64>::None();
@@ -459,21 +464,33 @@ struct BufferBinding
 
 struct BindingResource
 {
+	static BindingResource Buffer(const BufferBinding& bufferBinding);
+	static BindingResource BufferArray(const List<BufferBinding>& bufferBindings);
+	static BindingResource Sampler(const HSampler& sampler);
+	static BindingResource SamplerArray(const List<HSampler>& samplers);
+	static BindingResource TextureView(const HTextureView& textureView);
+	static BindingResource TextureViewArray(const List<HTextureView>& textureViews);
+
 	BindingResourceType type;
 
 	union
 	{
 		BufferBinding buffer;
-		List<BufferBinding> bufferArray;
 		HSampler sampler;
-		List<HSampler> samplerArray;
 		HTextureView textureView;
-		List<HTextureView> textureViewArray;
 	};
+
+	// TODO: can this be unioned somehow?
+	List<BufferBinding> bufferArray;
+	List<HSampler> samplerArray;
+	List<HTextureView> textureViewArray;
 };
 
 struct BindGroupEntry
 {
+	BindGroupEntry(u32 binding, const BindingResource& resource)
+		: binding(binding), resource(resource) {}
+
 	u32 binding;
 	BindingResource resource;
 };
@@ -486,9 +503,18 @@ struct BindGroupCreateInfo
 	List<BindGroupEntry> entries = List<BindGroupEntry>{};
 };
 
+struct BindGroupLayoutDescriptor
+{
+	BindGroupLayoutDescriptor(u32 group, const List<BindGroupLayoutEntry>& entries)
+		: group(group), entries(entries) {}
+
+	u32 group;
+	List<BindGroupLayoutEntry> entries = List<BindGroupLayoutEntry>{};
+};
+
 struct PipelineLayoutDescriptor
 {
-	List<BindGroupLayoutEntry> bindGroupLayouts = List<BindGroupLayoutEntry>{};
+	List<BindGroupLayoutDescriptor> bindGroupLayouts = List<BindGroupLayoutDescriptor>{};
 };
 
 struct GraphicsPipelineCreateInfo

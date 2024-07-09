@@ -22,8 +22,11 @@ public:
 	inline void RemoveTexture(const String& name) { m_textures.erase(m_textures.find(name)); }
 	inline const HashMap<String, Resource<Texture>>& GetTextures() const { return m_textures; }
 
-private:
-	void BuildPipeline();
+	static BindGroupLayoutDescriptor GetBindGroupLayout();
+	inline HBindGroup GetBindGroup() const { return m_bindGroup; }
+
+	// TODO: maybe auto generate? a ShaderBindable interface to inherit from can be a solution
+	static constexpr u32 SHADER_BIND_GROUP = 1;
 
 private:
 	template <typename T>
@@ -37,6 +40,8 @@ private:
 
 private:
 	Resource<Shader> m_shader;
+
+	HBindGroup m_bindGroup;
 
 	Vec4 m_color = Vec4(1, 1, 1, 1);
 	HashMap<String, Resource<Texture>> m_textures;

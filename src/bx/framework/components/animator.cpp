@@ -181,37 +181,4 @@ void Animator::Update()
 
             return worldMatrix;
         });
-
-    // Update graphics buffers
-    if (m_resources == INVALID_GRAPHICS_HANDLE)
-    {
-        ResourceBindingElement resourceElems[] =
-        {
-            ResourceBindingElement { ShaderType::VERTEX, "Animation", 1, ResourceBindingType::UNIFORM_BUFFER, ResourceBindingAccess::STATIC }
-        };
-
-        ResourceBindingInfo resourceBindingInfo;
-        resourceBindingInfo.resources = resourceElems;
-        resourceBindingInfo.numResources = 1;
-        
-        m_resources = Graphics::CreateResourceBinding(resourceBindingInfo);
-    }
-
-    if (m_buffer == INVALID_GRAPHICS_HANDLE)
-    {
-        BufferInfo info;
-        info.strideBytes = sizeof(Mat4);
-        info.type = BufferType::UNIFORM_BUFFER;
-        info.usage = BufferUsage::DYNAMIC;
-        info.access = BufferAccess::WRITE;
-
-        m_buffer = Graphics::CreateBuffer(info);
-
-        Graphics::BindResource(m_resources, "Animation", m_buffer);
-    }
-    
-    BufferData data;
-    data.dataSize = static_cast<u32>(m_boneMatrices.size() * sizeof(Mat4));
-    data.pData = m_boneMatrices.data();
-    Graphics::UpdateBuffer(m_buffer, data);
 }

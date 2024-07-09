@@ -46,6 +46,10 @@ public:
 	static void Draw(const DrawAttribs& attribs);
 	static void DrawIndexed(const DrawIndexedAttribs& attribs);*/
 
+	// Helper resources
+	static const HBuffer EmptyBuffer();
+	static const HTexture EmptyTexture();
+
 	// Swapchain
 	static TextureFormat GetSwapchainFormat();
 
@@ -70,7 +74,7 @@ public:
 	static const BufferCreateInfo& GetBufferCreateInfo(HBuffer buffer);
 	static HBuffer CreateBuffer(const BufferCreateInfo& createInfo);
 	template <typename T>
-	static HTexture CreateBufferWithData(const BufferCreateInfo& createInfo, const T& data)
+	static HBuffer CreateBufferWithData(const BufferCreateInfo& createInfo, const T& data)
 	{
 		CreateBufferWithDataPtr(createInfo, static_cast<const void*>(&data));
 	}
@@ -103,13 +107,20 @@ public:
 	static void DrawIndexed(HRenderPass renderPass, u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
 	static void EndRenderPass(HRenderPass& renderPass);
 
-	// Write data to buffer, write is queued untill `FlushBufferWrites` is called or when the frame is finished.
+	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteBuffer(HBuffer buffer, u64 offset, const u8* data);
+	template <typename T>
+	static void WriteBuffer(HBuffer buffer, u64 offset, const T& data)
+	{
+		WriteBufferPtr(buffer, offset, static_cast<const void*>(&data));
+	}
+	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
+	// Data is copied over immediately and can be freed after calling
+	static void WriteBufferPtr(HBuffer buffer, u64 offset, const void* data);
 	static void FlushBufferWrites();
-	// Write data to texture, write is queued untill `FlushTextureWrites` is called or when the frame is finished.
+	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteTexture(HTexture texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void WriteTexturePtr(HTexture texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
 	static void FlushTextureWrites();
 
 	// Debug draw utilities

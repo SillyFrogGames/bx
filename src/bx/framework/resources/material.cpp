@@ -35,10 +35,29 @@ bool Resource<Material>::Load(const String& filename, Material& data)
     cereal::JSONInputArchive archive(stream);
     archive(cereal::make_nvp("material", data));
 
+    HTexture albedoTexture = data.m_textures["Albedo"].GetData().GetTexture();
+    HTextureView albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
+
+    BindGroupCreateInfo createInfo{};
+    createInfo.name = Optional<String>::Some("Material Bind Group");
+    createInfo.entries = {
+        // TODO: 3 is a bit weird, emulate bind GROUPS on opengl
+        BindGroupEntry(3, BindingResource::TextureView(albedoTextureView))
+    };
+
+    data.m_bindGroup = Graphics::CreateBindGroup(createInfo);
+
     return true;
 }
 
 template<>
 void Resource<Material>::Unload(Material& data)
 {
+}
+
+BindGroupLayoutDescriptor Material::GetBindGroupLayout()
+{
+    return BindGroupLayoutDescriptor(Material::SHADER_BIND_GROUP, {
+        BindGroupLayoutEntry(3, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Sampler())           // layout (binding = 3) uniform sampler2D Albedo;
+    });
 }

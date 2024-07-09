@@ -10,11 +10,6 @@ template <typename T>
 class Optional
 {
 public:
-	Optional(const Optional<T>& other) = default;
-	Optional& operator=(const Optional<T>& other) = default;
-	Optional(Optional<T>&& other) = default;
-	Optional& operator=(Optional<T>&& other) = default;
-
 	template <typename ...Params>
 	static Optional<T> Some(Params&&... params)
 	{

@@ -15,19 +15,21 @@
 #include <bx/engine/modules/graphics.hpp>
 #include <bx/engine/modules/window.hpp>
 
-struct ViewData
+struct VertexConstantsUniform
 {
-    Mat4 viewMtx = Mat4::Identity();
-    Mat4 projMtx = Mat4::Identity();
-    Mat4 viewProjMtx = Mat4::Identity();
+    Mat4 view = Mat4::Identity();
+    Mat4 projection = Mat4::Identity();
+    Mat4 viewProjection = Mat4::Identity();
 };
 
-struct ConstantData
+struct VertexMeshUniform
 {
-    ViewData view;
+    Mat4 model = Mat4::Identity();
+    Mat4 boneToMesh = Mat4::Identity();
+    Vec4i lightIndices = Vec4i(-1, -1, -1, -1);
 };
 
-struct LightData
+struct LightSourceData
 {
     u32 type = 0;
     f32 intensity = 1.0f;
@@ -48,40 +50,39 @@ struct LightData
 struct State : NoCopy
 {
     HashMap<UUID, HGraphicsPipeline> shaderPipelines;
+    HashMap<UUID, HBuffer> animatorBoneBuffers;
 
     HTexture colorTarget = HTexture::null;
     HTexture depthTarget = HTexture::null;
+
+    HBuffer vertexConstantsBuffer = HBuffer::null;
+    HBuffer lightSourceBuffer = HBuffer::null;
 };
 static std::unique_ptr<State> s;
-
-struct ModelData
-{
-    Mat4 worldMtx = Mat4::Identity();
-    Mat4 meshMtx = Mat4::Identity();
-    Vec4i lightIndices = Vec4i(-1, -1, -1, -1);
-};
 
 void BuildShaderPipelines()
 {
     VertexBufferLayout vertexBufferLayout{};
     vertexBufferLayout.stride = sizeof(Mesh::Vertex);
     vertexBufferLayout.attributes = {
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, position), 32 * 3 / 4),
-        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, color), 32 * 4 / 4),
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, normal), 32 * 3 / 4),
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, tangent), 32 * 3 / 4),
-        VertexAttribute(VertexFormat::FLOAT_32X2, offsetof(Mesh::Vertex, uv), 32 * 2 / 4),
-        VertexAttribute(VertexFormat::SINT_32X4,  offsetof(Mesh::Vertex, bones), 32 * 3 / 4),
-        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, weights), 32 * 3 / 4)
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, position), sizeof(f32) * 3),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, color), sizeof(f32) * 4),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, normal), sizeof(f32) * 3),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, tangent), sizeof(f32) * 3),
+        VertexAttribute(VertexFormat::FLOAT_32X2, offsetof(Mesh::Vertex, uv), sizeof(f32) * 2),
+        VertexAttribute(VertexFormat::SINT_32X4,  offsetof(Mesh::Vertex, bones), sizeof(i32) * 3),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, weights), sizeof(f32) * 3)
     };
 
     PipelineLayoutDescriptor pipelineLayoutDescriptor{};
     pipelineLayoutDescriptor.bindGroupLayouts = {
-        BindGroupLayoutEntry(0, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
-        BindGroupLayoutEntry(1, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
-        BindGroupLayoutEntry(2, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),
-        BindGroupLayoutEntry(3, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Sampler()),
-        BindGroupLayoutEntry(4, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::UniformBuffer()),
+        BindGroupLayoutDescriptor(0, {
+            BindGroupLayoutEntry(0, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),      // layout (binding = 0, std140) uniform Constants
+            BindGroupLayoutEntry(1, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),      // layout (binding = 1, std140) uniform Model
+            BindGroupLayoutEntry(2, ShaderStageFlags::VERTEX, BindingTypeDescriptor::UniformBuffer()),      // layout (binding = 2, std140) uniform Animation
+            BindGroupLayoutEntry(4, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::UniformBuffer())     // layout (binding = 4, std140) uniform LightBuffer
+        }),
+        Material::GetBindGroupLayout()
     };
 
     ColorTargetState colorTargetState{};
@@ -123,9 +124,69 @@ void BuildShaderPipelines()
         });
 }
 
+void UpdateAnimators()
+{
+    EntityManager::ForEach<Animator>(
+        [&](Entity entity, Animator& anim)
+        {
+            anim.Update();
+
+            HBuffer boneBuffer;
+            auto boneBufferIter = s->animatorBoneBuffers.find(anim.GetUUID());
+            if (boneBufferIter == s->animatorBoneBuffers.end())
+            {
+                BufferCreateInfo createInfo{};
+                createInfo.name = Optional<String>::Some("Animator Bones");
+                createInfo.size = sizeof(Mat4) * 100;
+                createInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE;
+
+                boneBuffer = Graphics::CreateBuffer(createInfo);
+                s->animatorBoneBuffers.insert(std::make_pair(anim.GetUUID(), boneBuffer));
+            }
+            else
+            {
+                boneBuffer = boneBufferIter->second;
+            }
+            
+            Graphics::WriteBufferPtr(boneBuffer, 0, anim.GetBoneMatrices().data());
+        });
+}
+
+void UpdateLightSources()
+{
+    List<LightSourceData> lightSources = List<LightSourceData>{};
+
+    EntityManager::ForEach<Transform, Light>(
+        [&](Entity entity, const Transform& trx, const Light& l)
+        {
+            LightSourceData lightSource;
+            lightSource.position = trx.GetPosition();
+            lightSource.intensity = l.GetIntensity();
+            lightSource.constant = l.GetConstant();
+            lightSource.linear_cutoff = l.GetLinear();
+            lightSource.quadratic_outerCutoff = l.GetQuadratic();
+            lightSource.color = l.GetColor();
+            lightSources.emplace_back(lightSource);
+        });
+
+    Graphics::WriteBufferPtr(s->lightSourceBuffer, 0, lightSources.data());
+}
+
 void Renderer::Initialize()
 {
     s = std::make_unique<State>();
+
+    BufferCreateInfo vertexConstantsCreateInfo{};
+    vertexConstantsCreateInfo.name = Optional<String>::Some("Vertex Constants");
+    vertexConstantsCreateInfo.size = sizeof(VertexConstantsUniform);
+    vertexConstantsCreateInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::COPY_DST;
+    s->vertexConstantsBuffer = Graphics::CreateBuffer(vertexConstantsCreateInfo);
+
+    BufferCreateInfo lightSourceCreateInfo{};
+    lightSourceCreateInfo.name = Optional<String>::Some("Light Sources");
+    lightSourceCreateInfo.size = sizeof(LightSourceData) * 10;
+    lightSourceCreateInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::COPY_DST;
+    s->lightSourceBuffer = Graphics::CreateBuffer(lightSourceCreateInfo);
 }
 
 void Renderer::Shutdown()
@@ -153,7 +214,14 @@ void Renderer::Update()
         depthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
         depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
         s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
+
+        // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change
+        s->shaderPipelines.clear();
     }
+
+    UpdateAnimators();
+    UpdateLightSources();
+    Graphics::FlushBufferWrites();
 }
 
 void Renderer::Render()
@@ -176,21 +244,15 @@ void Renderer::Render()
                 if (mr.GetMaterialCount() == 0)
                     return;
 
-                for (const auto& material : mr.GetMaterials())
+                HBuffer animatorBonesBuffer;
+                if (entity.HasComponent<Animator>())
                 {
-                    if (!material)
-                        continue;
-
-                    const auto& materialData = material.GetData();
-
-                    /*GraphicsHandle resources = materialData.GetResources();
-                    for (const auto& entry : materialData.GetTextures())
-                    {
-                        if (!entry.second)
-                            Graphics::BindResource(resources, entry.first.c_str(), INVALID_GRAPHICS_HANDLE);
-                        else
-                            Graphics::BindResource(resources, entry.first.c_str(), entry.second->GetTexture());
-                    }*/
+                    const auto& anim = entity.GetComponent<Animator>();
+                    animatorBonesBuffer = s->animatorBoneBuffers.find(anim.GetUUID())->second;
+                }
+                else
+                {
+                    animatorBonesBuffer = Graphics::EmptyBuffer();
                 }
 
                 SizeType index = 0;
@@ -208,25 +270,39 @@ void Renderer::Render()
 
                     auto graphicsPipeline = s->shaderPipelines.find(shader.GetUUID())->second;
 
+                    VertexMeshUniform meshUniform{};
+                    meshUniform.boneToMesh = meshData.GetMatrix();
+                    meshUniform.model = trx.GetMatrix();
+                    meshUniform.lightIndices = Vec4i(0, 1, 2, 3);
+
+                    // TODO: should be push constants (need to be emulated on opengl)
+                    // TODO: use same patterns as the animator bones buffer
+                    BufferCreateInfo meshUniformCreateInfo{};
+                    meshUniformCreateInfo.name = Optional<String>::Some("Mesh Uniform");
+                    meshUniformCreateInfo.size = sizeof(VertexMeshUniform);
+                    meshUniformCreateInfo.usageFlags = BufferUsageFlags::UNIFORM;
+                    HBuffer meshUniformBuffer = Graphics::CreateBufferWithData(meshUniformCreateInfo, meshUniform);
+
+                    // TODO: very lazy, shouldn't be created every frame probably
+                    BindGroupCreateInfo createInfo{};
+                    createInfo.name = Optional<String>::Some("Renderer Core Bindgroup");
+                    createInfo.entries = {
+                        BindGroupEntry(0, BindingResource::Buffer(BufferBinding(s->vertexConstantsBuffer))),
+                        BindGroupEntry(1, BindingResource::Buffer(BufferBinding(meshUniformBuffer))),
+                        BindGroupEntry(2, BindingResource::Buffer(BufferBinding(animatorBonesBuffer))),
+                        BindGroupEntry(4, BindingResource::Buffer(BufferBinding(s->lightSourceBuffer)))
+                    };
+                    HBindGroup bindGroup = Graphics::CreateBindGroup(createInfo);
+
                     Graphics::SetGraphicsPipeline(renderPass, graphicsPipeline);
                     Graphics::SetVertexBuffer(renderPass, 0, BufferSlice(meshData.GetVertexBuffer()));
                     Graphics::SetIndexBuffer(renderPass, BufferSlice(meshData.GetIndexBuffer()), IndexFormat::UINT32);
-                    // TODO: bind group
+                    Graphics::SetBindGroup(renderPass, 0, bindGroup);
+                    Graphics::SetBindGroup(renderPass, Material::SHADER_BIND_GROUP, materialData.GetBindGroup());
                     Graphics::DrawIndexed(renderPass, meshData.GetIndices().size());
 
-                    /*DrawCommandData cmd;
-                    cmd.model.meshMtx = meshData.GetMatrix();
-                    cmd.model.worldMtx = trx.GetMatrix();
-                    cmd.model.lightIndices = GetLightIndices(trx.GetPosition());
-
-                    cmd.vbuffers = meshData.GetVertexBuffers();
-                    cmd.ibuffer = meshData.GetIndexBuffer();
-                    cmd.numIndices = static_cast<u32>(meshData.GetTriangles().size());
-                    cmd.pipeline = materialData.GetPipeline();
-                    cmd.matResources = materialData.GetResources();
-                    cmd.animResources = animResources;
-
-                    m_impl->drawCmds.emplace_back(cmd);*/
+                    Graphics::DestroyBindGroup(bindGroup);
+                    Graphics::DestroyBuffer(meshUniformBuffer);
                 }
             });
     }

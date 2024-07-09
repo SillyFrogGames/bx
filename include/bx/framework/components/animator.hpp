@@ -15,20 +15,12 @@ public:
 
 	inline void OnPostCopy() override
 	{
-		m_resources = INVALID_GRAPHICS_HANDLE;
-		m_buffer = INVALID_GRAPHICS_HANDLE;
-
 		RefreshBones();
 		RefreshCurrent();
 	}
 
 	void OnRemoved() override
 	{
-		if (m_resources != INVALID_GRAPHICS_HANDLE)
-			Graphics::DestroyResourceBinding(m_resources);
-
-		if (m_buffer != INVALID_GRAPHICS_HANDLE)
-			Graphics::DestroyBuffer(m_buffer);
 	}
 	
 	inline const Resource<Skeleton>& GetSkeleton() const { return m_skeleton; }
@@ -104,7 +96,10 @@ public:
 		return m_boneMatrices2[it->second];
 	}
 
-	inline GraphicsHandle GetResources() const { return m_resources; }
+	inline const List<Mat4>& GetBoneMatrices()
+	{
+		return m_boneMatrices;
+	}
 
 	void Update();
 
@@ -153,7 +148,4 @@ private:
 
 	List<Mat4> m_boneMatrices;
 	List<Mat4> m_boneMatrices2;
-
-	GraphicsHandle m_resources = INVALID_GRAPHICS_HANDLE;
-	GraphicsHandle m_buffer = INVALID_GRAPHICS_HANDLE;
 };
