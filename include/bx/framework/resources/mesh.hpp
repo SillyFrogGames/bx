@@ -68,7 +68,7 @@ public:
 	inline const List<u32>& GetIndices() const { return m_indices; }
 	inline void SetIndices(const List<u32>& indices) { m_indices = indices; }
 
-	inline HBuffer GetVertexBuffers() const { return m_vertexBuffer; }
+	inline HBuffer GetVertexBuffer() const { return m_vertexBuffer; }
 	inline HBuffer GetIndexBuffer() const { return m_indexBuffer; }
 
 private:

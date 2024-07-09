@@ -15,6 +15,8 @@ bool Resource<Texture>::Save(const String& filename, const Texture& data)
 {
     // TODO: Use astc compression: https://developer.nvidia.com/astc-texture-compression-for-game-assets
     // Possibly using this lib: https://github.com/ARM-software/astc-encoder
+    // @Conor, I propose we use bc encoding as it has a wider range of supported devices
+    // On top of that, bc7 performs a bit better
 
     std::ofstream stream(File::GetPath(filename), std::ios::binary);
     if (stream.fail())
@@ -37,18 +39,14 @@ bool Resource<Texture>::Load(const String& filename, Texture& data)
     cereal::PortableBinaryInputArchive archive(stream);
     archive(cereal::make_nvp("texture", data));
 
-    // Build graphic components
-    TextureInfo textureInfo;
-    textureInfo.width = data.width;
-    textureInfo.height = data.height;
-    textureInfo.format = TextureFormat::RGBA8_UNORM;
-    textureInfo.flags = TextureFlags::SHADER_RESOURCE;
+    // TODO: we NEED texture types to distinguish between srgb, unorm and float unorm textures!!!!!!
 
-    BufferData bufferData;
-    bufferData.dataSize = static_cast<u32>(data.pixels.size());
-    bufferData.pData = data.pixels.data();
-
-    data.m_texture = Graphics::CreateTexture(textureInfo, bufferData);
+    TextureCreateInfo createInfo{};
+    createInfo.name = Optional<String>::Some(filename);
+    createInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
+    createInfo.size = Extend3D(data.width, data.height, 1);
+    createInfo.usageFlags = TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::COPY_SRC;
+    data.m_texture = Graphics::CreateTextureWithDataPtr(createInfo, static_cast<const void*>(data.pixels.data()));
 
     return true;
 }
@@ -56,5 +54,5 @@ bool Resource<Texture>::Load(const String& filename, Texture& data)
 template<>
 void Resource<Texture>::Unload(Texture& data)
 {
-    // TODO
+    Graphics::DestroyTexture(data.m_texture);
 }

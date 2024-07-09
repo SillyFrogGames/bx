@@ -160,5 +160,75 @@ void Renderer::Render()
 {
     Graphics::UpdateDebugLines();
 
-    
+    HTextureView colorTargetView = Graphics::CreateTextureView(s->colorTarget);
+    HTextureView depthTargetView = Graphics::CreateTextureView(s->depthTarget);
+
+    RenderPassDescriptor renderPassDescriptor{};
+    renderPassDescriptor.name = Optional<String>::Some("Draw Meshes");
+    renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(colorTargetView) };
+    renderPassDescriptor.depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::Some(depthTargetView);
+
+    HRenderPass renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
+    {
+        EntityManager::ForEach<Transform, MeshFilter, MeshRenderer>(
+            [&](Entity entity, const Transform& trx, const MeshFilter& mf, const MeshRenderer& mr)
+            {
+                if (mr.GetMaterialCount() == 0)
+                    return;
+
+                for (const auto& material : mr.GetMaterials())
+                {
+                    if (!material)
+                        continue;
+
+                    const auto& materialData = material.GetData();
+
+                    /*GraphicsHandle resources = materialData.GetResources();
+                    for (const auto& entry : materialData.GetTextures())
+                    {
+                        if (!entry.second)
+                            Graphics::BindResource(resources, entry.first.c_str(), INVALID_GRAPHICS_HANDLE);
+                        else
+                            Graphics::BindResource(resources, entry.first.c_str(), entry.second->GetTexture());
+                    }*/
+                }
+
+                SizeType index = 0;
+                for (const auto& mesh : mf.GetMeshes())
+                {
+                    const auto& material = mr.GetMaterial(index++);
+                    index %= mr.GetMaterialCount();
+
+                    if (!mesh || !material)
+                        continue;
+
+                    const auto& meshData = mesh.GetData();
+                    const auto& materialData = material.GetData();
+                    const auto& shader = materialData.GetShader();
+
+                    auto graphicsPipeline = s->shaderPipelines.find(shader.GetUUID())->second;
+
+                    Graphics::SetGraphicsPipeline(renderPass, graphicsPipeline);
+                    Graphics::SetVertexBuffer(renderPass, 0, BufferSlice(meshData.GetVertexBuffer()));
+                    Graphics::SetIndexBuffer(renderPass, BufferSlice(meshData.GetIndexBuffer()), IndexFormat::UINT32);
+                    // TODO: bind group
+                    Graphics::DrawIndexed(renderPass, meshData.GetIndices().size());
+
+                    /*DrawCommandData cmd;
+                    cmd.model.meshMtx = meshData.GetMatrix();
+                    cmd.model.worldMtx = trx.GetMatrix();
+                    cmd.model.lightIndices = GetLightIndices(trx.GetPosition());
+
+                    cmd.vbuffers = meshData.GetVertexBuffers();
+                    cmd.ibuffer = meshData.GetIndexBuffer();
+                    cmd.numIndices = static_cast<u32>(meshData.GetTriangles().size());
+                    cmd.pipeline = materialData.GetPipeline();
+                    cmd.matResources = materialData.GetResources();
+                    cmd.animResources = animResources;
+
+                    m_impl->drawCmds.emplace_back(cmd);*/
+                }
+            });
+    }
+    Graphics::EndRenderPass(renderPass);
 }

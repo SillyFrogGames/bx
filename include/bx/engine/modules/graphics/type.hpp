@@ -573,6 +573,9 @@ struct ImageDataLayout
 
 struct BufferSlice
 {
+	BufferSlice(HBuffer buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
+		: buffer(buffer), offset(offset), size(size) {}
+
 	HBuffer buffer = HBuffer::null;
 	u64 offset = 0;
 	Optional<u64> size = Optional<u64>::None();
@@ -580,20 +583,29 @@ struct BufferSlice
 
 struct Operations
 {
+	Operations(LoadOp load = LoadOp::LOAD, StoreOp store = StoreOp::STORE)
+		: load(load), store(store) {}
+
 	LoadOp load = LoadOp::LOAD;
 	StoreOp store = StoreOp::STORE;
 };
 
 struct RenderPassColorAttachment
 {
-	HTextureView view;
-	Optional<HTextureView> resolveTarget = Optional<HTextureView>::None();
+	RenderPassColorAttachment(HTextureView view, Operations ops = Operations{}, const Optional<HTextureView>& resolveTarget = Optional<HTextureView>::None())
+		: view(view), ops(ops), resolveTarget(resolveTarget) {}
+
+	HTextureView view = HTextureView::null;
 	Operations ops = Operations{};
+	Optional<HTextureView> resolveTarget = Optional<HTextureView>::None();
 };
 
 struct RenderPassDepthStencilAttachment
 {
-	HTextureView view;
+	RenderPassDepthStencilAttachment(HTextureView view, const Optional<Operations>& depthOps = Optional<Operations>::None(), const Optional<Operations>& stencilOps = Optional<Operations>::None())
+		: view(view), depthOps(depthOps), stencilOps(stencilOps) {}
+
+	HTextureView view = HTextureView::null;
 	Optional<Operations> depthOps = Optional<Operations>::None();
 	Optional<Operations> stencilOps = Optional<Operations>::None();
 };
@@ -603,7 +615,7 @@ struct RenderPassDescriptor
 	Optional<String> name = Optional<String>::None();
 
 	List<RenderPassColorAttachment> colorAttachments = List<RenderPassColorAttachment>{};
-	Optional<RenderPassColorAttachment> depthStencilAttachment = Optional<RenderPassColorAttachment>::None();
+	Optional<RenderPassDepthStencilAttachment> depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::None();
 };
 
 struct DebugVertex
