@@ -23,7 +23,7 @@ namespace Gl
     class ShaderProgram : NoCopy
     {
     public:
-        ShaderProgram(const String& name, const List<Shader>& shaders);
+        ShaderProgram(const String& name, const List<Shader*>& shaders);
         ~ShaderProgram();
 
     private:

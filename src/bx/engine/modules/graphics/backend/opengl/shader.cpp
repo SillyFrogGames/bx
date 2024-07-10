@@ -30,14 +30,14 @@ namespace Gl
         glDeleteShader(handle);
     }
 
-    ShaderProgram::ShaderProgram(const String& name, const List<Shader>& shaders)
+    ShaderProgram::ShaderProgram(const String& name, const List<Shader*>& shaders)
     {
         handle = glCreateProgram();
         DebugNames::Set(GL_PROGRAM, handle, name);
 
         for (auto& shader : shaders)
         {
-            glAttachShader(handle, shader.handle);
+            glAttachShader(handle, shader->handle);
         }
         glLinkProgram(handle);
 

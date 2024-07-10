@@ -12,4 +12,6 @@ namespace Gl
 	GLenum TextureFormatToGlType(const TextureFormat& format);
 	GLenum TextureFormatToGlFormat(const TextureFormat& format);
 	GLenum TextureFormatToGlInternalFormat(const TextureFormat& format);
+
+	GLenum ShaderTypeToGl(const ShaderType& type);
 }

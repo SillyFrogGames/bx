@@ -39,6 +39,9 @@ struct State : NoCopy
     HashMap<HTexture, GLuint> textures;
     HashMap<HTextureView, GLuint> textureViews;
     HashMap<HBuffer, GLuint> buffers;
+    HashMap<HShader, Shader> shaders;
+    HashMap<HGraphicsPipeline, ShaderProgram> graphicsPipelines;
+    HashMap<HComputePipeline, ShaderProgram> computePipelines;
 };
 static std::unique_ptr<State> s;
 
@@ -212,7 +215,7 @@ HBuffer Graphics::CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, co
 
     GLuint buffer;
     glGenBuffers(1, &buffer);
-    glNamedBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
+    glBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
 
     s->buffers.insert(std::make_pair(bufferHandle, buffer));
 
@@ -234,32 +237,81 @@ void Graphics::DestroyBuffer(HBuffer& buffer)
 
 HShader Graphics::CreateShader(const ShaderCreateInfo& createInfo)
 {
+    BX_ENSURE(ValidateShaderCreateInfo(createInfo));
 
+    HShader shaderHandle = s->shaderHandlePool.Create();
+    s_createInfoCache->shaderCreateInfos.insert(std::make_pair(shaderHandle, createInfo));
+
+    GLenum type = ShaderTypeToGl(createInfo.shaderType);
+
+    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
+    s->shaders.emplace(std::make_pair(shaderHandle, std::move(Shader(name, type, createInfo.src))));
+
+    return shaderHandle;
 }
 
 void Graphics::DestroyShader(HShader& shader)
 {
+    BX_ENSURE(shader);
 
+    auto& shaderIter = s->shaders.find(shader);
+    BX_ENSURE(shaderIter != s->shaders.end());
+
+    s->shaders.erase(shader);
+    s_createInfoCache->shaderCreateInfos.erase(shader);
+    s->shaderHandlePool.Destroy(shader);
 }
 
 HGraphicsPipeline Graphics::CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 {
+    BX_ENSURE(ValidateGraphicsPipelineCreateInfo(createInfo));
 
+    HGraphicsPipeline graphicsPipelineHandle = s->graphicsPipelineHandlePool.Create();
+    s_createInfoCache->graphicsPipelineCreateInfos.insert(std::make_pair(graphicsPipelineHandle, createInfo));
+
+    auto& vertShaderIter = s->shaders.find(createInfo.vertexShader);
+    BX_ENSURE(vertShaderIter != s->shaders.end());
+    auto& fragShaderIter = s->shaders.find(createInfo.fragmentShader);
+    BX_ENSURE(fragShaderIter != s->shaders.end());
+
+    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
+    s->graphicsPipelines.emplace(std::make_pair(graphicsPipelineHandle, std::move(ShaderProgram(name, List<Shader*>{ &vertShaderIter->second, &fragShaderIter->second }))));
+
+    return graphicsPipelineHandle;
 }
 
 void Graphics::DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline)
 {
+    BX_ENSURE(graphicsPipeline);
 
+    s->graphicsPipelines.erase(graphicsPipeline);
+    s_createInfoCache->graphicsPipelineCreateInfos.erase(graphicsPipeline);
+    s->graphicsPipelineHandlePool.Destroy(graphicsPipeline);
 }
 
 HComputePipeline Graphics::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 {
+    BX_ENSURE(ValidateComputePipelineCreateInfo(createInfo));
 
+    HComputePipeline computePipelineHandle = s->computePipelineHandlePool.Create();
+    s_createInfoCache->computePipelineCreateInfos.insert(std::make_pair(computePipelineHandle, createInfo));
+
+    auto& shaderIter = s->shaders.find(createInfo.shader);
+    BX_ENSURE(shaderIter != s->shaders.end());
+
+    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
+    s->computePipelines.emplace(std::make_pair(computePipelineHandle, std::move(ShaderProgram(name, List<Shader*>{ &shaderIter->second }))));
+
+    return computePipelineHandle;
 }
 
-void Graphics::DestroyComputePipeline(HComputePipeline& graphicsPipeline)
+void Graphics::DestroyComputePipeline(HComputePipeline& computePipeline)
 {
+    BX_ENSURE(computePipeline);
 
+    s->computePipelines.erase(computePipeline);
+    s_createInfoCache->computePipelineCreateInfos.erase(computePipeline);
+    s->computePipelineHandlePool.Destroy(computePipeline);
 }
 
 HBindGroupLayout Graphics::GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup)

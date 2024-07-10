@@ -450,4 +450,21 @@ namespace Gl
 			BX_FAIL("{} not supported.", format);
 		}
 	}
+
+	GLenum ShaderTypeToGl(const ShaderType& type)
+	{
+		switch (type)
+		{
+		case ShaderType::VERTEX:
+			return GL_VERTEX_SHADER;
+		case ShaderType::FRAGMENT:
+			return GL_FRAGMENT_SHADER;
+		case ShaderType::GEOMETRY:
+			return GL_GEOMETRY_SHADER;
+		case ShaderType::COMPUTE:
+			return GL_COMPUTE_SHADER;
+		default:
+			BX_FAIL("{} not supported.", type);
+		}
+	}
 }

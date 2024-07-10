@@ -49,7 +49,7 @@ public:
 	static void DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline);
 	static const ComputePipelineCreateInfo& GetComputePipelineCreateInfo(HComputePipeline computePipeline);
 	static HComputePipeline CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
-	static void DestroyComputePipeline(HComputePipeline& graphicsPipeline);
+	static void DestroyComputePipeline(HComputePipeline& computePipeline);
 
 	static HBindGroupLayout GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup);
 	static HBindGroupLayout GetBindGroupLayout(HComputePipeline computePipeline, u32 bindGroup);
