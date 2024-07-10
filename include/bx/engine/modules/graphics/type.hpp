@@ -354,21 +354,8 @@ struct VertexBufferLayout
 
 struct BlendComponent
 {
-	static BlendComponent Replace()
-	{
-		BlendComponent component{};
-		component.srcFactor = BlendFactor::ONE;
-		component.dstFactor = BlendFactor::ZERO;
-		return component;
-	}
-
-	static BlendComponent AlphaBlending()
-	{
-		BlendComponent component{};
-		component.srcFactor = BlendFactor::SRC_ALPHA;
-		component.dstFactor = BlendFactor::ONE_MINUS_SRC_ALPHA;
-		return component;
-	}
+	static BlendComponent Replace();
+	static BlendComponent AlphaBlending();
 
 	BlendFactor srcFactor;
 	BlendFactor dstFactor;
