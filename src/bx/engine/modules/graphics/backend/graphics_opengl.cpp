@@ -13,6 +13,7 @@
 #include "bx/engine/modules/imgui.hpp"
 
 #include "bx/engine/modules/graphics/backend/opengl/buffer.hpp"
+#include "bx/engine/modules/graphics/backend/opengl/conversion.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/validation.hpp"
 using namespace Gl;
@@ -34,6 +35,8 @@ struct State : NoCopy
     HandlePool<BindGroupApi> bindGroupHandlePool;
     HandlePool<BindGroupLayoutApi> bindGroupLayoutHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
+
+    HashMap<HTexture, GLuint> textures;
 };
 static std::unique_ptr<State> s;
 
@@ -94,7 +97,20 @@ HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
     HTexture textureHandle = s->textureHandlePool.Create();
     s_createInfoCache->textureCreateInfos.insert(std::make_pair(textureHandle, createInfo));
 
+    GLuint texture;
+    glGenTextures(1, &texture);
 
+    GLenum type = TextureDimensionToGl(createInfo.dimension);
+
+    if (type == GL_TEXTURE_2D)
+    {
+        glTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            createInfo.size.width, createInfo.size.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    }
+
+    
 
     return textureHandle;
 }
