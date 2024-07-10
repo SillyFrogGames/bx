@@ -22,13 +22,14 @@ using namespace Gl;
 
 struct State : NoCopy
 {
-    HashMap<HTexture, TextureCreateInfo> textureCreateInfos;
-    HashMap<HBuffer, BufferCreateInfo> bufferCreateInfos;
+    
 };
 static std::unique_ptr<State> s;
 
 b8 Graphics::Initialize()
 {
+    s_createInfoCache = std::make_unique<CreateInfoCache>();
+
     s = std::make_unique<State>();
 
     return true;
@@ -75,15 +76,6 @@ TextureFormat Graphics::GetSwapchainFormat()
     return TextureFormat::RGBA8_UNORM_SRGB;
 }
 
-const TextureCreateInfo& Graphics::GetTextureCreateInfo(HTexture texture)
-{
-    BX_ENSURE(texture);
-
-    auto& createInfoIter = s->textureCreateInfos.find(texture);
-    BX_ENSURE(createInfoIter != s->textureCreateInfos.end());
-    return createInfoIter->second;
-}
-
 HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
     BX_ENSURE(ValidateTextureCreateInfo(createInfo));
@@ -111,22 +103,12 @@ void Graphics::DestroyTextureView(HTextureView& textureView)
 
 }
 
-const SamplerCreateInfo& Graphics::GetSamplerCreateInfo(HSampler sampler)
-{
-
-}
-
 HSampler Graphics::CreateSampler(const SamplerCreateInfo& create)
 {
 
 }
 
 void Graphics::DestroySampler(HSampler& sampler)
-{
-
-}
-
-const BufferCreateInfo& Graphics::GetBufferCreateInfo(HBuffer buffer)
 {
 
 }
@@ -146,11 +128,6 @@ void Graphics::DestroyBuffer(HBuffer& buffer)
 
 }
 
-const ShaderCreateInfo& Graphics::GetShaderCreateInfo(HShader shader)
-{
-
-}
-
 HShader Graphics::CreateShader(const ShaderCreateInfo& createInfo)
 {
 
@@ -161,22 +138,12 @@ void Graphics::DestroyShader(HShader& shader)
 
 }
 
-const GraphicsPipelineCreateInfo& Graphics::GetGraphicsPipelineCreateInfo(HGraphicsPipeline graphicsPipeline)
-{
-
-}
-
 HGraphicsPipeline Graphics::CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 {
 
 }
 
 void Graphics::DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline)
-{
-
-}
-
-const ComputePipelineCreateInfo& Graphics::GetComputePipelineCreateInfo(HComputePipeline computePipeline)
 {
 
 }

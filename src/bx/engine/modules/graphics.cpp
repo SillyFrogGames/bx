@@ -1,10 +1,68 @@
 #include "bx/engine/modules/graphics.hpp"
 
+#include "bx/engine/modules/graphics/type_validation.hpp"
+
 #include "bx/engine/core/log.hpp"
 #include "bx/engine/core/guard.hpp"
 #include "bx/engine/core/file.hpp"
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/containers/pool.hpp"
+
+const TextureCreateInfo& Graphics::GetTextureCreateInfo(HTexture texture)
+{
+    BX_ENSURE(texture);
+
+    auto& createInfoIter = s_createInfoCache->textureCreateInfos.find(texture);
+    BX_ENSURE(createInfoIter != s_createInfoCache->textureCreateInfos.end());
+    return createInfoIter->second;
+}
+
+const SamplerCreateInfo& Graphics::GetSamplerCreateInfo(HSampler sampler)
+{
+    BX_ENSURE(sampler);
+
+    auto& createInfoIter = s_createInfoCache->samplerCreateInfos.find(sampler);
+    BX_ENSURE(createInfoIter != s_createInfoCache->samplerCreateInfos.end());
+    return createInfoIter->second;
+}
+
+const BufferCreateInfo& Graphics::GetBufferCreateInfo(HBuffer buffer)
+{
+    BX_ENSURE(buffer);
+
+    auto& createInfoIter = s_createInfoCache->bufferCreateInfos.find(buffer);
+    BX_ENSURE(createInfoIter != s_createInfoCache->bufferCreateInfos.end());
+    return createInfoIter->second;
+}
+
+const ShaderCreateInfo& Graphics::GetShaderCreateInfo(HShader shader)
+{
+    BX_ENSURE(shader);
+
+    auto& createInfoIter = s_createInfoCache->shaderCreateInfos.find(shader);
+    BX_ENSURE(createInfoIter != s_createInfoCache->shaderCreateInfos.end());
+    return createInfoIter->second;
+}
+
+const GraphicsPipelineCreateInfo& Graphics::GetGraphicsPipelineCreateInfo(HGraphicsPipeline graphicsPipeline)
+{
+    BX_ENSURE(graphicsPipeline);
+
+    auto& createInfoIter = s_createInfoCache->graphicsPipelineCreateInfos.find(graphicsPipeline);
+    BX_ENSURE(createInfoIter != s_createInfoCache->graphicsPipelineCreateInfos.end());
+    return createInfoIter->second;
+}
+
+const ComputePipelineCreateInfo& Graphics::GetComputePipelineCreateInfo(HComputePipeline computePipeline)
+{
+    BX_ENSURE(computePipeline);
+
+    auto& createInfoIter = s_createInfoCache->computePipelineCreateInfos.find(computePipeline);
+    BX_ENSURE(createInfoIter != s_createInfoCache->computePipelineCreateInfos.end());
+    return createInfoIter->second;
+}
+
+// TODO: move debug lines somewhere else
 
 struct DebugLineData
 {

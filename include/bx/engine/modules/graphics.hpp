@@ -95,6 +95,17 @@ private:
 	friend class Runtime;
 	friend class Module;
 
+	struct CreateInfoCache : NoCopy
+	{
+		HashMap<HBuffer, BufferCreateInfo> bufferCreateInfos;
+		HashMap<HSampler, SamplerCreateInfo> samplerCreateInfos;
+		HashMap<HTexture, TextureCreateInfo> textureCreateInfos;
+		HashMap<HShader, ShaderCreateInfo> shaderCreateInfos;
+		HashMap<HGraphicsPipeline, GraphicsPipelineCreateInfo> graphicsPipelineCreateInfos;
+		HashMap<HComputePipeline, ComputePipelineCreateInfo> computePipelineCreateInfos;
+	};
+	static std::unique_ptr<CreateInfoCache> s_createInfoCache;
+
 	static b8 Initialize();
 	static void Reload();
 	static void Shutdown();
