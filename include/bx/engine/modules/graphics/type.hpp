@@ -219,9 +219,7 @@ ENUM(BlendFactor,
 	ONE_MINUS_DST,
 	DST_ALPHA,
 	ONE_MINUS_DST_ALPHA,
-	SRC_ALPHA_SATURATED,
-	CONSTANT,
-	ONE_MINUS_CONSTANT
+	SRC_ALPHA_SATURATED
 );
 
 ENUM(BlendOperation,
@@ -553,11 +551,13 @@ struct BufferSlice
 
 struct Operations
 {
-	Operations(LoadOp load = LoadOp::LOAD, StoreOp store = StoreOp::STORE)
-		: load(load), store(store) {}
+	Operations(LoadOp load = LoadOp::LOAD, StoreOp store = StoreOp::STORE, const Optional<Color>& clearColor = Optional<Color>::None())
+		: load(load), store(store), clearColor(clearColor) {}
 
 	LoadOp load = LoadOp::LOAD;
 	StoreOp store = StoreOp::STORE;
+
+	Optional<Color> clearColor = Optional<Color>::None();
 };
 
 struct RenderPassColorAttachment

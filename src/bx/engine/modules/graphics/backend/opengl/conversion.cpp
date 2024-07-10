@@ -467,4 +467,33 @@ namespace Gl
 			BX_FAIL("{} not supported.", type);
 		}
 	}
+
+	GLenum BlendFactorToGl(const BlendFactor& factor)
+	{
+		switch (factor)
+		{
+		case BlendFactor::ZERO:
+			return GL_ZERO;
+		case BlendFactor::ONE:
+			return GL_ONE;
+		case BlendFactor::SRC:
+			return GL_SRC_COLOR;
+		case BlendFactor::ONE_MINUS_SRC:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case BlendFactor::SRC_ALPHA:
+			return GL_SRC_ALPHA;
+		case BlendFactor::ONE_MINUS_SRC_ALPHA:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		case BlendFactor::DST:
+			return GL_DST_COLOR;
+		case BlendFactor::ONE_MINUS_DST:
+			return GL_ONE_MINUS_DST_COLOR;
+		case BlendFactor::DST_ALPHA:
+			return GL_DST_ALPHA;
+		case BlendFactor::ONE_MINUS_DST_ALPHA:
+			return GL_ONE_MINUS_DST_ALPHA;
+		case BlendFactor::SRC_ALPHA_SATURATED:
+			return GL_SRC_ALPHA_SATURATE;
+		}
+	}
 }

@@ -336,6 +336,8 @@ void Graphics::DestroyBindGroup(HBindGroup& bindGroup)
 
 HRenderPass Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
 {
+    // TODO: support multiple color attachments
+
 
 }
 

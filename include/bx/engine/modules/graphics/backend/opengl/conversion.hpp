@@ -14,4 +14,6 @@ namespace Gl
 	GLenum TextureFormatToGlInternalFormat(const TextureFormat& format);
 
 	GLenum ShaderTypeToGl(const ShaderType& type);
+
+	GLenum BlendFactorToGl(const BlendFactor& factor);
 }
