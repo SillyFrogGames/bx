@@ -201,7 +201,22 @@ b8 ValidatePipelineLayoutDescriptor(const PipelineLayoutDescriptor& descriptor, 
 		}
 		usedGroups[groupLayout.group] = true;
 
+		List<b8> usedBindings(1024);
+		for (auto& entry : groupLayout.entries)
+		{
+			if (usedBindings[entry.binding])
+			{
+				BX_LOGE("Invalid {} creation info: binding {} in group {} was used at least twice.", creationName, entry.binding, groupLayout.group);
+				return false;
+			}
+			usedBindings[entry.binding] = true;
 
+			if (entry.visibility == (ShaderStageFlags)0)
+			{
+				BX_LOGE("Invalid {} creation info: binding {} in group {} visibility cannot be empty.", creationName, entry.binding, groupLayout.group);
+				return false;
+			}
+		}
 	}
 
 	return true;
