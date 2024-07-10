@@ -6,8 +6,8 @@ class Graphics
 {
 public:
 	// Helper resources
-	static const HBuffer EmptyBuffer();
-	static const HTexture EmptyTexture();
+	static const HBuffer& EmptyBuffer();
+	static const HTexture& EmptyTexture();
 
 	// Swapchain
 	static TextureFormat GetSwapchainFormat();
@@ -95,7 +95,7 @@ private:
 	friend class Runtime;
 	friend class Module;
 
-	static bool Initialize();
+	static b8 Initialize();
 	static void Reload();
 	static void Shutdown();
 

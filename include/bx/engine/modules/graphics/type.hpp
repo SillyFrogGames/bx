@@ -12,60 +12,80 @@ struct HBuffer
 {
 	u64 id;
 	static const HBuffer null;
+
+	b8 operator==(const HBuffer& other) const { return id == other.id; }
 };
 
 struct HSampler
 {
 	u64 id;
 	static const HSampler null;
+
+	b8 operator==(const HSampler& other) const { return id == other.id; }
 };
 
 struct HTexture
 {
 	u64 id;
 	static const HTexture null;
+
+	b8 operator==(const HTexture& other) const { return id == other.id; }
 };
 
 struct HTextureView
 {
 	u64 id;
 	static const HTextureView null;
+
+	b8 operator==(const HTextureView& other) const { return id == other.id; }
 };
 
 struct HShader
 {
 	u64 id;
 	static const HShader null;
+
+	b8 operator==(const HShader& other) const { return id == other.id; }
 };
 
 struct HGraphicsPipeline
 {
 	u64 id;
 	static const HGraphicsPipeline null;
+
+	b8 operator==(const HGraphicsPipeline& other) const { return id == other.id; }
 };
 
 struct HComputePipeline
 {
 	u64 id;
 	static const HComputePipeline null;
+
+	b8 operator==(const HComputePipeline& other) const { return id == other.id; }
 };
 
 struct HRenderPass
 {
 	u64 id;
 	static const HRenderPass null;
+
+	b8 operator==(const HRenderPass& other) const { return id == other.id; }
 };
 
 struct HBindGroupLayout
 {
 	u64 id;
 	static const HBindGroupLayout null;
+
+	b8 operator==(const HBindGroupLayout& other) const { return id == other.id; }
 };
 
 struct HBindGroup
 {
 	u64 id;
 	static const HBindGroup null;
+
+	b8 operator==(const HBindGroup& other) const { return id == other.id; }
 };
 
 ENUM(ShaderType,
@@ -437,10 +457,9 @@ struct BindGroupLayoutEntry
 	Optional<u32> count = Optional<u32>::None();
 };
 
-
-
 struct BufferBinding
 {
+	BufferBinding() = default;
 	BufferBinding(HBuffer buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
 		: buffer(buffer), offset(offset), size(size) {}
 
@@ -464,9 +483,9 @@ struct BindingResource
 	BufferBinding buffer;
 	HSampler sampler;
 	HTextureView textureView;
-	List<BufferBinding> bufferArray;
-	List<HSampler> samplerArray;
-	List<HTextureView> textureViewArray;
+	List<BufferBinding> bufferArray = List<BufferBinding>{};
+	List<HSampler> samplerArray = List<HSampler>{};
+	List<HTextureView> textureViewArray = List<HTextureView>{};
 };
 
 struct BindGroupEntry

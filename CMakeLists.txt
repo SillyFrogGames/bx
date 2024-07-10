@@ -135,6 +135,9 @@ set (BX_SRCS
 	"src/bx/engine/modules/script.cpp"
 	"src/bx/engine/modules/window.cpp"
 	"src/bx/engine/modules/imgui.cpp"
+
+	"src/bx/engine/modules/graphics/type.cpp"
+	"src/bx/engine/modules/graphics/type_validation.cpp"
 	
 	"src/bx/framework/components/animator.cpp"
 	"src/bx/framework/components/attributes.cpp"
@@ -176,6 +179,7 @@ endif()
 if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
 	set (BX_SRCS ${BX_SRCS}
 		"src/bx/engine/modules/graphics/backend/opengl/buffer.cpp"
+		"src/bx/engine/modules/graphics/backend/opengl/conversion.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/opengl_api.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/shader.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/validation.cpp"
