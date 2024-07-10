@@ -3,90 +3,32 @@
 #include "bx/engine/core/math.hpp"
 #include "bx/engine/core/type.hpp"
 #include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/handle.hpp"
 #include "bx/engine/containers/optional.hpp"
 #include "bx/engine/containers/list.hpp"
 #include "bx/engine/containers/string.hpp"
 #include "bx/engine/containers/hash_map.hpp"
 
-struct HBuffer
-{
-	u64 id;
-	static const HBuffer null;
-
-	b8 operator==(const HBuffer& other) const { return id == other.id; }
-};
-
-struct HSampler
-{
-	u64 id;
-	static const HSampler null;
-
-	b8 operator==(const HSampler& other) const { return id == other.id; }
-};
-
-struct HTexture
-{
-	u64 id;
-	static const HTexture null;
-
-	b8 operator==(const HTexture& other) const { return id == other.id; }
-};
-
-struct HTextureView
-{
-	u64 id;
-	static const HTextureView null;
-
-	b8 operator==(const HTextureView& other) const { return id == other.id; }
-};
-
-struct HShader
-{
-	u64 id;
-	static const HShader null;
-
-	b8 operator==(const HShader& other) const { return id == other.id; }
-};
-
-struct HGraphicsPipeline
-{
-	u64 id;
-	static const HGraphicsPipeline null;
-
-	b8 operator==(const HGraphicsPipeline& other) const { return id == other.id; }
-};
-
-struct HComputePipeline
-{
-	u64 id;
-	static const HComputePipeline null;
-
-	b8 operator==(const HComputePipeline& other) const { return id == other.id; }
-};
-
-struct HRenderPass
-{
-	u64 id;
-	static const HRenderPass null;
-
-	b8 operator==(const HRenderPass& other) const { return id == other.id; }
-};
-
-struct HBindGroupLayout
-{
-	u64 id;
-	static const HBindGroupLayout null;
-
-	b8 operator==(const HBindGroupLayout& other) const { return id == other.id; }
-};
-
-struct HBindGroup
-{
-	u64 id;
-	static const HBindGroup null;
-
-	b8 operator==(const HBindGroup& other) const { return id == other.id; }
-};
+struct BufferDummy {};
+using HBuffer = Handle<BufferDummy>;
+struct SamplerDummy {};
+using HSampler = Handle<SamplerDummy>;
+struct TextureDummy {};
+using HTexture = Handle<TextureDummy>;
+struct TextureViewDummy {};
+using HTextureView = Handle<TextureViewDummy>;
+struct ShaderDummy {};
+using HShader = Handle<ShaderDummy>;
+struct GraphicsPipelineDummy {};
+using HGraphicsPipeline = Handle<GraphicsPipelineDummy>;
+struct ComputePipelineDummy {};
+using HComputePipeline = Handle<ComputePipelineDummy>;
+struct RenderPassDummy {};
+using HRenderPass = Handle<RenderPassDummy>;
+struct BindGroupLayoutDummy {};
+using HBindGroupLayout = Handle<BindGroupLayoutDummy>;
+struct BindGroupDummy {};
+using HBindGroup = Handle<BindGroupDummy>;
 
 ENUM(ShaderType,
 	VERTEX,

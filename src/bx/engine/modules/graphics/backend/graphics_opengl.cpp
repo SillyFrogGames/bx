@@ -1,5 +1,7 @@
 #include "bx/engine/modules/graphics/backend/graphics_opengl.hpp"
 
+#include "bx/engine/modules/graphics/type_validation.hpp"
+
 #include "bx/engine/core/file.hpp"
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/core/memory.hpp"
@@ -69,16 +71,23 @@ TextureFormat Graphics::GetSwapchainFormat()
     vid_mode->redBits;
     vid_mode->greenBits;
     vid_mode->blueBits;*/
+    // The resulting bits will then somehow need to be converted into a `TextureFormat`
     return TextureFormat::RGBA8_UNORM_SRGB;
 }
 
 const TextureCreateInfo& Graphics::GetTextureCreateInfo(HTexture texture)
 {
+    BX_ENSURE(texture);
 
+    auto& createInfoIter = s->textureCreateInfos.find(texture);
+    BX_ENSURE(createInfoIter != s->textureCreateInfos.end());
+    return createInfoIter->second;
 }
 
 HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
+    BX_ENSURE(ValidateTextureCreateInfo(createInfo));
+
 
 }
 
