@@ -9,26 +9,26 @@
 #include "bx/engine/containers/string.hpp"
 #include "bx/engine/containers/hash_map.hpp"
 
-struct BufferDummy {};
-using HBuffer = Handle<BufferDummy>;
-struct SamplerDummy {};
-using HSampler = Handle<SamplerDummy>;
-struct TextureDummy {};
-using HTexture = Handle<TextureDummy>;
-struct TextureViewDummy {};
-using HTextureView = Handle<TextureViewDummy>;
-struct ShaderDummy {};
-using HShader = Handle<ShaderDummy>;
-struct GraphicsPipelineDummy {};
-using HGraphicsPipeline = Handle<GraphicsPipelineDummy>;
-struct ComputePipelineDummy {};
-using HComputePipeline = Handle<ComputePipelineDummy>;
-struct RenderPassDummy {};
-using HRenderPass = Handle<RenderPassDummy>;
-struct BindGroupLayoutDummy {};
-using HBindGroupLayout = Handle<BindGroupLayoutDummy>;
-struct BindGroupDummy {};
-using HBindGroup = Handle<BindGroupDummy>;
+struct BufferApi {};
+using HBuffer = Handle<BufferApi>;
+struct SamplerApi {};
+using HSampler = Handle<SamplerApi>;
+struct TextureApi {};
+using HTexture = Handle<TextureApi>;
+struct TextureViewApi {};
+using HTextureView = Handle<TextureViewApi>;
+struct ShaderApi {};
+using HShader = Handle<ShaderApi>;
+struct GraphicsPipelineApi {};
+using HGraphicsPipeline = Handle<GraphicsPipelineApi>;
+struct ComputePipelineApi {};
+using HComputePipeline = Handle<ComputePipelineApi>;
+struct RenderPassApi {};
+using HRenderPass = Handle<RenderPassApi>;
+struct BindGroupLayoutApi {};
+using HBindGroupLayout = Handle<BindGroupLayoutApi>;
+struct BindGroupApi {};
+using HBindGroup = Handle<BindGroupApi>;
 
 ENUM(ShaderType,
 	VERTEX,

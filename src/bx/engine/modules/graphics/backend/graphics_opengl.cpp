@@ -2,6 +2,7 @@
 
 #include "bx/engine/modules/graphics/type_validation.hpp"
 
+#include "bx/engine/core/handle_pool.hpp"
 #include "bx/engine/core/file.hpp"
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/core/memory.hpp"
@@ -22,7 +23,17 @@ using namespace Gl;
 
 struct State : NoCopy
 {
-    
+    HandlePool<BufferApi> bufferHandlePool;
+    HandlePool<TextureApi> textureHandlePool;
+    HandlePool<TextureViewApi> textureViewHandlePool;
+    HandlePool<SamplerApi> samplerHandlePool;
+    HandlePool<ShaderApi> shaderHandlePool;
+    HandlePool<GraphicsPipelineApi> graphicsPipelineHandlePool;
+    HandlePool<ComputePipelineApi> computePipelineHandlePool;
+    HandlePool<RenderPassApi> renderPassHandlePool;
+    HandlePool<BindGroupApi> bindGroupHandlePool;
+    HandlePool<BindGroupLayoutApi> bindGroupLayoutHandlePool;
+    HandlePool<RenderPassApi> renderPassHandlePool;
 };
 static std::unique_ptr<State> s;
 
@@ -80,7 +91,12 @@ HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
     BX_ENSURE(ValidateTextureCreateInfo(createInfo));
 
+    HTexture textureHandle = s->textureHandlePool.Create();
+    s_createInfoCache->textureCreateInfos.insert(std::make_pair(textureHandle, createInfo));
 
+
+
+    return textureHandle;
 }
 
 HTexture Graphics::CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data)
