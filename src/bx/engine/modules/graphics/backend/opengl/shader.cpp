@@ -1,0 +1,58 @@
+#include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
+
+#include "bx/engine/core/macros.hpp"
+
+#include "bx/engine/modules/graphics/backend/opengl/validation.hpp"
+
+namespace Gl
+{
+	Shader::Shader(const String& name, GLenum type, const String& src)
+	{
+        handle = glCreateShader(type);
+        DebugNames::Set(GL_SHADER, handle, name);
+
+        const char* pSourceCode = src.c_str();
+        glShaderSource(handle, 1, &pSourceCode, NULL);
+        glCompileShader(handle);
+
+        GLint success;
+        GLchar log[1024 * 4];
+        glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            glGetShaderInfoLog(handle, sizeof(log), NULL, log);
+            BX_LOGE("Failed to compile shader '%s'.\n---------------------------------\n%s",
+                name.c_str(), log);
+        }
+	}
+
+    Shader::~Shader()
+    {
+        glDeleteShader(handle);
+    }
+
+    ShaderProgram::ShaderProgram(const String& name, const List<Shader>& shaders)
+    {
+        handle = glCreateProgram();
+        DebugNames::Set(GL_PROGRAM, handle, name);
+
+        for (auto& shader : shaders)
+        {
+            glAttachShader(handle, shader.handle);
+        }
+        glLinkProgram(handle);
+
+        GLint success;
+        GLchar log[1024 * 4];
+        glGetProgramiv(handle, GL_LINK_STATUS, &success);
+        if (!success) {
+            glGetProgramInfoLog(handle, sizeof(log), NULL, log);
+            BX_LOGE("Failed to compile program '%s'.\n---------------------------------\n%s",
+                name.c_str(), log);
+        }
+    }
+
+    ShaderProgram::~ShaderProgram()
+    {
+        glDeleteProgram(handle);
+    }
+}
