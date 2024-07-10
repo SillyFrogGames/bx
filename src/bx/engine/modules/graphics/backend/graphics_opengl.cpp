@@ -37,6 +37,8 @@ struct State : NoCopy
     HandlePool<RenderPassApi> renderPassHandlePool;
 
     HashMap<HTexture, GLuint> textures;
+    HashMap<HTextureView, GLuint> textureViews;
+    HashMap<HBuffer, GLuint> buffers;
 };
 static std::unique_ptr<State> s;
 
@@ -92,47 +94,98 @@ TextureFormat Graphics::GetSwapchainFormat()
 
 HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
+    CreateTextureWithDataPtr(createInfo, nullptr);
+}
+
+HTexture Graphics::CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data)
+{
     BX_ENSURE(ValidateTextureCreateInfo(createInfo));
 
     HTexture textureHandle = s->textureHandlePool.Create();
     s_createInfoCache->textureCreateInfos.insert(std::make_pair(textureHandle, createInfo));
 
+    GLenum type = TextureDimensionToGl(createInfo.dimension, createInfo.size.depthOrArrayLayers);
+
     GLuint texture;
     glGenTextures(1, &texture);
+    glBindTexture(type, texture);
 
-    GLenum type = TextureDimensionToGl(createInfo.dimension);
-
-    if (type == GL_TEXTURE_2D)
+    if (type == GL_TEXTURE_1D)
     {
-        glTexImage2D(GL_TEXTURE_2D,
+        // TODO
+        BX_FAIL("TODO");
+    }
+    else if (type == GL_TEXTURE_2D || type == GL_TEXTURE_1D_ARRAY)
+    {
+        u32 height = (type == GL_TEXTURE_1D_ARRAY) ? createInfo.size.depthOrArrayLayers : createInfo.size.height;
+
+        glTexImage2D(
+            type,
             0,
-            GL_RGB,
-            createInfo.size.width, createInfo.size.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            TextureFormatToGlInternalFormat(createInfo.format),
+            createInfo.size.width,
+            height,
+            0,
+            TextureFormatToGlFormat(createInfo.format),
+            TextureFormatToGlType(createInfo.format),
+            data
+        );
+    }
+    else if (type == GL_TEXTURE_3D || type == GL_TEXTURE_2D_ARRAY)
+    {
+        glTexImage3D(
+            type,
+            0,
+            TextureFormatToGlInternalFormat(createInfo.format),
+            createInfo.size.width,
+            createInfo.size.height,
+            createInfo.size.depthOrArrayLayers,
+            0,
+            TextureFormatToGlFormat(createInfo.format),
+            TextureFormatToGlType(createInfo.format),
+            data
+        );
     }
 
-    
+    s->textures.insert(std::make_pair(textureHandle, texture));
 
     return textureHandle;
 }
 
-HTexture Graphics::CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data)
-{
-
-}
-
 void Graphics::DestroyTexture(HTexture& texture)
 {
+    BX_ENSURE(texture);
 
+    auto& textureIter = s->textures.find(texture);
+    BX_ENSURE(textureIter != s->textures.end());
+    glDeleteTextures(1, &textureIter->second);
+
+    s->textures.erase(texture);
+    s_createInfoCache->textureCreateInfos.erase(texture);
+    s->textureHandlePool.Destroy(texture);
 }
 
 HTextureView Graphics::CreateTextureView(HTexture texture)
 {
+    BX_ENSURE(texture);
 
+    HTextureView textureViewHandle = s->textureViewHandlePool.Create();
+    
+    auto& textureIter = s->textures.find(texture);
+    BX_ENSURE(textureIter != s->textures.end());
+    GLuint texture = textureIter->second;
+
+    s->textureViews.insert(std::make_pair(textureViewHandle, texture));
+
+    return textureViewHandle;
 }
 
 void Graphics::DestroyTextureView(HTextureView& textureView)
 {
+    BX_ENSURE(textureView);
 
+    s->textureViews.erase(textureView);
+    s->textureViewHandlePool.Destroy(textureView);
 }
 
 HSampler Graphics::CreateSampler(const SamplerCreateInfo& create)
@@ -147,17 +200,36 @@ void Graphics::DestroySampler(HSampler& sampler)
 
 HBuffer Graphics::CreateBuffer(const BufferCreateInfo& createInfo)
 {
-
+    CreateBufferWithDataPtr(createInfo, nullptr);
 }
 
 HBuffer Graphics::CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, const void* data)
 {
+    BX_ENSURE(ValidateBufferCreateInfo(createInfo));
 
+    HBuffer bufferHandle = s->bufferHandlePool.Create();
+    s_createInfoCache->bufferCreateInfos.insert(std::make_pair(bufferHandle, createInfo));
+
+    GLuint buffer;
+    glGenBuffers(1, &buffer);
+    glNamedBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
+
+    s->buffers.insert(std::make_pair(bufferHandle, buffer));
+
+    return bufferHandle;
 }
 
 void Graphics::DestroyBuffer(HBuffer& buffer)
 {
+    BX_ENSURE(buffer);
 
+    auto& bufferIter = s->buffers.find(buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+    glDeleteTextures(1, &bufferIter->second);
+
+    s->buffers.erase(buffer);
+    s_createInfoCache->bufferCreateInfos.erase(buffer);
+    s->bufferHandlePool.Destroy(buffer);
 }
 
 HShader Graphics::CreateShader(const ShaderCreateInfo& createInfo)

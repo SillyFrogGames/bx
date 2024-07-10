@@ -8,7 +8,8 @@
 
 namespace Gl
 {
-	GLenum TextureDimensionToGl(const TextureDimension& dimension);
+	GLenum TextureDimensionToGl(const TextureDimension& dimension, u32 depthOrArrayLayers);
 	GLenum TextureFormatToGlType(const TextureFormat& format);
 	GLenum TextureFormatToGlFormat(const TextureFormat& format);
+	GLenum TextureFormatToGlInternalFormat(const TextureFormat& format);
 }

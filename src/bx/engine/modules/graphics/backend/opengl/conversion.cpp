@@ -4,14 +4,14 @@
 
 namespace Gl
 {
-	GLenum TextureDimensionToGl(const TextureDimension& dimension)
+	GLenum TextureDimensionToGl(const TextureDimension& dimension, u32 depthOrArrayLayers)
 	{
 		switch (dimension)
 		{
 		case TextureDimension::D1:
-			return GL_TEXTURE_1D;
+			return (depthOrArrayLayers == 1) ? GL_TEXTURE_1D : GL_TEXTURE_1D_ARRAY;
 		case TextureDimension::D2:
-			return GL_TEXTURE_2D;
+			return (depthOrArrayLayers == 1) ? GL_TEXTURE_2D : GL_TEXTURE_2D_ARRAY;
 		case TextureDimension::D3:
 			return GL_TEXTURE_3D;
 		default:
@@ -164,6 +164,150 @@ namespace Gl
 	}
 
 	GLenum TextureFormatToGlFormat(const TextureFormat& format)
+	{
+		switch (format)
+		{
+		case TextureFormat::R8_UNORM:
+			return GL_RED;
+		case TextureFormat::R8_SNORM:
+			return GL_RED;
+		case TextureFormat::R8_UINT:
+			return GL_RED;
+		case TextureFormat::R8_SINT:
+			return GL_RED;
+
+		case TextureFormat::R16_UINT:
+			return GL_RED;
+		case TextureFormat::R16_SINT:
+			return GL_RED;
+		case TextureFormat::R16_UNORM:
+			return GL_RED;
+		case TextureFormat::R16_SNORM:
+			return GL_RED;
+		case TextureFormat::R16_FLOAT:
+			return GL_RED;
+		case TextureFormat::RG8_UNORM:
+			return GL_RG;
+		case TextureFormat::RG8_SNORM:
+			return GL_RG;
+		case TextureFormat::RG8_UINT:
+			return GL_RG;
+		case TextureFormat::RG8_SINT:
+			return GL_RG;
+
+		case TextureFormat::R32_UINT:
+			return GL_RED;
+		case TextureFormat::R32_SINT:
+			return GL_RED;
+		case TextureFormat::R32_FLOAT:
+			return GL_RED;
+		case TextureFormat::RG16_UINT:
+			return GL_RG;
+		case TextureFormat::RG16_SINT:
+			return GL_RG;
+		case TextureFormat::RG16_UNORM:
+			return GL_RG;
+		case TextureFormat::RG16_SNORM:
+			return GL_RG;
+		case TextureFormat::RG16_FLOAT:
+			return GL_RG;
+		case TextureFormat::RGBA8_UNORM:
+			return GL_RGBA;
+		case TextureFormat::RGBA8_UNORM_SRGB:
+			return GL_RGBA;
+		case TextureFormat::RGBA8_SNORM:
+			return GL_RGBA;
+		case TextureFormat::RGBA8_UINT:
+			return GL_RGBA;
+		case TextureFormat::RGBA8_SINT:
+			return GL_RGBA;
+		/*case TextureFormat::BGRA8_UNORM:
+			return GL_BGRA;*/
+		/*case TextureFormat::BGRA8_UNORM_SRGB:
+			return GL_UNSIGNED_BYTE;*/
+
+		case TextureFormat::RGB9E5_UFLOAT:
+			return GL_RGB;
+		case TextureFormat::RGB10A2_UINT:
+			return GL_RGBA;
+		case TextureFormat::RGB10A2_UNORM:
+			return GL_RGBA;
+		case TextureFormat::RG11B10_FLOAT:
+			return GL_RGB;
+
+		case TextureFormat::RG32_UINT:
+			return GL_RG;
+		case TextureFormat::RG32_SINT:
+			return GL_RG;
+		case TextureFormat::RG32_FLOAT:
+			return GL_RG;
+		case TextureFormat::RGBA16_UINT:
+			return GL_RGBA;
+		case TextureFormat::RGBA16_SINT:
+			return GL_RGBA;
+		case TextureFormat::RGBA16_UNORM:
+			return GL_RGBA;
+		case TextureFormat::RGBA16_SNORM:
+			return GL_RGBA;
+		case TextureFormat::RGBA16_FLOAT:
+			return GL_RGBA;
+
+		case TextureFormat::RGBA32_UINT:
+			return GL_RGBA;
+		case TextureFormat::RGBA32_SINT:
+			return GL_RGBA;
+		case TextureFormat::RGBA32_FLOAT:
+			return GL_RGBA;
+
+			// TODO: figure out how to support these
+			/*case TextureFormat::STENCIL8:
+				return GL_BYTE;*/
+		case TextureFormat::DEPTH16_UNORM:
+			return GL_DEPTH_COMPONENT;
+		case TextureFormat::DEPTH24_PLUS:
+			return GL_DEPTH_COMPONENT;
+		case TextureFormat::DEPTH24_PLUS_STENCIL8:
+			return GL_DEPTH_STENCIL;
+		case TextureFormat::DEPTH32_FLOAT:
+			return GL_DEPTH_COMPONENT;
+		case TextureFormat::DEPTH32_FLOAT_STENCIL8:
+			return GL_DEPTH_STENCIL;
+
+			/*case TextureFormat::BC1_RGBA_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC1_RGBA_UNORM_SRGB:
+				return GL_FLOAT;
+			case TextureFormat::BC2_RGBA_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC2_RGBA_UNORM_SRGB:
+				return GL_FLOAT;
+			case TextureFormat::BC3_RGBA_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC3_RGBA_UNORM_SRGB:
+				return GL_FLOAT;
+			case TextureFormat::BC4_R_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC4_R_SNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC5_RG_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC5_RG_SNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC6H_RGB_UFLOAT:
+				return GL_FLOAT;
+			case TextureFormat::BC6H_RGB_FLOAT:
+				return GL_FLOAT;
+			case TextureFormat::BC7_RGBA_UNORM:
+				return GL_FLOAT;
+			case TextureFormat::BC7_RGBA_UNORM_SRGB:
+				return GL_FLOAT;*/
+
+		default:
+			BX_FAIL("{} not supported.", format);
+		}
+	}
+
+	GLenum TextureFormatToGlInternalFormat(const TextureFormat& format)
 	{
 		switch (format)
 		{
