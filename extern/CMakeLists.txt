@@ -126,7 +126,7 @@ elseif (BX_GRAPHICS_BACKEND STREQUAL "Vulkan")
 	target_link_libraries(imgui_vulkan vulkan)
 	
 	# Glslang
-	#set (ENABLE_OPT OFF)
+	set (ENABLE_OPT OFF)
 	#set (BUILD_EXTERNAL OFF)
 	#set (BUILD_SHARED_LIBS OFF)
 	add_subdirectory (glslang)

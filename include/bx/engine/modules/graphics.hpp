@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bx/engine/core/guard.hpp"
 #include "bx/engine/modules/graphics/type.hpp"
 
 class Graphics
