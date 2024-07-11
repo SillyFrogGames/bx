@@ -699,6 +699,70 @@ static u32 GetValueSize(GraphicsValueType vt)
     }
 }
 
+static void ExtractShaderInfo(GLuint shaderProgram)
+{
+    GLint numUniforms = 0;
+    glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &numUniforms);
+
+    for (GLint i = 0; i < numUniforms; ++i)
+    {
+        GLchar name[256];
+        GLenum type;
+        GLint size;
+        glGetActiveUniform(shaderProgram, i, sizeof(name), nullptr, &size, &type, name);
+
+        GLint location = glGetUniformLocation(shaderProgram, name);
+
+        BX_LOGI("Found uniform: {} at location: {}", name, location);
+    }
+}
+
+static void ExtractBlockUniforms(GLuint shaderProgram, GLint blockIndex)
+{
+    GLint numUniforms;
+    glGetActiveUniformBlockiv(shaderProgram, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numUniforms);
+
+    std::vector<GLint> uniformIndices(numUniforms);
+    glGetActiveUniformBlockiv(shaderProgram, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, uniformIndices.data());
+
+    for (GLint i = 0; i < numUniforms; ++i)
+    {
+        GLchar name[256];
+        GLenum type;
+        GLint size;
+        glGetActiveUniform(shaderProgram, uniformIndices[i], sizeof(name), nullptr, &size, &type, name);
+
+        GLint offset;
+        glGetActiveUniformsiv(shaderProgram, 1, (const GLuint*)&uniformIndices[i], GL_UNIFORM_OFFSET, &offset);
+
+        //uniformBlock.uniforms.push_back({ name, type, uniformIndices[i], size, offset });
+
+        BX_LOGI("Found block uniform: {} at index: {}", name, uniformIndices[i]);
+    }
+}
+
+static void ExtractUniformBlocks(GLuint shaderProgram)
+{
+    //std::vector<ShaderUniformBlock> uniformBlocks;
+
+    GLint numBlocks;
+    glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
+
+    for (GLint i = 0; i < numBlocks; ++i)
+    {
+        GLchar name[256];
+        glGetActiveUniformBlockName(shaderProgram, i, sizeof(name), nullptr, name);
+
+        GLint blockIndex = glGetUniformBlockIndex(shaderProgram, name);
+        //uniformBlocks.push_back({ blockName, blockIndex });
+
+        BX_LOGI("Found uniform block: {} at block index: {}", name, blockIndex);
+        ExtractBlockUniforms(shaderProgram, blockIndex);
+    }
+
+    //return uniformBlocks;
+}
+
 GraphicsHandle Graphics::CreatePipeline(const PipelineInfo& info)
 {
     const auto& vert_shader = GetImpl(info.vertShader, s_shaders);
@@ -741,6 +805,8 @@ GraphicsHandle Graphics::CreatePipeline(const PipelineInfo& info)
 
         relativeOffset += elem.numComponents * GetValueSize(elem.valueType);
     }
+
+    ExtractUniformBlocks(program_handle);
 
     PipelineImpl pipeline_impl;
     pipeline_impl.program = program_handle;
