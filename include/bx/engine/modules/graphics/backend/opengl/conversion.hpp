@@ -19,4 +19,7 @@ namespace Gl
 
 	GLenum PrimitiveTopologyToGl(const PrimitiveTopology& topology);
 	GLenum IndexFormatToGl(const IndexFormat& format);
+
+	GLint VertexFormatToGlSize(const VertexFormat& format);
+	GLenum VertexFormatToGlType(const VertexFormat& format);
 }

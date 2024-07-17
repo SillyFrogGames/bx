@@ -524,4 +524,142 @@ namespace Gl
 			return GL_UNSIGNED_INT;
 		}
 	}
+
+	GLint VertexFormatToGlSize(const VertexFormat& format)
+	{
+		switch (format)
+		{
+		case VertexFormat::UINT_8X2:
+			return 2;
+		case VertexFormat::UINT_8X4:
+			return 4;
+		case VertexFormat::SINT_8X2:
+			return 2;
+		case VertexFormat::SINT_8X4:
+			return 4;
+		case VertexFormat::UNORM_8X2:
+			return 2;
+		case VertexFormat::UNORM_8X4:
+			return 4;
+		case VertexFormat::SNORM_8X2:
+			return 2;
+		case VertexFormat::SNORM_8X4:
+			return 4;
+
+		case VertexFormat::UINT_16X2:
+			return 2;
+		case VertexFormat::UINT_16X4:
+			return 4;
+		case VertexFormat::SINT_16X2:
+			return 2;
+		case VertexFormat::SINT_16X4:
+			return 4;
+		case VertexFormat::UNORM_16X2:
+			return 2;
+		case VertexFormat::UNORM_16X4:
+			return 4;
+		case VertexFormat::SNORM_16X2:
+			return 2;
+		case VertexFormat::SNORM_16X4:
+			return 4;
+		case VertexFormat::FLOAT_16X2:
+			return 2;
+		case VertexFormat::FLOAT_16X4:
+			return 4;
+
+		case VertexFormat::FLOAT_32:
+			return 1;
+		case VertexFormat::FLOAT_32X2:
+			return 2;
+		case VertexFormat::FLOAT_32X3:
+			return 3;
+		case VertexFormat::FLOAT_32X4:
+			return 4;
+		case VertexFormat::UINT_32:
+			return 1;
+		case VertexFormat::UINT_32X2:
+			return 2;
+		case VertexFormat::UINT_32X3:
+			return 3;
+		case VertexFormat::UINT_32X4:
+			return 4;
+		case VertexFormat::SINT_32:
+			return 1;
+		case VertexFormat::SINT_32X2:
+			return 2;
+		case VertexFormat::SINT_32X3:
+			return 3;
+		case VertexFormat::SINT_32X4:
+			return 4;
+		}
+	}
+
+	GLenum VertexFormatToGlType(const VertexFormat& format)
+	{
+		switch (format)
+		{
+		case VertexFormat::UINT_8X2:
+			return GL_UNSIGNED_BYTE;
+		case VertexFormat::UINT_8X4:
+			return GL_UNSIGNED_BYTE;
+		case VertexFormat::SINT_8X2:
+			return GL_BYTE;
+		case VertexFormat::SINT_8X4:
+			return GL_BYTE;
+		case VertexFormat::UNORM_8X2:
+			return GL_UNSIGNED_BYTE;
+		case VertexFormat::UNORM_8X4:
+			return GL_UNSIGNED_BYTE;
+		case VertexFormat::SNORM_8X2:
+			return GL_BYTE;
+		case VertexFormat::SNORM_8X4:
+			return GL_BYTE;
+
+		case VertexFormat::UINT_16X2:
+			return GL_UNSIGNED_SHORT;
+		case VertexFormat::UINT_16X4:
+			return GL_UNSIGNED_SHORT;
+		case VertexFormat::SINT_16X2:
+			return GL_SHORT;
+		case VertexFormat::SINT_16X4:
+			return GL_SHORT;
+		case VertexFormat::UNORM_16X2:
+			return GL_UNSIGNED_SHORT;
+		case VertexFormat::UNORM_16X4:
+			return GL_UNSIGNED_SHORT;
+		case VertexFormat::SNORM_16X2:
+			return GL_SHORT;
+		case VertexFormat::SNORM_16X4:
+			return GL_SHORT;
+		case VertexFormat::FLOAT_16X2:
+			return GL_HALF_FLOAT;
+		case VertexFormat::FLOAT_16X4:
+			return GL_HALF_FLOAT;
+
+		case VertexFormat::FLOAT_32:
+			return GL_FLOAT;
+		case VertexFormat::FLOAT_32X2:
+			return GL_FLOAT;
+		case VertexFormat::FLOAT_32X3:
+			return GL_FLOAT;
+		case VertexFormat::FLOAT_32X4:
+			return GL_FLOAT;
+		case VertexFormat::UINT_32:
+			return GL_UNSIGNED_INT;
+		case VertexFormat::UINT_32X2:
+			return GL_UNSIGNED_INT;
+		case VertexFormat::UINT_32X3:
+			return GL_UNSIGNED_INT;
+		case VertexFormat::UINT_32X4:
+			return GL_UNSIGNED_INT;
+		case VertexFormat::SINT_32:
+			return GL_INT;
+		case VertexFormat::SINT_32X2:
+			return GL_INT;
+		case VertexFormat::SINT_32X3:
+			return GL_INT;
+		case VertexFormat::SINT_32X4:
+			return GL_INT;
+		}
+	}
 }

@@ -13,6 +13,7 @@
 
 #include "bx/engine/modules/graphics/backend/opengl/buffer.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/conversion.hpp"
+#include "bx/engine/modules/graphics/backend/opengl/graphics_pipeline.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/validation.hpp"
 using namespace Gl;
@@ -38,7 +39,7 @@ struct State : NoCopy
     HashMap<TextureViewHandle, GLuint> textureViews;
     HashMap<BufferHandle, GLuint> buffers;
     HashMap<ShaderHandle, Shader> shaders;
-    HashMap<GraphicsPipelineHandle, ShaderProgram> graphicsPipelines;
+    HashMap<GraphicsPipelineHandle, GraphicsPipeline> graphicsPipelines;
     HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
 
     RenderPassHandle activeRenderPass;
@@ -278,7 +279,9 @@ GraphicsPipelineHandle Graphics::CreateGraphicsPipeline(const GraphicsPipelineCr
     BX_ENSURE(fragShaderIter != s->shaders.end());
 
     String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    s->graphicsPipelines.emplace(std::make_pair(graphicsPipelineHandle, std::move(ShaderProgram(name, List<Shader*>{ &vertShaderIter->second, &fragShaderIter->second }))));
+    ShaderProgram shaderProgram(name, List<Shader*>{ &vertShaderIter->second, & fragShaderIter->second });
+    GraphicsPipeline graphicsPipeline(std::move(shaderProgram), createInfo.vertexBuffers);
+    s->graphicsPipelines.emplace(std::make_pair(graphicsPipelineHandle, std::move(graphicsPipeline)));
 
     return graphicsPipelineHandle;
 }
@@ -397,6 +400,8 @@ void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format
 void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
 {
     BX_ASSERT(s->activeRenderPass, "No render pass active.");
+
+    // TODO
 }
 
 void Graphics::Draw(u32 vertexCount, u32 firstVertex, u32 instanceCount)

@@ -24,7 +24,11 @@ namespace Gl
     {
     public:
         ShaderProgram(const String& name, const List<Shader*>& shaders);
+        ShaderProgram(ShaderProgram&& other);
+        ShaderProgram& operator=(ShaderProgram&& other);
         ~ShaderProgram();
+
+        u32 GetHandle() const;
 
     private:
         u32 handle;

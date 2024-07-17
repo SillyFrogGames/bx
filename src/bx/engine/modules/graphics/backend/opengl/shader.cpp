@@ -51,8 +51,26 @@ namespace Gl
         }
     }
 
+    ShaderProgram::ShaderProgram(ShaderProgram&& other)
+        : handle(other.handle)
+    {
+        other.handle = UINT_MAX;
+    }
+
+    ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other)
+    {
+        handle = other.handle;
+        other.handle = UINT_MAX;
+    }
+
     ShaderProgram::~ShaderProgram()
     {
-        glDeleteProgram(handle);
+        if (handle != UINT_MAX)
+            glDeleteProgram(handle);
+    }
+
+    u32 ShaderProgram::GetHandle() const
+    {
+        return handle;
     }
 }
