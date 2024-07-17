@@ -1,14 +1,14 @@
 #include "bx/engine/modules/graphics/type.hpp"
 
-const HBuffer HBuffer::null = { 0 };
-const HTexture HTexture::null = { 0 };
-const HTextureView HTextureView::null = { 0 };
-const HShader HShader::null = { 0 };
-const HGraphicsPipeline HGraphicsPipeline::null = { 0 };
-const HComputePipeline HComputePipeline::null = { 0 };
-const HRenderPass HRenderPass::null = { 0 };
-const HBindGroupLayout HBindGroupLayout::null = { 0 };
-const HBindGroup HBindGroup::null = { 0 };
+const BufferHandle BufferHandle::null = { 0 };
+const TextureHandle TextureHandle::null = { 0 };
+const TextureViewHandle TextureViewHandle::null = { 0 };
+const ShaderHandle ShaderHandle::null = { 0 };
+const GraphicsPipelineHandle GraphicsPipelineHandle::null = { 0 };
+const ComputePipelineHandle ComputePipelineHandle::null = { 0 };
+const RenderPassHandle RenderPassHandle::null = { 0 };
+const BindGroupLayoutHandle BindGroupLayoutHandle::null = { 0 };
+const BindGroupHandle BindGroupHandle::null = { 0 };
 
 BlendComponent BlendComponent::Replace()
 {
@@ -91,7 +91,7 @@ BindingResource BindingResource::BufferArray(const List<BufferBinding>& bufferBi
 	return resource;
 }
 
-BindingResource BindingResource::Sampler(const HSampler& sampler)
+BindingResource BindingResource::Sampler(const SamplerHandle& sampler)
 {
 	BindingResource resource{};
 	resource.type = BindingResourceType::SAMPLER;
@@ -99,7 +99,7 @@ BindingResource BindingResource::Sampler(const HSampler& sampler)
 	return resource;
 }
 
-BindingResource BindingResource::SamplerArray(const List<HSampler>& samplers)
+BindingResource BindingResource::SamplerArray(const List<SamplerHandle>& samplers)
 {
 	BindingResource resource{};
 	resource.type = BindingResourceType::SAMPLER_ARRAY;
@@ -107,7 +107,7 @@ BindingResource BindingResource::SamplerArray(const List<HSampler>& samplers)
 	return resource;
 }
 
-BindingResource BindingResource::TextureView(const HTextureView& textureView)
+BindingResource BindingResource::TextureView(const TextureViewHandle& textureView)
 {
 	BindingResource resource{};
 	resource.type = BindingResourceType::TEXTURE_VIEW;
@@ -115,7 +115,7 @@ BindingResource BindingResource::TextureView(const HTextureView& textureView)
 	return resource;
 }
 
-BindingResource BindingResource::TextureViewArray(const List<HTextureView>& textureViews)
+BindingResource BindingResource::TextureViewArray(const List<TextureViewHandle>& textureViews)
 {
 	BindingResource resource{};
 	resource.type = BindingResourceType::TEXTURE_VIEW_ARRAY;

@@ -35,8 +35,8 @@ bool Resource<Material>::Load(const String& filename, Material& data)
     cereal::JSONInputArchive archive(stream);
     archive(cereal::make_nvp("material", data));
 
-    HTexture albedoTexture = data.m_textures["Albedo"].GetData().GetTexture();
-    HTextureView albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
+    TextureHandle albedoTexture = data.m_textures["Albedo"].GetData().GetTexture();
+    TextureViewHandle albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
 
     BindGroupCreateInfo createInfo{};
     createInfo.name = Optional<String>::Some("Material Bind Group");

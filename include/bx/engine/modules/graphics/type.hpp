@@ -3,32 +3,33 @@
 #include "bx/engine/core/math.hpp"
 #include "bx/engine/core/type.hpp"
 #include "bx/engine/core/macros.hpp"
-#include "bx/engine/core/handle.hpp"
+#include "bx/engine/containers/handle.hpp"
 #include "bx/engine/containers/optional.hpp"
 #include "bx/engine/containers/list.hpp"
 #include "bx/engine/containers/string.hpp"
 #include "bx/engine/containers/hash_map.hpp"
 
+// TODO: rename to BufferHandle
 struct BufferApi {};
-using HBuffer = Handle<BufferApi>;
+using BufferHandle = Handle<BufferApi>;
 struct SamplerApi {};
-using HSampler = Handle<SamplerApi>;
+using SamplerHandle = Handle<SamplerApi>;
 struct TextureApi {};
-using HTexture = Handle<TextureApi>;
+using TextureHandle = Handle<TextureApi>;
 struct TextureViewApi {};
-using HTextureView = Handle<TextureViewApi>;
+using TextureViewHandle = Handle<TextureViewApi>;
 struct ShaderApi {};
-using HShader = Handle<ShaderApi>;
+using ShaderHandle = Handle<ShaderApi>;
 struct GraphicsPipelineApi {};
-using HGraphicsPipeline = Handle<GraphicsPipelineApi>;
+using GraphicsPipelineHandle = Handle<GraphicsPipelineApi>;
 struct ComputePipelineApi {};
-using HComputePipeline = Handle<ComputePipelineApi>;
+using ComputePipelineHandle = Handle<ComputePipelineApi>;
 struct RenderPassApi {};
-using HRenderPass = Handle<RenderPassApi>;
+using RenderPassHandle = Handle<RenderPassApi>;
 struct BindGroupLayoutApi {};
-using HBindGroupLayout = Handle<BindGroupLayoutApi>;
+using BindGroupLayoutHandle = Handle<BindGroupLayoutApi>;
 struct BindGroupApi {};
-using HBindGroup = Handle<BindGroupApi>;
+using BindGroupHandle = Handle<BindGroupApi>;
 
 ENUM(ShaderType,
 	VERTEX,
@@ -147,7 +148,7 @@ ENUM(SamplerBorderColor,
 	OPAQUE_WHITE
 );
 
-ENUM(AddressMode,
+ENUM(SamplerAddressMode,
 	CLAMP_TO_EDGE,
 	REPEAT,
 	MIRROR_REPEAT,
@@ -400,10 +401,10 @@ struct BindGroupLayoutEntry
 struct BufferBinding
 {
 	BufferBinding() = default;
-	BufferBinding(HBuffer buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
+	BufferBinding(BufferHandle buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
 		: buffer(buffer), offset(offset), size(size) {}
 
-	HBuffer buffer = HBuffer::null;
+	BufferHandle buffer = BufferHandle::null;
 	u64 offset = 0;
 	Optional<u64> size = Optional<u64>::None();
 };
@@ -412,20 +413,20 @@ struct BindingResource
 {
 	static BindingResource Buffer(const BufferBinding& bufferBinding);
 	static BindingResource BufferArray(const List<BufferBinding>& bufferBindings);
-	static BindingResource Sampler(const HSampler& sampler);
-	static BindingResource SamplerArray(const List<HSampler>& samplers);
-	static BindingResource TextureView(const HTextureView& textureView);
-	static BindingResource TextureViewArray(const List<HTextureView>& textureViews);
+	static BindingResource Sampler(const SamplerHandle& sampler);
+	static BindingResource SamplerArray(const List<SamplerHandle>& samplers);
+	static BindingResource TextureView(const TextureViewHandle& textureView);
+	static BindingResource TextureViewArray(const List<TextureViewHandle>& textureViews);
 
 	BindingResourceType type;
 
 	// TODO: can this be unioned somehow? std::vector seems to have trouble and the custom Optional<T> as well
 	BufferBinding buffer;
-	HSampler sampler;
-	HTextureView textureView;
+	SamplerHandle sampler;
+	TextureViewHandle textureView;
 	List<BufferBinding> bufferArray = List<BufferBinding>{};
-	List<HSampler> samplerArray = List<HSampler>{};
-	List<HTextureView> textureViewArray = List<HTextureView>{};
+	List<SamplerHandle> samplerArray = List<SamplerHandle>{};
+	List<TextureViewHandle> textureViewArray = List<TextureViewHandle>{};
 };
 
 struct BindGroupEntry
@@ -441,7 +442,7 @@ struct BindGroupCreateInfo
 {
 	Optional<String> name = Optional<String>::None();
 
-	HBindGroupLayout layout = HBindGroupLayout::null;
+	BindGroupLayoutHandle layout = BindGroupLayoutHandle::null;
 	List<BindGroupEntry> entries = List<BindGroupEntry>{};
 };
 
@@ -463,11 +464,11 @@ struct GraphicsPipelineCreateInfo
 {
 	Optional<String> name = Optional<String>::None();
 
-	HShader vertexShader = HShader::null;
-	HShader fragmentShader = HShader::null;
+	ShaderHandle vertexShader = ShaderHandle::null;
+	ShaderHandle fragmentShader = ShaderHandle::null;
 	// TODO
-	// HShader geometryShader = HShader::null;
-	// HShader tessalationShader = HShader::null;
+	// ShaderHandle geometryShader = ShaderHandle::null;
+	// ShaderHandle tessalationShader = ShaderHandle::null;
 
 	List<VertexBufferLayout> vertexBuffers = List<VertexBufferLayout>{};
 	Optional<ColorTargetState> colorTarget = Optional<ColorTargetState>::None();
@@ -482,7 +483,7 @@ struct ComputePipelineCreateInfo
 {
 	Optional<String> name = Optional<String>::None();
 
-	HShader shader = HShader::null;
+	ShaderHandle shader = ShaderHandle::null;
 	PipelineLayoutDescriptor layout;
 	HashMap<String, f64> constants = HashMap<String, f64>{};
 };
@@ -507,9 +508,9 @@ struct SamplerCreateInfo
 {
 	Optional<String> name = Optional<String>::None();
 
-	AddressMode addressModeU = AddressMode::CLAMP_TO_EDGE;
-	AddressMode addressModeV = AddressMode::CLAMP_TO_EDGE;
-	AddressMode addressModeW = AddressMode::CLAMP_TO_EDGE;
+	SamplerAddressMode addressModeU = SamplerAddressMode::CLAMP_TO_EDGE;
+	SamplerAddressMode addressModeV = SamplerAddressMode::CLAMP_TO_EDGE;
+	SamplerAddressMode addressModeW = SamplerAddressMode::CLAMP_TO_EDGE;
 	FilterMode magFilter;
 	FilterMode minFilter;
 	f32 lodMinClamp = 0.0f;
@@ -541,10 +542,10 @@ struct ImageDataLayout
 
 struct BufferSlice
 {
-	BufferSlice(HBuffer buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
+	BufferSlice(BufferHandle buffer, u64 offset = 0, const Optional<u64>& size = Optional<u64>::None())
 		: buffer(buffer), offset(offset), size(size) {}
 
-	HBuffer buffer = HBuffer::null;
+	BufferHandle buffer = BufferHandle::null;
 	u64 offset = 0;
 	Optional<u64> size = Optional<u64>::None();
 };
@@ -562,20 +563,20 @@ struct Operations
 
 struct RenderPassColorAttachment
 {
-	RenderPassColorAttachment(HTextureView view, Operations ops = Operations{}, const Optional<HTextureView>& resolveTarget = Optional<HTextureView>::None())
+	RenderPassColorAttachment(TextureViewHandle view, Operations ops = Operations{}, const Optional<TextureViewHandle>& resolveTarget = Optional<TextureViewHandle>::None())
 		: view(view), ops(ops), resolveTarget(resolveTarget) {}
 
-	HTextureView view = HTextureView::null;
+	TextureViewHandle view = TextureViewHandle::null;
 	Operations ops = Operations{};
-	Optional<HTextureView> resolveTarget = Optional<HTextureView>::None();
+	Optional<TextureViewHandle> resolveTarget = Optional<TextureViewHandle>::None();
 };
 
 struct RenderPassDepthStencilAttachment
 {
-	RenderPassDepthStencilAttachment(HTextureView view, const Optional<Operations>& depthOps = Optional<Operations>::None(), const Optional<Operations>& stencilOps = Optional<Operations>::None())
+	RenderPassDepthStencilAttachment(TextureViewHandle view, const Optional<Operations>& depthOps = Optional<Operations>::None(), const Optional<Operations>& stencilOps = Optional<Operations>::None())
 		: view(view), depthOps(depthOps), stencilOps(stencilOps) {}
 
-	HTextureView view = HTextureView::null;
+	TextureViewHandle view = TextureViewHandle::null;
 	Optional<Operations> depthOps = Optional<Operations>::None();
 	Optional<Operations> stencilOps = Optional<Operations>::None();
 };

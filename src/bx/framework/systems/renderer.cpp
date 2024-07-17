@@ -49,14 +49,14 @@ struct LightSourceData
 
 struct State : NoCopy
 {
-    HashMap<UUID, HGraphicsPipeline> shaderPipelines;
-    HashMap<UUID, HBuffer> animatorBoneBuffers;
+    HashMap<UUID, GraphicsPipelineHandle> shaderPipelines;
+    HashMap<UUID, BufferHandle> animatorBoneBuffers;
 
-    HTexture colorTarget = HTexture::null;
-    HTexture depthTarget = HTexture::null;
+    TextureHandle colorTarget = TextureHandle::null;
+    TextureHandle depthTarget = TextureHandle::null;
 
-    HBuffer vertexConstantsBuffer = HBuffer::null;
-    HBuffer lightSourceBuffer = HBuffer::null;
+    BufferHandle vertexConstantsBuffer = BufferHandle::null;
+    BufferHandle lightSourceBuffer = BufferHandle::null;
 };
 static std::unique_ptr<State> s;
 
@@ -117,7 +117,7 @@ void BuildShaderPipelines()
                     createInfo.layout = pipelineLayoutDescriptor;
                     createInfo.depthFormat = Optional<TextureFormat>::Some(depthFormat);
 
-                    HGraphicsPipeline graphicsPipeline = Graphics::CreateGraphicsPipeline(createInfo);
+                    GraphicsPipelineHandle graphicsPipeline = Graphics::CreateGraphicsPipeline(createInfo);
                     s->shaderPipelines.insert(std::make_pair(shaderResource.GetUUID(), graphicsPipeline));
                 }
             }
@@ -131,7 +131,7 @@ void UpdateAnimators()
         {
             anim.Update();
 
-            HBuffer boneBuffer;
+            BufferHandle boneBuffer;
             auto boneBufferIter = s->animatorBoneBuffers.find(anim.GetUUID());
             if (boneBufferIter == s->animatorBoneBuffers.end())
             {
@@ -228,15 +228,15 @@ void Renderer::Render()
 {
     Graphics::UpdateDebugLines();
 
-    HTextureView colorTargetView = Graphics::CreateTextureView(s->colorTarget);
-    HTextureView depthTargetView = Graphics::CreateTextureView(s->depthTarget);
+    TextureViewHandle colorTargetView = Graphics::CreateTextureView(s->colorTarget);
+    TextureViewHandle depthTargetView = Graphics::CreateTextureView(s->depthTarget);
 
     RenderPassDescriptor renderPassDescriptor{};
     renderPassDescriptor.name = Optional<String>::Some("Draw Meshes");
     renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(colorTargetView) };
     renderPassDescriptor.depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::Some(depthTargetView);
 
-    HRenderPass renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
+    RenderPassHandle renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
     {
         EntityManager::ForEach<Transform, MeshFilter, MeshRenderer>(
             [&](Entity entity, const Transform& trx, const MeshFilter& mf, const MeshRenderer& mr)
@@ -244,7 +244,7 @@ void Renderer::Render()
                 if (mr.GetMaterialCount() == 0)
                     return;
 
-                HBuffer animatorBonesBuffer;
+                BufferHandle animatorBonesBuffer;
                 if (entity.HasComponent<Animator>())
                 {
                     const auto& anim = entity.GetComponent<Animator>();
@@ -281,7 +281,7 @@ void Renderer::Render()
                     meshUniformCreateInfo.name = Optional<String>::Some("Mesh Uniform");
                     meshUniformCreateInfo.size = sizeof(VertexMeshUniform);
                     meshUniformCreateInfo.usageFlags = BufferUsageFlags::UNIFORM;
-                    HBuffer meshUniformBuffer = Graphics::CreateBufferWithData(meshUniformCreateInfo, meshUniform);
+                    BufferHandle meshUniformBuffer = Graphics::CreateBuffer(meshUniformCreateInfo, &meshUniform);
 
                     // TODO: very lazy, shouldn't be created every frame probably
                     BindGroupCreateInfo createInfo{};
@@ -292,7 +292,7 @@ void Renderer::Render()
                         BindGroupEntry(2, BindingResource::Buffer(BufferBinding(animatorBonesBuffer))),
                         BindGroupEntry(4, BindingResource::Buffer(BufferBinding(s->lightSourceBuffer)))
                     };
-                    HBindGroup bindGroup = Graphics::CreateBindGroup(createInfo);
+                    BindGroupHandle bindGroup = Graphics::CreateBindGroup(createInfo);
 
                     Graphics::SetGraphicsPipeline(renderPass, graphicsPipeline);
                     Graphics::SetVertexBuffer(renderPass, 0, BufferSlice(meshData.GetVertexBuffer()));

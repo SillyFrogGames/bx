@@ -68,8 +68,8 @@ public:
 	inline const List<u32>& GetIndices() const { return m_indices; }
 	inline void SetIndices(const List<u32>& indices) { m_indices = indices; }
 
-	inline HBuffer GetVertexBuffer() const { return m_vertexBuffer; }
-	inline HBuffer GetIndexBuffer() const { return m_indexBuffer; }
+	inline BufferHandle GetVertexBuffer() const { return m_vertexBuffer; }
+	inline BufferHandle GetIndexBuffer() const { return m_indexBuffer; }
 
 private:
 	template <typename T>
@@ -88,6 +88,6 @@ private:
 	List<Vec4> m_weights;
 	List<u32> m_indices;
 
-	HBuffer m_vertexBuffer = HBuffer::null;
-	HBuffer m_indexBuffer = HBuffer::null;
+	BufferHandle m_vertexBuffer = BufferHandle::null;
+	BufferHandle m_indexBuffer = BufferHandle::null;
 };

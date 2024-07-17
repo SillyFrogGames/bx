@@ -11,8 +11,8 @@ public:
 	const String& GetSource() const { return m_source; }
 	void SetSource(const String& src) { m_source = src; }
 
-	HShader GetVertexShader() const { return m_vertexShader; }
-	HShader GetFragmentShader() const { return m_fragmentShader; }
+	ShaderHandle GetVertexShader() const { return m_vertexShader; }
+	ShaderHandle GetFragmentShader() const { return m_fragmentShader; }
 
 private:
 	template <typename T>
@@ -24,6 +24,6 @@ private:
 	List<String> m_includes;
 	List<String> m_macros;
 	String m_source;
-	HShader m_vertexShader = HShader::null;
-	HShader m_fragmentShader = HShader::null;
+	ShaderHandle m_vertexShader = ShaderHandle::null;
+	ShaderHandle m_fragmentShader = ShaderHandle::null;
 };

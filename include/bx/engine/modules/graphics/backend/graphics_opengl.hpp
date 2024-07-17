@@ -85,5 +85,5 @@
 class GraphicsOpenGL
 {
 public:
-    static GLuint GetTextureHandle(HTexture texture);
+    static GLuint GetTextureHandle(TextureHandle texture);
 };

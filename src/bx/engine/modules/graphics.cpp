@@ -8,7 +8,7 @@
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/containers/pool.hpp"
 
-const TextureCreateInfo& Graphics::GetTextureCreateInfo(HTexture texture)
+const TextureCreateInfo& Graphics::GetTextureCreateInfo(TextureHandle texture)
 {
     BX_ENSURE(texture);
 
@@ -17,7 +17,7 @@ const TextureCreateInfo& Graphics::GetTextureCreateInfo(HTexture texture)
     return createInfoIter->second;
 }
 
-const SamplerCreateInfo& Graphics::GetSamplerCreateInfo(HSampler sampler)
+const SamplerCreateInfo& Graphics::GetSamplerCreateInfo(SamplerHandle sampler)
 {
     BX_ENSURE(sampler);
 
@@ -26,7 +26,7 @@ const SamplerCreateInfo& Graphics::GetSamplerCreateInfo(HSampler sampler)
     return createInfoIter->second;
 }
 
-const BufferCreateInfo& Graphics::GetBufferCreateInfo(HBuffer buffer)
+const BufferCreateInfo& Graphics::GetBufferCreateInfo(BufferHandle buffer)
 {
     BX_ENSURE(buffer);
 
@@ -35,7 +35,7 @@ const BufferCreateInfo& Graphics::GetBufferCreateInfo(HBuffer buffer)
     return createInfoIter->second;
 }
 
-const ShaderCreateInfo& Graphics::GetShaderCreateInfo(HShader shader)
+const ShaderCreateInfo& Graphics::GetShaderCreateInfo(ShaderHandle shader)
 {
     BX_ENSURE(shader);
 
@@ -44,7 +44,7 @@ const ShaderCreateInfo& Graphics::GetShaderCreateInfo(HShader shader)
     return createInfoIter->second;
 }
 
-const GraphicsPipelineCreateInfo& Graphics::GetGraphicsPipelineCreateInfo(HGraphicsPipeline graphicsPipeline)
+const GraphicsPipelineCreateInfo& Graphics::GetGraphicsPipelineCreateInfo(GraphicsPipelineHandle graphicsPipeline)
 {
     BX_ENSURE(graphicsPipeline);
 
@@ -53,7 +53,7 @@ const GraphicsPipelineCreateInfo& Graphics::GetGraphicsPipelineCreateInfo(HGraph
     return createInfoIter->second;
 }
 
-const ComputePipelineCreateInfo& Graphics::GetComputePipelineCreateInfo(HComputePipeline computePipeline)
+const ComputePipelineCreateInfo& Graphics::GetComputePipelineCreateInfo(ComputePipelineHandle computePipeline)
 {
     BX_ENSURE(computePipeline);
 

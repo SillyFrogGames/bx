@@ -29,7 +29,7 @@ static T& GetImpl(GraphicsHandle handle, HashMap<GraphicsHandle, T>& map)
     return it->second;
 }
 
-GLuint GraphicsOpenGL::GetTextureHandle(HTexture texture)
+GLuint GraphicsOpenGL::GetTextureHandle(TextureHandle texture)
 {
     /*const auto& texture_impl = GetImpl(texture, s_textures);
     return texture_impl.texture;*/

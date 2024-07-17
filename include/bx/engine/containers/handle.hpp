@@ -23,3 +23,31 @@ struct std::hash<Handle<T>>
 		return std::hash<u64>()(h.id);
 	}
 };
+
+template <typename T>
+class HandlePool
+{
+public:
+	HandlePool()
+	{
+		m_count = 0;
+	}
+
+	Handle<T> Create()
+	{
+		BX_ASSERT(++m_count != 18446744073709551615, "Failed to create handles, pool is emtpy.");
+
+		return Handle<T>{ m_count };
+	}
+
+	void Destroy(Handle<T>& handle)
+	{
+		BX_ENSURE(handle);
+
+		u64 id = handle.id;
+		handle.id = 0;
+	}
+
+private:
+	u64 m_count;
+};

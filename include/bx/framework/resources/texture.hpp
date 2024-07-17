@@ -12,7 +12,7 @@ public:
 	i32 depth = 0;
 	List<u8> pixels;
 
-	inline HTexture GetTexture() const { return m_texture; }
+	inline TextureHandle GetTexture() const { return m_texture; }
 
 private:
 	template <typename T>
@@ -21,5 +21,5 @@ private:
 	template <typename T>
 	friend class Resource;
 
-	HTexture m_texture = HTexture::null;
+	TextureHandle m_texture = TextureHandle::null;
 };

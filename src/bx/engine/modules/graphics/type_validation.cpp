@@ -83,7 +83,7 @@ b8 ValidateShaderCreateInfo(const ShaderCreateInfo& createInfo)
 
 b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 {
-	if (createInfo.layout == HBindGroupLayout::null)
+	if (createInfo.layout == BindGroupLayoutHandle::null)
 	{
 		BX_LOGE("Invalid bind group creation info: layout cannot be null.");
 		return false;
@@ -104,7 +104,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 		{
 		case BindingResourceType::BUFFER:
 		{
-			if (resource.buffer.buffer == HBuffer::null)
+			if (resource.buffer.buffer == BufferHandle::null)
 			{
 				BX_LOGE("Invalid bind group creation info: binding {} contains a null buffer.", entry.binding);
 				return false;
@@ -113,7 +113,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 		}
 		case BindingResourceType::SAMPLER:
 		{
-			if (resource.sampler == HSampler::null)
+			if (resource.sampler == SamplerHandle::null)
 			{
 				BX_LOGE("Invalid bind group creation info: binding {} contains a null sampler.", entry.binding);
 				return false;
@@ -122,7 +122,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 		}
 		case BindingResourceType::TEXTURE_VIEW:
 		{
-			if (resource.textureView == HTextureView::null)
+			if (resource.textureView == TextureViewHandle::null)
 			{
 				BX_LOGE("Invalid bind group creation info: binding {} contains a null texture view.", entry.binding);
 				return false;
@@ -139,7 +139,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 
 			for (u32 i = 0; i < resource.bufferArray.size(); i++)
 			{
-				if (resource.bufferArray[i].buffer == HBuffer::null)
+				if (resource.bufferArray[i].buffer == BufferHandle::null)
 				{
 					BX_LOGE("Invalid bind group creation info: binding {} contains a null buffer at index {}.", entry.binding, i);
 					return false;
@@ -157,7 +157,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 
 			for (u32 i = 0; i < resource.samplerArray.size(); i++)
 			{
-				if (resource.samplerArray[i] == HSampler::null)
+				if (resource.samplerArray[i] == SamplerHandle::null)
 				{
 					BX_LOGE("Invalid bind group creation info: binding {} contains a null sampler at index {}.", entry.binding, i);
 					return false;
@@ -175,7 +175,7 @@ b8 ValidateBindGroupCreateInfo(const BindGroupCreateInfo& createInfo)
 
 			for (u32 i = 0; i < resource.textureViewArray.size(); i++)
 			{
-				if (resource.textureViewArray[i] == HTextureView::null)
+				if (resource.textureViewArray[i] == TextureViewHandle::null)
 				{
 					BX_LOGE("Invalid bind group creation info: binding {} contains a null texture view at index {}.", entry.binding, i);
 					return false;
@@ -224,13 +224,13 @@ b8 ValidatePipelineLayoutDescriptor(const PipelineLayoutDescriptor& descriptor, 
 
 b8 ValidateGraphicsPipelineCreateInfo(const GraphicsPipelineCreateInfo& createInfo)
 {
-	if (createInfo.vertexShader == HShader::null)
+	if (createInfo.vertexShader == ShaderHandle::null)
 	{
 		BX_LOGE("Invalid graphics pipeline creation info: vertexShader cannot be null.");
 		return false;
 	}
 
-	if (createInfo.fragmentShader == HShader::null)
+	if (createInfo.fragmentShader == ShaderHandle::null)
 	{
 		BX_LOGE("Invalid graphics pipeline creation info: fragmentShader cannot be null.");
 		return false;
@@ -246,7 +246,7 @@ b8 ValidateGraphicsPipelineCreateInfo(const GraphicsPipelineCreateInfo& createIn
 
 b8 ValidateComputePipelineCreateInfo(const ComputePipelineCreateInfo& createInfo)
 {
-	if (createInfo.shader == HShader::null)
+	if (createInfo.shader == ShaderHandle::null)
 	{
 		BX_LOGE("Invalid compute pipeline creation info: shader cannot be null.");
 		return false;

@@ -2,7 +2,6 @@
 
 #include "bx/engine/modules/graphics/type_validation.hpp"
 
-#include "bx/engine/core/handle_pool.hpp"
 #include "bx/engine/core/file.hpp"
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/core/memory.hpp"
@@ -36,12 +35,12 @@ struct State : NoCopy
     HandlePool<BindGroupLayoutApi> bindGroupLayoutHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
 
-    HashMap<HTexture, GLuint> textures;
-    HashMap<HTextureView, GLuint> textureViews;
-    HashMap<HBuffer, GLuint> buffers;
-    HashMap<HShader, Shader> shaders;
-    HashMap<HGraphicsPipeline, ShaderProgram> graphicsPipelines;
-    HashMap<HComputePipeline, ShaderProgram> computePipelines;
+    HashMap<TextureHandle, GLuint> textures;
+    HashMap<TextureViewHandle, GLuint> textureViews;
+    HashMap<BufferHandle, GLuint> buffers;
+    HashMap<ShaderHandle, Shader> shaders;
+    HashMap<GraphicsPipelineHandle, ShaderProgram> graphicsPipelines;
+    HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
 };
 static std::unique_ptr<State> s;
 
@@ -74,12 +73,12 @@ void Graphics::EndFrame()
     ImGuiImpl::EndFrame();
 }
 
-const HBuffer& Graphics::EmptyBuffer()
+const BufferHandle& Graphics::EmptyBuffer()
 {
 
 }
 
-const HTexture& Graphics::EmptyTexture()
+const TextureHandle& Graphics::EmptyTexture()
 {
 
 }
@@ -95,16 +94,16 @@ TextureFormat Graphics::GetSwapchainFormat()
     return TextureFormat::RGBA8_UNORM_SRGB;
 }
 
-HTexture Graphics::CreateTexture(const TextureCreateInfo& createInfo)
+TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
-    CreateTextureWithDataPtr(createInfo, nullptr);
+    CreateTexture(createInfo, nullptr);
 }
 
-HTexture Graphics::CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data)
+TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const void* data)
 {
     BX_ENSURE(ValidateTextureCreateInfo(createInfo));
 
-    HTexture textureHandle = s->textureHandlePool.Create();
+    TextureHandle textureHandle = s->textureHandlePool.Create();
     s_createInfoCache->textureCreateInfos.insert(std::make_pair(textureHandle, createInfo));
 
     GLenum type = TextureDimensionToGl(createInfo.dimension, createInfo.size.depthOrArrayLayers);
@@ -155,7 +154,7 @@ HTexture Graphics::CreateTextureWithDataPtr(const TextureCreateInfo& createInfo,
     return textureHandle;
 }
 
-void Graphics::DestroyTexture(HTexture& texture)
+void Graphics::DestroyTexture(TextureHandle& texture)
 {
     BX_ENSURE(texture);
 
@@ -168,11 +167,11 @@ void Graphics::DestroyTexture(HTexture& texture)
     s->textureHandlePool.Destroy(texture);
 }
 
-HTextureView Graphics::CreateTextureView(HTexture texture)
+TextureViewHandle Graphics::CreateTextureView(TextureHandle texture)
 {
     BX_ENSURE(texture);
 
-    HTextureView textureViewHandle = s->textureViewHandlePool.Create();
+    TextureViewHandle textureViewHandle = s->textureViewHandlePool.Create();
     
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
@@ -183,7 +182,7 @@ HTextureView Graphics::CreateTextureView(HTexture texture)
     return textureViewHandle;
 }
 
-void Graphics::DestroyTextureView(HTextureView& textureView)
+void Graphics::DestroyTextureView(TextureViewHandle& textureView)
 {
     BX_ENSURE(textureView);
 
@@ -191,26 +190,26 @@ void Graphics::DestroyTextureView(HTextureView& textureView)
     s->textureViewHandlePool.Destroy(textureView);
 }
 
-HSampler Graphics::CreateSampler(const SamplerCreateInfo& create)
+SamplerHandle Graphics::CreateSampler(const SamplerCreateInfo& create)
 {
 
 }
 
-void Graphics::DestroySampler(HSampler& sampler)
+void Graphics::DestroySampler(SamplerHandle& sampler)
 {
 
 }
 
-HBuffer Graphics::CreateBuffer(const BufferCreateInfo& createInfo)
+BufferHandle Graphics::CreateBuffer(const BufferCreateInfo& createInfo)
 {
-    CreateBufferWithDataPtr(createInfo, nullptr);
+    CreateBuffer(createInfo, nullptr);
 }
 
-HBuffer Graphics::CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, const void* data)
+BufferHandle Graphics::CreateBuffer(const BufferCreateInfo& createInfo, const void* data)
 {
     BX_ENSURE(ValidateBufferCreateInfo(createInfo));
 
-    HBuffer bufferHandle = s->bufferHandlePool.Create();
+    BufferHandle bufferHandle = s->bufferHandlePool.Create();
     s_createInfoCache->bufferCreateInfos.insert(std::make_pair(bufferHandle, createInfo));
 
     GLuint buffer;
@@ -222,7 +221,7 @@ HBuffer Graphics::CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, co
     return bufferHandle;
 }
 
-void Graphics::DestroyBuffer(HBuffer& buffer)
+void Graphics::DestroyBuffer(BufferHandle& buffer)
 {
     BX_ENSURE(buffer);
 
@@ -235,11 +234,11 @@ void Graphics::DestroyBuffer(HBuffer& buffer)
     s->bufferHandlePool.Destroy(buffer);
 }
 
-HShader Graphics::CreateShader(const ShaderCreateInfo& createInfo)
+ShaderHandle Graphics::CreateShader(const ShaderCreateInfo& createInfo)
 {
     BX_ENSURE(ValidateShaderCreateInfo(createInfo));
 
-    HShader shaderHandle = s->shaderHandlePool.Create();
+    ShaderHandle shaderHandle = s->shaderHandlePool.Create();
     s_createInfoCache->shaderCreateInfos.insert(std::make_pair(shaderHandle, createInfo));
 
     GLenum type = ShaderTypeToGl(createInfo.shaderType);
@@ -250,7 +249,7 @@ HShader Graphics::CreateShader(const ShaderCreateInfo& createInfo)
     return shaderHandle;
 }
 
-void Graphics::DestroyShader(HShader& shader)
+void Graphics::DestroyShader(ShaderHandle& shader)
 {
     BX_ENSURE(shader);
 
@@ -262,11 +261,11 @@ void Graphics::DestroyShader(HShader& shader)
     s->shaderHandlePool.Destroy(shader);
 }
 
-HGraphicsPipeline Graphics::CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
+GraphicsPipelineHandle Graphics::CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo)
 {
     BX_ENSURE(ValidateGraphicsPipelineCreateInfo(createInfo));
 
-    HGraphicsPipeline graphicsPipelineHandle = s->graphicsPipelineHandlePool.Create();
+    GraphicsPipelineHandle graphicsPipelineHandle = s->graphicsPipelineHandlePool.Create();
     s_createInfoCache->graphicsPipelineCreateInfos.insert(std::make_pair(graphicsPipelineHandle, createInfo));
 
     auto& vertShaderIter = s->shaders.find(createInfo.vertexShader);
@@ -280,7 +279,7 @@ HGraphicsPipeline Graphics::CreateGraphicsPipeline(const GraphicsPipelineCreateI
     return graphicsPipelineHandle;
 }
 
-void Graphics::DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline)
+void Graphics::DestroyGraphicsPipeline(GraphicsPipelineHandle& graphicsPipeline)
 {
     BX_ENSURE(graphicsPipeline);
 
@@ -289,11 +288,11 @@ void Graphics::DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline)
     s->graphicsPipelineHandlePool.Destroy(graphicsPipeline);
 }
 
-HComputePipeline Graphics::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
+ComputePipelineHandle Graphics::CreateComputePipeline(const ComputePipelineCreateInfo& createInfo)
 {
     BX_ENSURE(ValidateComputePipelineCreateInfo(createInfo));
 
-    HComputePipeline computePipelineHandle = s->computePipelineHandlePool.Create();
+    ComputePipelineHandle computePipelineHandle = s->computePipelineHandlePool.Create();
     s_createInfoCache->computePipelineCreateInfos.insert(std::make_pair(computePipelineHandle, createInfo));
 
     auto& shaderIter = s->shaders.find(createInfo.shader);
@@ -305,7 +304,7 @@ HComputePipeline Graphics::CreateComputePipeline(const ComputePipelineCreateInfo
     return computePipelineHandle;
 }
 
-void Graphics::DestroyComputePipeline(HComputePipeline& computePipeline)
+void Graphics::DestroyComputePipeline(ComputePipelineHandle& computePipeline)
 {
     BX_ENSURE(computePipeline);
 
@@ -314,69 +313,69 @@ void Graphics::DestroyComputePipeline(HComputePipeline& computePipeline)
     s->computePipelineHandlePool.Destroy(computePipeline);
 }
 
-HBindGroupLayout Graphics::GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup)
+BindGroupLayoutHandle Graphics::GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup)
 {
 
 }
 
-HBindGroupLayout Graphics::GetBindGroupLayout(HComputePipeline computePipeline, u32 bindGroup)
+BindGroupLayoutHandle Graphics::GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup)
 {
 
 }
 
-HBindGroup Graphics::CreateBindGroup(const BindGroupCreateInfo& createInfo)
+BindGroupHandle Graphics::CreateBindGroup(const BindGroupCreateInfo& createInfo)
 {
 
 }
 
-void Graphics::DestroyBindGroup(HBindGroup& bindGroup)
+void Graphics::DestroyBindGroup(BindGroupHandle& bindGroup)
 {
 
 }
 
-HRenderPass Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
+RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
 {
     // TODO: support multiple color attachments
 
 
 }
 
-void Graphics::SetGraphicsPipeline(HRenderPass renderPass, HGraphicsPipeline graphicsPipeline)
+void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 {
 
 }
 
-void Graphics::SetVertexBuffer(HRenderPass renderPass, u32 slot, const BufferSlice& bufferSlice)
+void Graphics::SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice)
 {
 
 }
 
-void Graphics::SetIndexBuffer(HRenderPass renderPass, const BufferSlice& bufferSlice, IndexFormat format)
+void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format)
 {
 
 }
 
-void Graphics::SetBindGroup(HRenderPass renderPass, u32 index, HBindGroup bindGroup)
+void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
 {
 
 }
 
-void Graphics::Draw(HRenderPass renderPass, u32 vertexCount, u32 firstVertex, u32 instanceCount, u32 firstInstance)
+void Graphics::Draw(u32 vertexCount, u32 firstVertex, u32 instanceCount, u32 firstInstance)
 {
 
 }
 
-void Graphics::DrawIndexed(HRenderPass renderPass, u32 indexCount, u32 firstIndex, u32 baseVertex, u32 instanceCount, u32 firstInstance)
+void Graphics::DrawIndexed(u32 indexCount, u32 firstIndex, u32 baseVertex, u32 instanceCount, u32 firstInstance)
 {
 
 }
 
-void Graphics::EndRenderPass(HRenderPass& renderPass)
+void Graphics::EndRenderPass(RenderPassHandle& renderPass)
 {
 
 }
 
-void Graphics::WriteBufferPtr(HBuffer buffer, u64 offset, const void* data)
+void Graphics::WriteBufferPtr(BufferHandle buffer, u64 offset, const void* data)
 {
 
 }
@@ -386,7 +385,7 @@ void Graphics::FlushBufferWrites()
 
 }
 
-void Graphics::WriteTexturePtr(HTexture texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
+void Graphics::WriteTexturePtr(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
 {
 
 }

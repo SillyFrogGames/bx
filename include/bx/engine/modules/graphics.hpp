@@ -7,80 +7,64 @@ class Graphics
 {
 public:
 	// Helper resources
-	static const HBuffer& EmptyBuffer();
-	static const HTexture& EmptyTexture();
+	static const BufferHandle& EmptyBuffer();
+	static const TextureHandle& EmptyTexture();
 
 	// Swapchain
+	// TODO: rework api a bit so it matches the old func calls better
 	static TextureFormat GetSwapchainFormat();
 
 	// Resource creation and destruction
-	static const TextureCreateInfo& GetTextureCreateInfo(HTexture texture);
-	static HTexture CreateTexture(const TextureCreateInfo& createInfo);
-	template <typename T>
-	static HTexture CreateTextureWithData(const TextureCreateInfo& createInfo, const T& data)
-	{
-		return CreateTextureWithDataPtr(createInfo, static_cast<const void*>(&data));
-	}
-	static HTexture CreateTextureWithDataPtr(const TextureCreateInfo& createInfo, const void* data);
-	static void DestroyTexture(HTexture& texture);
+	static const TextureCreateInfo& GetTextureCreateInfo(TextureHandle texture);
+	static TextureHandle CreateTexture(const TextureCreateInfo& createInfo);
+	static TextureHandle CreateTexture(const TextureCreateInfo& createInfo, const void* data);
+	static void DestroyTexture(TextureHandle& texture);
 
-	static HTextureView CreateTextureView(HTexture texture);
-	static void DestroyTextureView(HTextureView& textureView);
+	static TextureViewHandle CreateTextureView(TextureHandle texture);
+	static void DestroyTextureView(TextureViewHandle& textureView);
 
-	static const SamplerCreateInfo& GetSamplerCreateInfo(HSampler sampler);
-	static HSampler CreateSampler(const SamplerCreateInfo& create);
-	static void DestroySampler(HSampler& sampler);
+	static const SamplerCreateInfo& GetSamplerCreateInfo(SamplerHandle sampler);
+	static SamplerHandle CreateSampler(const SamplerCreateInfo& create);
+	static void DestroySampler(SamplerHandle& sampler);
 
-	static const BufferCreateInfo& GetBufferCreateInfo(HBuffer buffer);
-	static HBuffer CreateBuffer(const BufferCreateInfo& createInfo);
-	template <typename T>
-	static HBuffer CreateBufferWithData(const BufferCreateInfo& createInfo, const T& data)
-	{
-		return CreateBufferWithDataPtr(createInfo, static_cast<const void*>(&data));
-	}
-	static HBuffer CreateBufferWithDataPtr(const BufferCreateInfo& createInfo, const void* data);
-	static void DestroyBuffer(HBuffer& buffer);
+	static const BufferCreateInfo& GetBufferCreateInfo(BufferHandle buffer);
+	static BufferHandle CreateBuffer(const BufferCreateInfo& createInfo);
+	static BufferHandle CreateBuffer(const BufferCreateInfo& createInfo, const void* data);
+	static void DestroyBuffer(BufferHandle& buffer);
 
-	static const ShaderCreateInfo& GetShaderCreateInfo(HShader shader);
-	static HShader CreateShader(const ShaderCreateInfo& createInfo);
-	static void DestroyShader(HShader& shader);
+	static const ShaderCreateInfo& GetShaderCreateInfo(ShaderHandle shader);
+	static ShaderHandle CreateShader(const ShaderCreateInfo& createInfo);
+	static void DestroyShader(ShaderHandle& shader);
 	
-	static const GraphicsPipelineCreateInfo& GetGraphicsPipelineCreateInfo(HGraphicsPipeline graphicsPipeline);
-	static HGraphicsPipeline CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
-	static void DestroyGraphicsPipeline(HGraphicsPipeline& graphicsPipeline);
-	static const ComputePipelineCreateInfo& GetComputePipelineCreateInfo(HComputePipeline computePipeline);
-	static HComputePipeline CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
-	static void DestroyComputePipeline(HComputePipeline& computePipeline);
+	static const GraphicsPipelineCreateInfo& GetGraphicsPipelineCreateInfo(GraphicsPipelineHandle graphicsPipeline);
+	static GraphicsPipelineHandle CreateGraphicsPipeline(const GraphicsPipelineCreateInfo& createInfo);
+	static void DestroyGraphicsPipeline(GraphicsPipelineHandle& graphicsPipeline);
+	static const ComputePipelineCreateInfo& GetComputePipelineCreateInfo(ComputePipelineHandle computePipeline);
+	static ComputePipelineHandle CreateComputePipeline(const ComputePipelineCreateInfo& createInfo);
+	static void DestroyComputePipeline(ComputePipelineHandle& computePipeline);
 
-	static HBindGroupLayout GetBindGroupLayout(HGraphicsPipeline graphicsPipeline, u32 bindGroup);
-	static HBindGroupLayout GetBindGroupLayout(HComputePipeline computePipeline, u32 bindGroup);
-	static HBindGroup CreateBindGroup(const BindGroupCreateInfo& createInfo);
-	static void DestroyBindGroup(HBindGroup& bindGroup);
+	static BindGroupLayoutHandle GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup);
+	static BindGroupLayoutHandle GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup);
+	static BindGroupHandle CreateBindGroup(const BindGroupCreateInfo& createInfo);
+	static void DestroyBindGroup(BindGroupHandle& bindGroup);
 
 	// Cmds
-	static HRenderPass BeginRenderPass(const RenderPassDescriptor& descriptor);
-	static void SetGraphicsPipeline(HRenderPass renderPass, HGraphicsPipeline graphicsPipeline);
-	static void SetVertexBuffer(HRenderPass renderPass, u32 slot, const BufferSlice& bufferSlice);
-	static void SetIndexBuffer(HRenderPass renderPass, const BufferSlice& bufferSlice, IndexFormat format);
-	static void SetBindGroup(HRenderPass renderPass, u32 index, HBindGroup bindGroup);
-	static void Draw(HRenderPass renderPass, u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
-	static void DrawIndexed(HRenderPass renderPass, u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
-	static void EndRenderPass(HRenderPass& renderPass);
+	static RenderPassHandle BeginRenderPass(const RenderPassDescriptor& descriptor);
+	static void SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline);
+	static void SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice);
+	static void SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format);
+	static void SetBindGroup(u32 index, BindGroupHandle bindGroup);
+	static void Draw(u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
+	static void DrawIndexed(u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
+	static void EndRenderPass(RenderPassHandle& renderPass);
 
 	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	template <typename T>
-	static void WriteBuffer(HBuffer buffer, u64 offset, const T& data)
-	{
-		WriteBufferPtr(buffer, offset, static_cast<const void*>(&data));
-	}
-	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
-	// Data is copied over immediately and can be freed after calling
-	static void WriteBufferPtr(HBuffer buffer, u64 offset, const void* data);
+	static void WriteBufferPtr(BufferHandle buffer, u64 offset, const void* data);
 	static void FlushBufferWrites();
 	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteTexturePtr(HTexture texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void WriteTexturePtr(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
 	static void FlushTextureWrites();
 
 	// Debug draw utilities
@@ -96,14 +80,15 @@ private:
 	friend class Runtime;
 	friend class Module;
 
+
 	struct CreateInfoCache : NoCopy
 	{
-		HashMap<HBuffer, BufferCreateInfo> bufferCreateInfos;
-		HashMap<HSampler, SamplerCreateInfo> samplerCreateInfos;
-		HashMap<HTexture, TextureCreateInfo> textureCreateInfos;
-		HashMap<HShader, ShaderCreateInfo> shaderCreateInfos;
-		HashMap<HGraphicsPipeline, GraphicsPipelineCreateInfo> graphicsPipelineCreateInfos;
-		HashMap<HComputePipeline, ComputePipelineCreateInfo> computePipelineCreateInfos;
+		HashMap<BufferHandle, BufferCreateInfo> bufferCreateInfos;
+		HashMap<SamplerHandle, SamplerCreateInfo> samplerCreateInfos;
+		HashMap<TextureHandle, TextureCreateInfo> textureCreateInfos;
+		HashMap<ShaderHandle, ShaderCreateInfo> shaderCreateInfos;
+		HashMap<GraphicsPipelineHandle, GraphicsPipelineCreateInfo> graphicsPipelineCreateInfos;
+		HashMap<ComputePipelineHandle, ComputePipelineCreateInfo> computePipelineCreateInfos;
 	};
 	static std::unique_ptr<CreateInfoCache> s_createInfoCache;
 
