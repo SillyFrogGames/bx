@@ -62,6 +62,15 @@ const ComputePipelineCreateInfo& Graphics::GetComputePipelineCreateInfo(ComputeP
     return createInfoIter->second;
 }
 
+const BindGroupCreateInfo& Graphics::GetBindGroupCreateInfo(BindGroupHandle bindGroup)
+{
+    BX_ENSURE(bindGroup);
+
+    auto& createInfoIter = s_createInfoCache->bindGroupCreateInfos.find(bindGroup);
+    BX_ENSURE(createInfoIter != s_createInfoCache->bindGroupCreateInfos.end());
+    return createInfoIter->second;
+}
+
 // TODO: move debug lines somewhere else
 
 struct DebugLineData

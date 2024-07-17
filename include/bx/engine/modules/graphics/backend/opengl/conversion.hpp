@@ -16,4 +16,7 @@ namespace Gl
 	GLenum ShaderTypeToGl(const ShaderType& type);
 
 	GLenum BlendFactorToGl(const BlendFactor& factor);
+
+	GLenum PrimitiveTopologyToGl(const PrimitiveTopology& topology);
+	GLenum IndexFormatToGl(const IndexFormat& format);
 }

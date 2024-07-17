@@ -6,6 +6,8 @@
 class Graphics
 {
 public:
+	// TODO: capabilities()
+
 	// Helper resources
 	static const BufferHandle& EmptyBuffer();
 	static const TextureHandle& EmptyTexture();
@@ -45,6 +47,8 @@ public:
 
 	static BindGroupLayoutHandle GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup);
 	static BindGroupLayoutHandle GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup);
+
+	static const BindGroupCreateInfo& GetBindGroupCreateInfo(BindGroupHandle bindGroup);
 	static BindGroupHandle CreateBindGroup(const BindGroupCreateInfo& createInfo);
 	static void DestroyBindGroup(BindGroupHandle& bindGroup);
 
@@ -54,17 +58,17 @@ public:
 	static void SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice);
 	static void SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format);
 	static void SetBindGroup(u32 index, BindGroupHandle bindGroup);
-	static void Draw(u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
-	static void DrawIndexed(u32 indexCount, u32 firstIndex = 0, u32 baseVertex = 0, u32 instanceCount = 1, u32 firstInstance = 0);
+	static void Draw(u32 vertexCount, u32 firstVertex = 0, u32 instanceCount = 1);
+	static void DrawIndexed(u32 indexCount, u32 instanceCount = 1);
 	static void EndRenderPass(RenderPassHandle& renderPass);
 
 	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteBufferPtr(BufferHandle buffer, u64 offset, const void* data);
+	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data);
 	static void FlushBufferWrites();
 	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteTexturePtr(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void WriteTexture(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
 	static void FlushTextureWrites();
 
 	// Debug draw utilities
@@ -80,6 +84,8 @@ private:
 	friend class Runtime;
 	friend class Module;
 
+	// Internal use only, query `Capabilities` for accurate limits.
+	static constexpr size_t MAX_BIND_GROUPS = 64;
 
 	struct CreateInfoCache : NoCopy
 	{
@@ -89,6 +95,7 @@ private:
 		HashMap<ShaderHandle, ShaderCreateInfo> shaderCreateInfos;
 		HashMap<GraphicsPipelineHandle, GraphicsPipelineCreateInfo> graphicsPipelineCreateInfos;
 		HashMap<ComputePipelineHandle, ComputePipelineCreateInfo> computePipelineCreateInfos;
+		HashMap<BindGroupHandle, BindGroupCreateInfo> bindGroupCreateInfos;
 	};
 	static std::unique_ptr<CreateInfoCache> s_createInfoCache;
 

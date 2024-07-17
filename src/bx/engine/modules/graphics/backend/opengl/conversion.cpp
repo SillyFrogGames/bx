@@ -496,4 +496,32 @@ namespace Gl
 			return GL_SRC_ALPHA_SATURATE;
 		}
 	}
+
+	GLenum PrimitiveTopologyToGl(const PrimitiveTopology& topology)
+	{
+		switch (topology)
+		{
+		case PrimitiveTopology::POINT_LIST:
+			return GL_POINTS;
+		case PrimitiveTopology::LINE_LIST:
+			return GL_LINES;
+		case PrimitiveTopology::LINE_STRIP:
+			return GL_LINE_STRIP;
+		case PrimitiveTopology::TRIANGLE_LIST:
+			return GL_TRIANGLES;
+		case PrimitiveTopology::TRIANGLE_STRIP:
+			return GL_TRIANGLE_STRIP;
+		}
+	}
+
+	GLenum IndexFormatToGl(const IndexFormat& format)
+	{
+		switch (format)
+		{
+		case IndexFormat::UINT16:
+			return GL_UNSIGNED_SHORT;
+		case IndexFormat::UINT32:
+			return GL_UNSIGNED_INT;
+		}
+	}
 }

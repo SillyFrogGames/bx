@@ -294,12 +294,12 @@ void Renderer::Render()
                     };
                     BindGroupHandle bindGroup = Graphics::CreateBindGroup(createInfo);
 
-                    Graphics::SetGraphicsPipeline(renderPass, graphicsPipeline);
-                    Graphics::SetVertexBuffer(renderPass, 0, BufferSlice(meshData.GetVertexBuffer()));
-                    Graphics::SetIndexBuffer(renderPass, BufferSlice(meshData.GetIndexBuffer()), IndexFormat::UINT32);
-                    Graphics::SetBindGroup(renderPass, 0, bindGroup);
-                    Graphics::SetBindGroup(renderPass, Material::SHADER_BIND_GROUP, materialData.GetBindGroup());
-                    Graphics::DrawIndexed(renderPass, meshData.GetIndices().size());
+                    Graphics::SetGraphicsPipeline(graphicsPipeline);
+                    Graphics::SetVertexBuffer(0, BufferSlice(meshData.GetVertexBuffer()));
+                    Graphics::SetIndexBuffer(BufferSlice(meshData.GetIndexBuffer()), IndexFormat::UINT32);
+                    Graphics::SetBindGroup(0, bindGroup);
+                    Graphics::SetBindGroup(Material::SHADER_BIND_GROUP, materialData.GetBindGroup());
+                    Graphics::DrawIndexed(meshData.GetIndices().size());
 
                     Graphics::DestroyBindGroup(bindGroup);
                     Graphics::DestroyBuffer(meshUniformBuffer);

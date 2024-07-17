@@ -32,7 +32,6 @@ struct State : NoCopy
     HandlePool<ComputePipelineApi> computePipelineHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
     HandlePool<BindGroupApi> bindGroupHandlePool;
-    HandlePool<BindGroupLayoutApi> bindGroupLayoutHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
 
     HashMap<TextureHandle, GLuint> textures;
@@ -41,6 +40,11 @@ struct State : NoCopy
     HashMap<ShaderHandle, Shader> shaders;
     HashMap<GraphicsPipelineHandle, ShaderProgram> graphicsPipelines;
     HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
+
+    RenderPassHandle activeRenderPass;
+    GraphicsPipelineHandle boundGraphicsPipeline;
+    ComputePipelineHandle boundComputePipeline;
+    Optional<IndexFormat> boundIndexFormat;
 };
 static std::unique_ptr<State> s;
 
@@ -315,67 +319,129 @@ void Graphics::DestroyComputePipeline(ComputePipelineHandle& computePipeline)
 
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup)
 {
-
+    // Bind group layouts don't exist in opengl, however their handles should still act like they do.
+    return BindGroupLayoutHandle{ graphicsPipeline.id * MAX_BIND_GROUPS * bindGroup * 2 + 0 };
 }
 
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup)
 {
-
+    // Bind group layouts don't exist in opengl, however their handles should still act like they do.
+    return BindGroupLayoutHandle{ computePipeline.id * MAX_BIND_GROUPS * bindGroup * 2 + 1 };
 }
 
 BindGroupHandle Graphics::CreateBindGroup(const BindGroupCreateInfo& createInfo)
 {
+    BX_ENSURE(ValidateBindGroupCreateInfo(createInfo));
 
+    BindGroupHandle bindGroupHandle = s->bindGroupHandlePool.Create();
+    s_createInfoCache->bindGroupCreateInfos.insert(std::make_pair(bindGroupHandle, createInfo));
+
+    return bindGroupHandle;
 }
 
 void Graphics::DestroyBindGroup(BindGroupHandle& bindGroup)
 {
+    BX_ENSURE(bindGroup);
 
+    s_createInfoCache->bindGroupCreateInfos.erase(bindGroup);
+    s->bindGroupHandlePool.Destroy(bindGroup);
 }
 
 RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
 {
     // TODO: support multiple color attachments
+    // TODO: framebuffer
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
+    //s_createInfoCache->renderPass.insert(std::make_pair(renderPass, descriptor));
+
+    return renderPassHandle;
 }
 
 void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ENSURE(graphicsPipeline);
 
+    s->boundGraphicsPipeline = graphicsPipeline;
+
+    auto& info = GetGraphicsPipelineCreateInfo(graphicsPipeline);
+    
 }
 
 void Graphics::SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ENSURE(bufferSlice.buffer);
+    BX_ASSERT(slot == 0, "Slot must be 0 for now."); // TODO: allow multiple vertex slots
 
+    auto& bufferIter = s->buffers.find(bufferSlice.buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+
+    glBindBuffer(GL_ARRAY_BUFFER, bufferIter->second);
 }
 
 void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ENSURE(bufferSlice.buffer);
 
+    auto& bufferIter = s->buffers.find(bufferSlice.buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIter->second);
 }
 
 void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
 {
-
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
 }
 
-void Graphics::Draw(u32 vertexCount, u32 firstVertex, u32 instanceCount, u32 firstInstance)
+void Graphics::Draw(u32 vertexCount, u32 firstVertex, u32 instanceCount)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ASSERT(s->boundGraphicsPipeline, "No graphics pipeline bound.");
+    BX_ASSERT(instanceCount > 0, "Instance count must be larger than 0.");
 
+    auto& info = GetGraphicsPipelineCreateInfo(s->boundGraphicsPipeline);
+
+    if (instanceCount == 1)
+        glDrawArrays(PrimitiveTopologyToGl(info.topology), firstVertex, vertexCount);
+    else
+        glDrawArraysInstanced(PrimitiveTopologyToGl(info.topology), firstVertex, vertexCount, instanceCount);
 }
 
-void Graphics::DrawIndexed(u32 indexCount, u32 firstIndex, u32 baseVertex, u32 instanceCount, u32 firstInstance)
+void Graphics::DrawIndexed(u32 indexCount, u32 instanceCount)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ASSERT(s->boundGraphicsPipeline, "No graphics pipeline bound.");
+    BX_ASSERT(s->boundIndexFormat.IsSome(), "No index buffer bound.");
+    BX_ASSERT(instanceCount > 0, "Instance count must be larger than 0.");
 
+    auto& info = GetGraphicsPipelineCreateInfo(s->boundGraphicsPipeline);
+    GLenum indexType = IndexFormatToGl(s->boundIndexFormat.Unwrap());
+    GLenum topology = PrimitiveTopologyToGl(info.topology);
+
+    if (instanceCount == 1)
+        glDrawElements(topology, indexCount, indexType, nullptr);
+    else
+        glDrawElementsInstanced(topology, indexCount, indexType, nullptr, instanceCount);
 }
 
 void Graphics::EndRenderPass(RenderPassHandle& renderPass)
 {
+    BX_ENSURE(renderPass);
+    
+    s->activeRenderPass = RenderPassHandle::null;
+    s->renderPassHandlePool.Destroy(renderPass);
 
+    s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
+    s->boundComputePipeline = ComputePipelineHandle::null;
 }
 
-void Graphics::WriteBufferPtr(BufferHandle buffer, u64 offset, const void* data)
+void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
 {
 
 }
@@ -385,7 +451,7 @@ void Graphics::FlushBufferWrites()
 
 }
 
-void Graphics::WriteTexturePtr(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
+void Graphics::WriteTexture(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
 {
 
 }
