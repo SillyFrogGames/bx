@@ -2,11 +2,11 @@
 
 #include "bx/engine/core/type.hpp"
 
+#include <glad/glad.h>
+
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include <GLFW/glfw3.h>
 #endif // BX_WINDOW_GLFW_BACKEND
-
-#include <glad/glad.h>
 
 namespace Gl
 {

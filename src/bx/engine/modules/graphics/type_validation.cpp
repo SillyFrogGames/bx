@@ -35,9 +35,9 @@ b8 ValidateSamplerCreateInfo(const SamplerCreateInfo& createInfo)
 		return false;
 	}
 
-	if ((createInfo.addressModeU == AddressMode::CLAMP_TO_BORDER
-		|| createInfo.addressModeV == AddressMode::CLAMP_TO_BORDER
-		|| createInfo.addressModeW == AddressMode::CLAMP_TO_BORDER)
+	if ((createInfo.addressModeU == SamplerAddressMode::CLAMP_TO_BORDER
+		|| createInfo.addressModeV == SamplerAddressMode::CLAMP_TO_BORDER
+		|| createInfo.addressModeW == SamplerAddressMode::CLAMP_TO_BORDER)
 		&& createInfo.borderColor.IsNone())
 	{
 		BX_LOGE("Invalid sampler creation info: borderColor must be Some when AddressMode::CLAMP_TO_BORDER is used.");

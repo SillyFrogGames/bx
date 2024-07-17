@@ -148,7 +148,7 @@ void UpdateAnimators()
                 boneBuffer = boneBufferIter->second;
             }
             
-            Graphics::WriteBufferPtr(boneBuffer, 0, anim.GetBoneMatrices().data());
+            Graphics::WriteBuffer(boneBuffer, 0, anim.GetBoneMatrices().data());
         });
 }
 
@@ -169,7 +169,7 @@ void UpdateLightSources()
             lightSources.emplace_back(lightSource);
         });
 
-    Graphics::WriteBufferPtr(s->lightSourceBuffer, 0, lightSources.data());
+    Graphics::WriteBuffer(s->lightSourceBuffer, 0, lightSources.data());
 }
 
 void Renderer::Initialize()

@@ -6,10 +6,10 @@
 
 #include "opengl_api.hpp"
 
+#include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
+
 namespace Gl
 {
-    class ShaderProgram;
-
     class GraphicsPipeline : NoCopy
     {
     public:

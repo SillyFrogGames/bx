@@ -3,7 +3,6 @@
 #include "bx/engine/core/macros.hpp"
 
 #include "bx/engine/modules/graphics/backend/opengl/validation.hpp"
-#include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/conversion.hpp"
 
 namespace Gl

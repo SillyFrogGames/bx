@@ -33,7 +33,6 @@ struct State : NoCopy
     HandlePool<ComputePipelineApi> computePipelineHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
     HandlePool<BindGroupApi> bindGroupHandlePool;
-    HandlePool<RenderPassApi> renderPassHandlePool;
 
     HashMap<TextureHandle, GLuint> textures;
     HashMap<TextureViewHandle, GLuint> textureViews;
@@ -180,9 +179,8 @@ TextureViewHandle Graphics::CreateTextureView(TextureHandle texture)
     
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
-    GLuint texture = textureIter->second;
 
-    s->textureViews.insert(std::make_pair(textureViewHandle, texture));
+    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second));
 
     return textureViewHandle;
 }

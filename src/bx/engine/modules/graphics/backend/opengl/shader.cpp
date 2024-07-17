@@ -61,6 +61,7 @@ namespace Gl
     {
         handle = other.handle;
         other.handle = UINT_MAX;
+        return *this;
     }
 
     ShaderProgram::~ShaderProgram()
