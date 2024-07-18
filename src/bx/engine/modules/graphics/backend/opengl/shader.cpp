@@ -20,7 +20,7 @@ namespace Gl
         glGetShaderiv(handle, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(handle, sizeof(log), NULL, log);
-            BX_LOGE("Failed to compile shader '%s'.\n---------------------------------\n%s",
+            BX_LOGE("Failed to compile shader '{}'.\n---------------------------------\n{}",
                 name.c_str(), log);
         }
 	}
@@ -60,7 +60,7 @@ namespace Gl
         glGetProgramiv(handle, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(handle, sizeof(log), NULL, log);
-            BX_LOGE("Failed to compile program '%s'.\n---------------------------------\n%s",
+            BX_LOGE("Failed to compile program '{}'.\n---------------------------------\n{}",
                 name.c_str(), log);
         }
     }

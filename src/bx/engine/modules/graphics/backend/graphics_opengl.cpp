@@ -51,8 +51,9 @@ static std::unique_ptr<State> s;
 b8 Graphics::Initialize()
 {
     s_createInfoCache = std::make_unique<CreateInfoCache>();
-
     s = std::make_unique<State>();
+
+    Gl::Init(true);
 
     return true;
 }
@@ -219,8 +220,8 @@ BufferHandle Graphics::CreateBuffer(const BufferCreateInfo& createInfo, const vo
     s_createInfoCache->bufferCreateInfos.insert(std::make_pair(bufferHandle, createInfo));
 
     GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
+    glCreateBuffers(1, &buffer);
+    glNamedBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
 
     s->buffers.insert(std::make_pair(bufferHandle, buffer));
 
@@ -247,11 +248,24 @@ ShaderHandle Graphics::CreateShader(const ShaderCreateInfo& createInfo)
     ShaderHandle shaderHandle = s->shaderHandlePool.Create();
     s_createInfoCache->shaderCreateInfos.insert(std::make_pair(shaderHandle, createInfo));
 
-    GLenum type = ShaderTypeToGl(createInfo.shaderType);
+    String meta = String("#version 420 core\n");
+    switch (createInfo.shaderType)
+    {
+    case ShaderType::VERTEX:
+    {
+        meta += String("#define VERTEX\n");
+        break;
+    }
+    case ShaderType::FRAGMENT:
+    {
+        meta += String("#define FRAGMENT\n");
+        break;
+    }
+    }
 
+    GLenum type = ShaderTypeToGl(createInfo.shaderType);
     String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    Shader shader(name, type, createInfo.src);
-    s->shaders.try_emplace(shaderHandle, name, type, createInfo.src);
+    s->shaders.try_emplace(shaderHandle, name, type, meta + createInfo.src);
 
     return shaderHandle;
 }

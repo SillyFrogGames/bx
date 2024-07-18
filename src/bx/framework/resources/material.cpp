@@ -35,25 +35,44 @@ bool Resource<Material>::Load(const String& filename, Material& data)
     cereal::JSONInputArchive archive(stream);
     archive(cereal::make_nvp("material", data));
 
-    TextureHandle albedoTexture = data.m_textures["Albedo"].GetData().GetTexture();
-    TextureViewHandle albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
-
-    BindGroupCreateInfo createInfo{};
-    createInfo.name = Optional<String>::Some("Material Bind Group");
-    createInfo.entries = {
-        // TODO: 3 is a bit weird, emulate bind GROUPS on opengl
-        BindGroupEntry(3, BindingResource::TextureView(albedoTextureView))
-    };
-
-    data.m_bindGroup = Graphics::CreateBindGroup(createInfo);
-
     return true;
 }
 
 template<>
 void Resource<Material>::Unload(Material& data)
 {
-    Graphics::DestroyBindGroup(data.m_bindGroup);
+    for (auto& bindGroup : data.m_bindGroupCache)
+    {
+        Graphics::DestroyBindGroup(bindGroup.second);
+    }
+}
+
+BindGroupHandle Material::GetBindGroup(BindGroupLayoutHandle layout) const
+{
+    auto bindGroupIter = m_bindGroupCache.find(layout);
+    if (bindGroupIter != m_bindGroupCache.end())
+    {
+        return bindGroupIter->second;
+    }
+    else
+    {
+        auto albedoTextureIter = m_textures.find("Albedo");
+        BX_ENSURE(albedoTextureIter != m_textures.end());
+        TextureHandle albedoTexture = albedoTextureIter->second.GetData().GetTexture();
+        TextureViewHandle albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
+
+        BindGroupCreateInfo createInfo{};
+        createInfo.name = Optional<String>::Some("Material Bind Group");
+        createInfo.layout = layout;
+        createInfo.entries = {
+            // TODO: 3 is a bit weird, emulate bind GROUPS on opengl
+            BindGroupEntry(3, BindingResource::TextureView(albedoTextureView))
+        };
+
+        BindGroupHandle bindGroup = Graphics::CreateBindGroup(createInfo);
+        m_bindGroupCache.insert(std::make_pair(layout, bindGroup));
+        return bindGroup;
+    }
 }
 
 BindGroupLayoutDescriptor Material::GetBindGroupLayout()

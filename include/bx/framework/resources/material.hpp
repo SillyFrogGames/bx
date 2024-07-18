@@ -23,7 +23,7 @@ public:
 	inline const HashMap<String, Resource<Texture>>& GetTextures() const { return m_textures; }
 
 	static BindGroupLayoutDescriptor GetBindGroupLayout();
-	inline BindGroupHandle GetBindGroup() const { return m_bindGroup; }
+	BindGroupHandle GetBindGroup(BindGroupLayoutHandle layout) const;
 
 	// TODO: maybe auto generate? a ShaderBindable interface to inherit from can be a solution
 	static constexpr u32 SHADER_BIND_GROUP = 1;
@@ -41,7 +41,7 @@ private:
 private:
 	Resource<Shader> m_shader;
 
-	BindGroupHandle m_bindGroup;
+	mutable HashMap<BindGroupLayoutHandle, BindGroupHandle> m_bindGroupCache;
 
 	Vec4 m_color = Vec4(1, 1, 1, 1);
 	HashMap<String, Resource<Texture>> m_textures;

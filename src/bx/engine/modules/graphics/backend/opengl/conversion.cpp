@@ -15,7 +15,7 @@ namespace Gl
 		case TextureDimension::D3:
 			return GL_TEXTURE_3D;
 		default:
-			BX_FAIL("{} not supported.", dimension);
+			BX_FAIL("Texture dimension not supported.");
 		}
 	}
 
@@ -159,7 +159,7 @@ namespace Gl
 			return GL_FLOAT;*/
 
 		default:
-			BX_FAIL("{} not supported.", format);
+			BX_FAIL("Texture format not supported.");
 		}
 	}
 
@@ -303,7 +303,7 @@ namespace Gl
 				return GL_FLOAT;*/
 
 		default:
-			BX_FAIL("{} not supported.", format);
+			BX_FAIL("Texture format not supported.");
 		}
 	}
 
@@ -447,7 +447,7 @@ namespace Gl
 			return GL_FLOAT;*/
 
 		default:
-			BX_FAIL("{} not supported.", format);
+			BX_FAIL("Texture format not supported.");
 		}
 	}
 
@@ -464,7 +464,7 @@ namespace Gl
 		case ShaderType::COMPUTE:
 			return GL_COMPUTE_SHADER;
 		default:
-			BX_FAIL("{} not supported.", type);
+			BX_FAIL("Shader type not supported.");
 		}
 	}
 
