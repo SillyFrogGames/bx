@@ -79,12 +79,14 @@ void Graphics::EndFrame()
 
 const BufferHandle& Graphics::EmptyBuffer()
 {
-
+    BX_FAIL("TODO");
+    return BufferHandle::null;
 }
 
 const TextureHandle& Graphics::EmptyTexture()
 {
-
+    BX_FAIL("TODO");
+    return TextureHandle::null;
 }
 
 TextureFormat Graphics::GetSwapchainFormat()
@@ -100,7 +102,7 @@ TextureFormat Graphics::GetSwapchainFormat()
 
 TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
-    CreateTexture(createInfo, nullptr);
+    return CreateTexture(createInfo, nullptr);
 }
 
 TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const void* data)
@@ -195,7 +197,8 @@ void Graphics::DestroyTextureView(TextureViewHandle& textureView)
 
 SamplerHandle Graphics::CreateSampler(const SamplerCreateInfo& create)
 {
-
+    BX_FAIL("TODO");
+    return SamplerHandle::null;
 }
 
 void Graphics::DestroySampler(SamplerHandle& sampler)
@@ -205,7 +208,7 @@ void Graphics::DestroySampler(SamplerHandle& sampler)
 
 BufferHandle Graphics::CreateBuffer(const BufferCreateInfo& createInfo)
 {
-    CreateBuffer(createInfo, nullptr);
+    return CreateBuffer(createInfo, nullptr);
 }
 
 BufferHandle Graphics::CreateBuffer(const BufferCreateInfo& createInfo, const void* data)
@@ -247,7 +250,8 @@ ShaderHandle Graphics::CreateShader(const ShaderCreateInfo& createInfo)
     GLenum type = ShaderTypeToGl(createInfo.shaderType);
 
     String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    s->shaders.emplace(std::make_pair(shaderHandle, std::move(Shader(name, type, createInfo.src))));
+    Shader shader(name, type, createInfo.src);
+    s->shaders.try_emplace(shaderHandle, name, type, createInfo.src);
 
     return shaderHandle;
 }
@@ -278,8 +282,7 @@ GraphicsPipelineHandle Graphics::CreateGraphicsPipeline(const GraphicsPipelineCr
 
     String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
     ShaderProgram shaderProgram(name, List<Shader*>{ &vertShaderIter->second, & fragShaderIter->second });
-    GraphicsPipeline graphicsPipeline(std::move(shaderProgram), createInfo.vertexBuffers);
-    s->graphicsPipelines.emplace(std::make_pair(graphicsPipelineHandle, std::move(graphicsPipeline)));
+    s->graphicsPipelines.try_emplace(graphicsPipelineHandle, std::move(shaderProgram), createInfo.vertexBuffers);
 
     return graphicsPipelineHandle;
 }
@@ -460,6 +463,12 @@ void Graphics::WriteTexture(TextureHandle texture, const u8* data, const ImageDa
 }
 
 void Graphics::FlushTextureWrites()
+{
+
+}
+
+// TODO: remove!
+void Graphics::DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, const List<DebugVertex>& vertices)
 {
 
 }

@@ -13,6 +13,8 @@ namespace Gl
     {
     public:
         Shader(const String& name, GLenum type, const String& src);
+        Shader(Shader&& other) noexcept;
+        Shader& operator=(Shader&& other) noexcept;
         ~Shader();
 
     private:
@@ -24,8 +26,8 @@ namespace Gl
     {
     public:
         ShaderProgram(const String& name, const List<Shader*>& shaders);
-        ShaderProgram(ShaderProgram&& other);
-        ShaderProgram& operator=(ShaderProgram&& other);
+        ShaderProgram(ShaderProgram&& other) noexcept;
+        ShaderProgram& operator=(ShaderProgram&& other) noexcept;
         ~ShaderProgram();
 
         u32 GetHandle() const;

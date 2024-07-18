@@ -10,6 +10,10 @@ template <typename T>
 class Optional
 {
 public:
+	Optional()
+		: data(nullptr)
+	{}
+
 	Optional(const Optional<T>& other)
 	{
 		if (other.IsSome())
@@ -79,10 +83,6 @@ public:
 	}
 
 private:
-	Optional()
-		: data(nullptr)
-	{}
-
 	template <typename ...Params>
 	Optional(Params&&... params)
 		: data(new T(std::forward<Params>(params)...))

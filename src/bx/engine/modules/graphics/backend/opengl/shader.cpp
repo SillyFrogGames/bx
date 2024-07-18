@@ -25,9 +25,23 @@ namespace Gl
         }
 	}
 
+    Shader::Shader(Shader&& other) noexcept
+        : handle(other.handle)
+    {
+        other.handle = UINT_MAX;
+    }
+
+    Shader& Shader::operator=(Shader&& other) noexcept
+    {
+        handle = other.handle;
+        other.handle = UINT_MAX;
+        return *this;
+    }
+
     Shader::~Shader()
     {
-        glDeleteShader(handle);
+        if (handle != UINT_MAX)
+            glDeleteShader(handle);
     }
 
     ShaderProgram::ShaderProgram(const String& name, const List<Shader*>& shaders)
@@ -51,13 +65,13 @@ namespace Gl
         }
     }
 
-    ShaderProgram::ShaderProgram(ShaderProgram&& other)
+    ShaderProgram::ShaderProgram(ShaderProgram&& other) noexcept
         : handle(other.handle)
     {
         other.handle = UINT_MAX;
     }
 
-    ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other)
+    ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) noexcept
     {
         handle = other.handle;
         other.handle = UINT_MAX;

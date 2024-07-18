@@ -8,6 +8,8 @@
 #include "bx/engine/core/profiler.hpp"
 #include "bx/engine/containers/pool.hpp"
 
+std::unique_ptr<Graphics::CreateInfoCache> Graphics::s_createInfoCache = nullptr;
+
 const TextureCreateInfo& Graphics::GetTextureCreateInfo(TextureHandle texture)
 {
     BX_ENSURE(texture);
