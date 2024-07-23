@@ -1,92 +1,183 @@
 #pragma once
 
-#ifndef MEMORY_CUSTOM_CONTAINERS
+#include "bx/engine/core/byte_types.hpp"
+#include "bx/engine/core/type.hpp"
+#include "bx/engine/core/macros.hpp"
+#include "bx/engine/core/memory.hpp"
+#include "bx/engine/containers/list.hpp"
 
-// TODO: No std version
+// See:
+// https://bitsquid.blogspot.com/2011/09/managing-decoupling-part-4-id-lookup.html
+// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/game-engine-containers-handle_map-r4495/
 
-#else // MEMORY_CUSTOM_CONTAINERS
+struct HandleId
+{
+	inline bool operator==(const HandleId& other) const { return id == other.id; }
+	inline bool operator!=(const HandleId& other) const { return id != other.id; }
+	inline bool operator<(const HandleId& other) const { return id < other.id; }
+	inline bool operator>(const HandleId& other) const { return id > other.id; }
 
-#include "Engine/Memory.hpp"
-#include "Engine/Containers/List.hpp"
+	union
+	{
+		u64 id;
+		struct
+		{
+			u32 index;
+			u16 generation;
+			u16 uuid;
+		};
+	};
+};
 
-#define INDEX_MASK 0xFFFF
-#define NEW_OBJECT_ID_ADD 0x10000
+template <typename TVal>
+class Handle
+{
+public:
+	Handle() = default;
+	Handle(HandleId id) : m_id(id) {}
+
+	inline bool operator==(const Handle& other) const { return m_id == other.m_id; }
+	inline bool operator!=(const Handle& other) const { return m_id != other.m_id; }
+	inline bool operator<(const Handle& other) const { return m_id < other.m_id; }
+	inline bool operator>(const Handle& other) const { return m_id > other.m_id; }
+
+	inline HandleId GetId() const { return m_id; }
+
+private:
+	HandleId m_id;
+};
+
+struct HandleIndex
+{
+	u32 innerIndex = 0; // From index to object
+	u32 outerIndex = 0; // From object to index
+
+	union
+	{
+		u32 id;
+		struct
+		{
+			u16 generation;
+			u16 meta : 15;
+			u16 used : 1;
+		};
+	};
+};
 
 template <typename TVal>
 class HandleMap
 {
 public:
 	explicit HandleMap(SizeType capacity = 100)
-		: m_indices(capacity)
-		, m_objects(capacity)
 	{
-		m_count = 0;
-		for (int i = 0; i < capacity; i++)
-		{
-			Index index;
-			index.key = i;
-			index.next = i + 1;
+		m_indices.resize(capacity);
+		m_objects.resize(capacity);
 
-			m_indices.Add(index);
+		for (SizeType i = 0; i < capacity - 1; ++i)
+		{
+			auto& in = m_indices[i];
+
+			in.innerIndex = (u32)i + 1;
+			in.outerIndex = 0xFFFFFFFF;
+
+			in.id = 0;
 		}
 
-		enqueue = 0;
-		dequeue = capacity - 1;
+		m_freeListDequeue = 0;
+		m_freeListEnqueue = capacity - 1;
 	}
 
-	inline bool Contains(u32 key)
+	inline Handle<TVal> Insert(const TVal& val)
 	{
-		Index& index = m_indices[key & INDEX_MASK];
-		return index.key == key && index.index != USHRT_MAX;
+		auto index = m_freeListDequeue;
+		auto& in = m_indices[index];
+		m_freeListDequeue = in.innerIndex;
+
+		in.innerIndex = m_count++;
+		in.generation++;
+		in.used = 1;
+		
+		m_indices[in.innerIndex].outerIndex = index;
+		m_objects[in.innerIndex] = val;
+		
+		HandleId id{};
+		id.index = index;
+		id.generation = in.generation;
+		id.uuid = GetTypeId();
+
+		return Handle<TVal>(id);
 	}
 
-	inline T& LookUp(u32 key)
+	inline bool Remove(Handle<TVal> handle)
 	{
-		return m_handles[m_handles[key & INDEX_MASK].index];
+		if (!IsValid(handle))
+			return false;
+
+		const auto handleId = handle.GetId();
+
+		auto& in = m_indices[handleId.index];
+		in.used = 0;
+
+		auto lastIndex = --m_count;
+		m_objects[in.innerIndex] = std::move(m_objects[lastIndex]); // Move last object to empty slot
+		m_indices[m_indices[lastIndex].outerIndex].innerIndex = in.innerIndex; // Update last object index to use new inner index
+		
+		// Set inner index to the next index
+		m_indices[m_freeListEnqueue].innerIndex = handleId.index;
+		m_freeListEnqueue = handleId.index;
+
+		return true;
 	}
 
-	inline u32 Insert(const T& value)
+	inline TVal& Get(Handle<TVal> handle)
 	{
-		Handle& handle = m_handles[m_dequeue];
-		m_dequeue = handle.next;
-		handle.key += NEW_OBJECT_ID_ADD;
-		handle.index = m_count++;
-		T& obj = m_handles[handle.index];
-		obj = value;
-		return handle.id;
+		auto innerIndex = GetInnerIndex(handle);
+		return m_objects[innerIndex];
 	}
-
-	inline void Remove(u32 key)
+	
+	inline const TVal& Get(Handle<TVal> handle) const
 	{
-		Handle& handle = m_handles[key & INDEX_MASK];
-
-		T& obj = m_handles[handle.index];
-		obj = m_handles[--m_count];
-		m_handles[handle.id & INDEX_MASK].index = handle.index;
-
-		handle.index = USHRT_MAX;
-		m_handles[m_enqueue].next = key & INDEX_MASK;
-		m_enqueue = key & INDEX_MASK;
+		auto innerIndex = GetInnerIndex(handle);
+		return m_objects[innerIndex];
+	}
+	
+	inline bool IsValid(Handle<TVal> handle)
+	{
+		const auto handleId = handle.GetId();
+	
+		if (handleId.index >= m_indices.size())
+			return false;
+	
+		auto& in = m_indices[handleId.index];
+	
+		return handleId.uuid == GetTypeId()
+			&& handleId.generation == in.generation
+			&& in.innerIndex < m_count;
 	}
 
 private:
-	struct Index
-	{
-		u32 key = 0;
-		u16 index = 0;
-		u16 next = 0;
-	};
+	inline u16 GetTypeId() const { return Type<TVal>::Id() % 0xFFFF; }
 
-	struct Object
+	inline u32 GetInnerIndex(Handle<TVal> handle) const
 	{
-		u32 key = 0;
-		T value;
-	};
+		const auto handleId = handle.GetId();
+	
+		BX_ASSERT(handleId.index < m_indices.size(), "Outer index out of range!");
+	
+		const auto& in = m_indices[handleId.index];
+	
+		BX_ASSERT(handleId.uuid == GetTypeId(), "TypeId mismatch!");
+		BX_ASSERT(handleId.generation == in.generation, "At called with old generation!");
+		BX_ASSERT(in.innerIndex < m_count, "Inner index out of range!");
+	
+		return in.innerIndex;
+	}
 
-	u16 m_enqueue;
-	u16 m_dequeue;
-	u32 m_count;
-	List<Index> m_indices;
-	List<Object> m_objects;
+private:
+	u32 m_count = 0;
+	u32 m_freeListEnqueue = 0;
+	u32 m_freeListDequeue = 0;
+
+	List<HandleIndex> m_indices;
+	List<TVal> m_objects;
 };
-#endif
