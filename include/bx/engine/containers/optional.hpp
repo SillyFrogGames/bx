@@ -31,13 +31,13 @@ public:
 		return *this;
 	}
 
-	Optional(Optional<T>&& other)
+	Optional(Optional<T>&& other) noexcept
 	{
 		data = other.data;
 		other.data = nullptr;
 	}
 
-	Optional<T>& operator=(Optional<T>&& other)
+	Optional<T>& operator=(Optional<T>&& other) noexcept
 	{
 		data = other.data;
 		other.data = nullptr;

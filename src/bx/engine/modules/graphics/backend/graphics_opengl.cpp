@@ -41,13 +41,13 @@ struct GraphicsBackendState : NoCopy
     HashMap<GraphicsPipelineHandle, GraphicsPipeline> graphicsPipelines;
     HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
 
-    RenderPassHandle activeRenderPass;
-    GraphicsPipelineHandle boundGraphicsPipeline;
-    ComputePipelineHandle boundComputePipeline;
-    Optional<IndexFormat> boundIndexFormat;
+    RenderPassHandle activeRenderPass = RenderPassHandle::null;
+    GraphicsPipelineHandle boundGraphicsPipeline = GraphicsPipelineHandle::null;
+    ComputePipelineHandle boundComputePipeline = ComputePipelineHandle::null;
+    Optional<IndexFormat> boundIndexFormat = Optional<IndexFormat>::None();
 
-    BufferHandle emptyBuffer;
-    TextureHandle emptyTexture;
+    BufferHandle emptyBuffer = BufferHandle::null;
+    TextureHandle emptyTexture = TextureHandle::null;
 };
 static std::unique_ptr<GraphicsBackendState> s;
 
@@ -56,7 +56,7 @@ b8 Graphics::Initialize()
     s_createInfoCache = std::make_unique<CreateInfoCache>();
     s = std::make_unique<GraphicsBackendState>();
 
-    Gl::Init(true);
+    Gl::Init(false);
 
     BufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.name = Optional<String>::Some("Empty Buffer");
@@ -252,7 +252,7 @@ void Graphics::DestroyBuffer(BufferHandle& buffer)
 
     auto& bufferIter = s->buffers.find(buffer);
     BX_ENSURE(bufferIter != s->buffers.end());
-    glDeleteTextures(1, &bufferIter->second);
+    glDeleteBuffers(1, &bufferIter->second);
 
     s->buffers.erase(buffer);
     s_createInfoCache->bufferCreateInfos.erase(buffer);
@@ -395,7 +395,8 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
 {
     // TODO: support multiple color attachments
     // TODO: framebuffer
-
+    
+    glClearColor(0.3, 0, 0.3, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
@@ -415,9 +416,10 @@ void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 
     auto& pipelineIter = s->graphicsPipelines.find(graphicsPipeline);
     BX_ENSURE(pipelineIter != s->graphicsPipelines.end());
+    auto& pipeline = pipelineIter->second;
 
-    u32 vao = pipelineIter->second.GetVaoHandle();
-    glBindVertexArray(vao);
+    glUseProgram(pipeline.GetShaderProgramHandle());
+    glBindVertexArray(pipeline.GetVaoHandle());
 
     auto& info = GetGraphicsPipelineCreateInfo(graphicsPipeline);
     
@@ -500,7 +502,11 @@ void Graphics::EndRenderPass(RenderPassHandle& renderPass)
 
 void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
 {
+    BX_ENSURE(buffer);
+    BX_ASSERT(offset == 0, "Offset must be 0 for now.");
 
+    auto& createInfo = GetBufferCreateInfo(buffer);
+    glNamedBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
 }
 
 void Graphics::FlushBufferWrites()
@@ -510,7 +516,7 @@ void Graphics::FlushBufferWrites()
 
 void Graphics::WriteTexture(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
 {
-
+    BX_FAIL("TODO");
 }
 
 void Graphics::FlushTextureWrites()

@@ -494,6 +494,8 @@ namespace Gl
 			return GL_ONE_MINUS_DST_ALPHA;
 		case BlendFactor::SRC_ALPHA_SATURATED:
 			return GL_SRC_ALPHA_SATURATE;
+		default:
+			BX_FAIL("Blend factor not supported.");
 		}
 	}
 
@@ -511,6 +513,8 @@ namespace Gl
 			return GL_TRIANGLES;
 		case PrimitiveTopology::TRIANGLE_STRIP:
 			return GL_TRIANGLE_STRIP;
+		default:
+			BX_FAIL("Primitive topology not supported.");
 		}
 	}
 
@@ -522,6 +526,8 @@ namespace Gl
 			return GL_UNSIGNED_SHORT;
 		case IndexFormat::UINT32:
 			return GL_UNSIGNED_INT;
+		default:
+			BX_FAIL("Index format not supported.");
 		}
 	}
 
@@ -591,6 +597,8 @@ namespace Gl
 			return 3;
 		case VertexFormat::SINT_32X4:
 			return 4;
+		default:
+			BX_FAIL("Vertex format not supported.");
 		}
 	}
 
@@ -660,6 +668,8 @@ namespace Gl
 			return GL_INT;
 		case VertexFormat::SINT_32X4:
 			return GL_INT;
+		default:
+			BX_FAIL("Vertex format not supported.");
 		}
 	}
 }
