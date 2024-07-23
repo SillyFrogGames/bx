@@ -8,8 +8,9 @@ class Graphics
 public:
 	// TODO: capabilities()
 
-	// Helper resources
+	// Buffer with 1 byte set to zero, can only be used for read-only purposes (BufferUsageFlags::COPY_SRC | BufferUsageFlags::INDEX | BufferUsageFlags::VERTEX | BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE)
 	static const BufferHandle& EmptyBuffer();
+	// 2D texture with 1 pixel set to zero, can only be used for read-only purposes (TextureUsageFlags::COPY_SRC | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING)
 	static const TextureHandle& EmptyTexture();
 
 	// Swapchain
@@ -54,6 +55,7 @@ public:
 
 	// Cmds
 	static RenderPassHandle BeginRenderPass(const RenderPassDescriptor& descriptor);
+	// Set a graphics pipeline, will unbind any vertex and index buffers previously bound
 	static void SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline);
 	static void SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice);
 	static void SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format);

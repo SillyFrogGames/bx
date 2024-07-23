@@ -47,10 +47,10 @@ struct LightSourceData
     f32 quadratic_outerCutoff = 0.01f;
 };
 
-struct State : NoCopy
+struct RendererState : NoCopy
 {
-    HashMap<UUID, GraphicsPipelineHandle> shaderPipelines;
-    HashMap<UUID, BufferHandle> animatorBoneBuffers;
+    HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
+    HashMap<UUID, BufferHandle> animatorBoneBuffers{};
 
     TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
@@ -58,20 +58,20 @@ struct State : NoCopy
     BufferHandle vertexConstantsBuffer = BufferHandle::null;
     BufferHandle lightSourceBuffer = BufferHandle::null;
 };
-static std::unique_ptr<State> s;
+static std::unique_ptr<RendererState> s = nullptr;
 
 void BuildShaderPipelines()
 {
     VertexBufferLayout vertexBufferLayout{};
     vertexBufferLayout.stride = sizeof(Mesh::Vertex);
     vertexBufferLayout.attributes = {
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, position), sizeof(f32) * 3),
-        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, color), sizeof(f32) * 4),
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, normal), sizeof(f32) * 3),
-        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, tangent), sizeof(f32) * 3),
-        VertexAttribute(VertexFormat::FLOAT_32X2, offsetof(Mesh::Vertex, uv), sizeof(f32) * 2),
-        VertexAttribute(VertexFormat::SINT_32X4,  offsetof(Mesh::Vertex, bones), sizeof(i32) * 3),
-        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, weights), sizeof(f32) * 3)
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, position), 0),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, color),    1),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, normal),   2),
+        VertexAttribute(VertexFormat::FLOAT_32X3, offsetof(Mesh::Vertex, tangent),  3),
+        VertexAttribute(VertexFormat::FLOAT_32X2, offsetof(Mesh::Vertex, uv),       4),
+        VertexAttribute(VertexFormat::SINT_32X4,  offsetof(Mesh::Vertex, bones),    5),
+        VertexAttribute(VertexFormat::FLOAT_32X4, offsetof(Mesh::Vertex, weights),  6)
     };
 
     PipelineLayoutDescriptor pipelineLayoutDescriptor{};
@@ -96,9 +96,13 @@ void BuildShaderPipelines()
             if (mr.GetMaterialCount() == 0)
                 return;
 
-            for (const auto& material : mr.GetMaterials())
+            SizeType index = 0;
+            for (const auto& mesh : mf.GetMeshes())
             {
-                if (!material)
+                const auto& material = mr.GetMaterial(index++);
+                index %= mr.GetMaterialCount();
+
+                if (!mesh || !material)
                     continue;
 
                 const Material& materialData = material.GetData();
@@ -132,7 +136,7 @@ void UpdateAnimators()
             anim.Update();
 
             BufferHandle boneBuffer;
-            auto boneBufferIter = s->animatorBoneBuffers.find(anim.GetUUID());
+            auto& boneBufferIter = s->animatorBoneBuffers.find(anim.GetUUID());
             if (boneBufferIter == s->animatorBoneBuffers.end())
             {
                 BufferCreateInfo createInfo{};
@@ -174,7 +178,7 @@ void UpdateLightSources()
 
 void Renderer::Initialize()
 {
-    s = std::make_unique<State>();
+    s = std::make_unique<RendererState>();
 
     BufferCreateInfo vertexConstantsCreateInfo{};
     vertexConstantsCreateInfo.name = Optional<String>::Some("Vertex Constants");
@@ -215,17 +219,19 @@ void Renderer::Update()
         depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
         s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
 
-        // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change
-        s->shaderPipelines.clear();
+        // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change (except for the first time)
+        s->shaderPipelines.clear(); 
     }
-
-    UpdateAnimators();
-    UpdateLightSources();
-    Graphics::FlushBufferWrites();
 }
 
 void Renderer::Render()
 {
+    // TODO: this is a better fit for the update method, however, Graphics::Update is called BEFORE all the world does its updating, leaving it's state 1 frame behind
+    UpdateAnimators();
+    UpdateLightSources();
+    BuildShaderPipelines();
+    Graphics::FlushBufferWrites();
+
     Graphics::UpdateDebugLines();
 
     TextureViewHandle colorTargetView = Graphics::CreateTextureView(s->colorTarget);
@@ -268,7 +274,9 @@ void Renderer::Render()
                     const auto& materialData = material.GetData();
                     const auto& shader = materialData.GetShader();
 
-                    auto graphicsPipeline = s->shaderPipelines.find(shader.GetUUID())->second;
+                    auto& graphicsPipelineIter = s->shaderPipelines.find(shader.GetUUID());
+                    BX_ASSERT(graphicsPipelineIter != s->shaderPipelines.end(), "Missing graphics pipeline, this should not happen.");
+                    GraphicsPipelineHandle graphicsPipeline = graphicsPipelineIter->second;
 
                     VertexMeshUniform meshUniform{};
                     meshUniform.boneToMesh = meshData.GetMatrix();
@@ -286,6 +294,7 @@ void Renderer::Render()
                     // TODO: very lazy, shouldn't be created every frame probably
                     BindGroupCreateInfo createInfo{};
                     createInfo.name = Optional<String>::Some("Renderer Core Bindgroup");
+                    createInfo.layout = Graphics::GetBindGroupLayout(graphicsPipeline, 0);
                     createInfo.entries = {
                         BindGroupEntry(0, BindingResource::Buffer(BufferBinding(s->vertexConstantsBuffer))),
                         BindGroupEntry(1, BindingResource::Buffer(BufferBinding(meshUniformBuffer))),

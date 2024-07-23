@@ -22,7 +22,7 @@ using namespace Gl;
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
 
-struct State : NoCopy
+struct GraphicsBackendState : NoCopy
 {
     HandlePool<BufferApi> bufferHandlePool;
     HandlePool<TextureApi> textureHandlePool;
@@ -45,15 +45,29 @@ struct State : NoCopy
     GraphicsPipelineHandle boundGraphicsPipeline;
     ComputePipelineHandle boundComputePipeline;
     Optional<IndexFormat> boundIndexFormat;
+
+    BufferHandle emptyBuffer;
+    TextureHandle emptyTexture;
 };
-static std::unique_ptr<State> s;
+static std::unique_ptr<GraphicsBackendState> s;
 
 b8 Graphics::Initialize()
 {
     s_createInfoCache = std::make_unique<CreateInfoCache>();
-    s = std::make_unique<State>();
+    s = std::make_unique<GraphicsBackendState>();
 
     Gl::Init(true);
+
+    BufferCreateInfo bufferCreateInfo{};
+    bufferCreateInfo.name = Optional<String>::Some("Empty Buffer");
+    bufferCreateInfo.size = 1;
+    bufferCreateInfo.usageFlags = BufferUsageFlags::COPY_SRC | BufferUsageFlags::INDEX | BufferUsageFlags::VERTEX | BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE;
+    s->emptyBuffer = Graphics::CreateBuffer(bufferCreateInfo);
+
+    TextureCreateInfo textureCreateInfo{};
+    textureCreateInfo.name = Optional<String>::Some("Empty Texture");
+    textureCreateInfo.size = Extend3D(1, 1, 1);
+    textureCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING;
 
     return true;
 }
@@ -75,19 +89,23 @@ void Graphics::NewFrame()
 
 void Graphics::EndFrame()
 {
+    BX_ASSERT(s->activeRenderPass == RenderPassHandle::null, "Render pass must have been ended before the end of the frame.");
+    
+    s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
+    s->boundComputePipeline = ComputePipelineHandle::null;
+    s->boundIndexFormat = Optional<IndexFormat>::None();
+
     ImGuiImpl::EndFrame();
 }
 
 const BufferHandle& Graphics::EmptyBuffer()
 {
-    BX_FAIL("TODO");
-    return BufferHandle::null;
+    return s->emptyBuffer;
 }
 
 const TextureHandle& Graphics::EmptyTexture()
 {
-    BX_FAIL("TODO");
-    return TextureHandle::null;
+    return s->emptyTexture;
 }
 
 TextureFormat Graphics::GetSwapchainFormat()
@@ -338,13 +356,21 @@ void Graphics::DestroyComputePipeline(ComputePipelineHandle& computePipeline)
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup)
 {
     // Bind group layouts don't exist in opengl, however their handles should still act like they do.
-    return BindGroupLayoutHandle{ graphicsPipeline.id * MAX_BIND_GROUPS * bindGroup * 2 + 0 };
+    return BindGroupLayoutHandle{
+        graphicsPipeline.id * MAX_BIND_GROUPS * bindGroup   // Leave enough room for MAX_BIND_GROUPS count of layouts
+        * 2 + 0                                             // Interleave to share the same handle space with compute layouts
+        + 1                                                 // 0 is reserved for null handles
+    };
 }
 
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup)
 {
     // Bind group layouts don't exist in opengl, however their handles should still act like they do.
-    return BindGroupLayoutHandle{ computePipeline.id * MAX_BIND_GROUPS * bindGroup * 2 + 1 };
+    return BindGroupLayoutHandle{
+        computePipeline.id * MAX_BIND_GROUPS * bindGroup    // Leave enough room for MAX_BIND_GROUPS count of layouts
+        * 2 + 1                                             // Interleave to share the same handle space with graphics layouts
+        + 1                                                 // 0 is reserved for null handles
+    };
 }
 
 BindGroupHandle Graphics::CreateBindGroup(const BindGroupCreateInfo& createInfo)
@@ -375,6 +401,8 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
     RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
     //s_createInfoCache->renderPass.insert(std::make_pair(renderPass, descriptor));
 
+    s->activeRenderPass = renderPassHandle;
+
     return renderPassHandle;
 }
 
@@ -385,7 +413,14 @@ void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 
     s->boundGraphicsPipeline = graphicsPipeline;
 
+    auto& pipelineIter = s->graphicsPipelines.find(graphicsPipeline);
+    BX_ENSURE(pipelineIter != s->graphicsPipelines.end());
+
+    u32 vao = pipelineIter->second.GetVaoHandle();
+    glBindVertexArray(vao);
+
     auto& info = GetGraphicsPipelineCreateInfo(graphicsPipeline);
+    
     
 }
 
@@ -408,6 +443,8 @@ void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format
 
     auto& bufferIter = s->buffers.find(bufferSlice.buffer);
     BX_ENSURE(bufferIter != s->buffers.end());
+
+    s->boundIndexFormat = Optional<IndexFormat>::Some(format);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIter->second);
 }

@@ -123,7 +123,7 @@ namespace Gl
 		case TextureFormat::DEPTH24_PLUS:
 			return GL_FLOAT;
 		case TextureFormat::DEPTH24_PLUS_STENCIL8:
-			return GL_FLOAT;
+			return GL_UNSIGNED_INT_24_8_EXT;
 		case TextureFormat::DEPTH32_FLOAT:
 			return GL_FLOAT;
 		case TextureFormat::DEPTH32_FLOAT_STENCIL8:

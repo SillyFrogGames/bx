@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 static GLFWwindow* pWindow = nullptr;
-static b8 wasResized = false;
+static b8 wasResized = true;
 static b8 isActive = true;
 
 GLFWwindow* WindowGLFW::GetWindowPtr()
@@ -177,8 +177,7 @@ void Window::Shutdown()
 void Window::PollEvents()
 {
 	PROFILE_FUNCTION();
-	wasResized = false;
-
+	
 	glfwPollEvents();
 
 	if (glfwGetKey(pWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -188,6 +187,8 @@ void Window::PollEvents()
 void Window::Display()
 {
 	PROFILE_FUNCTION();
+
+	wasResized = false;
 
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 	glfwSwapBuffers(pWindow);
