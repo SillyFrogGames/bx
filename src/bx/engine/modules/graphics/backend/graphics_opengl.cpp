@@ -429,18 +429,22 @@ void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 void Graphics::SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice)
 {
     BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ASSERT(s->boundGraphicsPipeline, "No graphics pipeline bound.");
     BX_ENSURE(bufferSlice.buffer);
-    BX_ASSERT(slot == 0, "Slot must be 0 for now."); // TODO: allow multiple vertex slots
 
     auto& bufferIter = s->buffers.find(bufferSlice.buffer);
     BX_ENSURE(bufferIter != s->buffers.end());
 
-    glBindBuffer(GL_ARRAY_BUFFER, bufferIter->second);
+    auto& pipelineCreateInfo = GetGraphicsPipelineCreateInfo(s->boundGraphicsPipeline);
+    u32 stride = pipelineCreateInfo.vertexBuffers[slot].stride;
+
+    glBindVertexBuffer(slot, bufferIter->second, 0, stride);
 }
 
 void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format)
 {
     BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ASSERT(s->boundGraphicsPipeline, "No graphics pipeline bound.");
     BX_ENSURE(bufferSlice.buffer);
 
     auto& bufferIter = s->buffers.find(bufferSlice.buffer);
@@ -505,8 +509,11 @@ void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
     BX_ENSURE(buffer);
     BX_ASSERT(offset == 0, "Offset must be 0 for now.");
 
+    auto& bufferIter = s->buffers.find(buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+
     auto& createInfo = GetBufferCreateInfo(buffer);
-    glNamedBufferData(buffer, createInfo.size, data, GL_DYNAMIC_DRAW);
+    glNamedBufferData(bufferIter->second, createInfo.size, data, GL_DYNAMIC_DRAW);
 }
 
 void Graphics::FlushBufferWrites()
