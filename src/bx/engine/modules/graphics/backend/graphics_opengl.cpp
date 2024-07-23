@@ -396,8 +396,9 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
     // TODO: support multiple color attachments
     // TODO: framebuffer
     
-    glClearColor(0.3, 0, 0.3, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, 1920, 1080);
+    glClearColor(0.3f, 0.f, 0.1f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
     //s_createInfoCache->renderPass.insert(std::make_pair(renderPass, descriptor));
@@ -534,5 +535,4 @@ void Graphics::FlushTextureWrites()
 // TODO: remove!
 void Graphics::DebugDraw(const Mat4& viewProj, const DebugDrawAttribs& attribs, const List<DebugVertex>& vertices)
 {
-
 }
