@@ -9,7 +9,6 @@
 #include "bx/engine/containers/string.hpp"
 #include "bx/engine/containers/hash_map.hpp"
 
-// TODO: rename to BufferHandle
 struct BufferApi {};
 using BufferHandle = Handle<BufferApi>;
 struct SamplerApi {};

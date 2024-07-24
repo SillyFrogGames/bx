@@ -13,7 +13,7 @@ namespace Gl
     class GraphicsPipeline : NoCopy
     {
     public:
-        GraphicsPipeline(ShaderProgram&& shaderProgram, const List<VertexBufferLayout>& vertexBuffers);
+        GraphicsPipeline(ShaderProgram&& shaderProgram, const List<VertexBufferLayout>& vertexBuffers, const PipelineLayoutDescriptor& layout);
         ~GraphicsPipeline();
 
         u32 GetVaoHandle() const;

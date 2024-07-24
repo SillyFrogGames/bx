@@ -314,7 +314,7 @@ GraphicsPipelineHandle Graphics::CreateGraphicsPipeline(const GraphicsPipelineCr
 
     String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
     ShaderProgram shaderProgram(name, List<Shader*>{ &vertShaderIter->second, & fragShaderIter->second });
-    s->graphicsPipelines.try_emplace(graphicsPipelineHandle, std::move(shaderProgram), createInfo.vertexBuffers);
+    s->graphicsPipelines.try_emplace(graphicsPipelineHandle, std::move(shaderProgram), createInfo.vertexBuffers, createInfo.layout);
 
     return graphicsPipelineHandle;
 }
@@ -355,22 +355,29 @@ void Graphics::DestroyComputePipeline(ComputePipelineHandle& computePipeline)
 
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup)
 {
-    // Bind group layouts don't exist in opengl, however their handles should still act like they do.
-    return BindGroupLayoutHandle{
-        graphicsPipeline.id * MAX_BIND_GROUPS * bindGroup   // Leave enough room for MAX_BIND_GROUPS count of layouts
-        * 2 + 0                                             // Interleave to share the same handle space with compute layouts
-        + 1                                                 // 0 is reserved for null handles
-    };
+    u64 id = graphicsPipeline.id << 10 | static_cast<u64>(static_cast<u8>(bindGroup)) << 1 | 1;
+    return BindGroupLayoutHandle{ id };
 }
 
 BindGroupLayoutHandle Graphics::GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup)
 {
-    // Bind group layouts don't exist in opengl, however their handles should still act like they do.
-    return BindGroupLayoutHandle{
-        computePipeline.id * MAX_BIND_GROUPS * bindGroup    // Leave enough room for MAX_BIND_GROUPS count of layouts
-        * 2 + 1                                             // Interleave to share the same handle space with graphics layouts
-        + 1                                                 // 0 is reserved for null handles
-    };
+    u64 id = computePipeline.id << 10 | static_cast<u64>(static_cast<u8>(bindGroup)) << 1 | 0;
+    return BindGroupLayoutHandle{ id };
+}
+
+u32 Graphics::GetBindGroupLayoutBindGroup(BindGroupLayoutHandle bindGroupLayout)
+{
+    return static_cast<u32>((bindGroupLayout.id >> 54) << 55);
+}
+
+b8 Graphics::IsBindGroupLayoutGraphics(BindGroupLayoutHandle bindGroupLayout)
+{
+    return static_cast<b8>(bindGroupLayout.id << 63);
+}
+
+u64 Graphics::GetBindGroupLayoutPipeline(BindGroupLayoutHandle bindGroupLayout)
+{
+    return bindGroupLayout.id >> 10;
 }
 
 BindGroupHandle Graphics::CreateBindGroup(const BindGroupCreateInfo& createInfo)
@@ -459,7 +466,79 @@ void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format
 void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
 {
     BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ENSURE(bindGroup);
 
+    auto& bindGroupCreateInfoIter = s_createInfoCache->bindGroupCreateInfos.find(bindGroup);
+    BX_ENSURE(bindGroupCreateInfoIter != s_createInfoCache->bindGroupCreateInfos.end());
+    BindGroupCreateInfo& createInfo = bindGroupCreateInfoIter->second;
+
+    BX_ASSERT(GetBindGroupLayoutBindGroup(createInfo.layout) == index, "Index must match with layout in bind group create info.");
+    u64 rawPipeline = GetBindGroupLayoutPipeline(createInfo.layout);
+    PipelineLayoutDescriptor layout;
+    if (IsBindGroupLayoutGraphics(createInfo.layout))
+    {
+        auto& createInfoIter = s_createInfoCache->graphicsPipelineCreateInfos.find(GraphicsPipelineHandle{rawPipeline});
+        BX_ENSURE(createInfoIter != s_createInfoCache->graphicsPipelineCreateInfos.end());
+        layout = createInfoIter->second.layout;
+    }
+    else
+    {
+        auto& createInfoIter = s_createInfoCache->computePipelineCreateInfos.find(ComputePipelineHandle{ rawPipeline });
+        BX_ENSURE(createInfoIter != s_createInfoCache->computePipelineCreateInfos.end());
+        layout = createInfoIter->second.layout;
+    }
+
+    // TODO: optimize?
+    OptionalView<BindGroupLayoutDescriptor> groupLayout = OptionalView<BindGroupLayoutDescriptor>::None();
+    for (auto& group : layout.bindGroupLayouts)
+    {
+        if (group.group == index)
+        {
+            groupLayout = OptionalView<BindGroupLayoutDescriptor>::Some(&group);
+            break;
+        }
+    }
+    BX_ASSERT(groupLayout.IsSome(), "Group {} not found in layout.", index);
+
+    for (auto& entry : createInfo.entries)
+    {
+        const BindingResource& resource = entry.resource;
+
+        // TODO: optimize?
+        OptionalView<BindGroupLayoutEntry> groupLayoutEntry = OptionalView<BindGroupLayoutEntry>::None();
+        for (auto& layoutEntry : groupLayout.Unwrap().entries)
+        {
+            if (layoutEntry.binding == entry.binding)
+            {
+                groupLayoutEntry = OptionalView<BindGroupLayoutEntry>::Some(&layoutEntry);
+                break;
+            }
+        }
+        BX_ASSERT(groupLayoutEntry.IsSome(), "Group {} binding {} not found in layout.", index, entry.binding);
+
+        switch (resource.type)
+        {
+        case BindingResourceType::BUFFER:
+        {
+            if (groupLayoutEntry.Unwrap().type.type == BindingType::UNIFORM_BUFFER)
+            {
+                auto& bufferIter = s->buffers.find(resource.buffer.buffer);
+                BX_ENSURE(bufferIter != s->buffers.end());
+
+                glBindBufferBase(GL_UNIFORM_BUFFER, entry.binding, bufferIter->second);
+            }
+            else if (groupLayoutEntry.Unwrap().type.type == BindingType::STORAGE_BUFFER)
+            {
+                BX_FAIL("TODO");
+            }
+            else
+            {
+                BX_FAIL("Unexpected binding resource type at group {} binding {}.", index, entry.binding);
+            }
+            break;
+        }
+        }
+    }
     // TODO
 }
 

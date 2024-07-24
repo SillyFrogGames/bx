@@ -7,7 +7,7 @@
 
 namespace Gl
 {
-    GraphicsPipeline::GraphicsPipeline(ShaderProgram&& shaderProgram, const List<VertexBufferLayout>& vertexBuffers)
+    GraphicsPipeline::GraphicsPipeline(ShaderProgram&& shaderProgram, const List<VertexBufferLayout>& vertexBuffers, const PipelineLayoutDescriptor& layout)
         : shaderProgram(std::move(shaderProgram))
     {
         glGenVertexArrays(1, &vao);
@@ -28,6 +28,22 @@ namespace Gl
             }
         }
         glBindVertexArray(0);
+
+        /*for (auto& groupLayout : layout.bindGroupLayouts)
+        {
+            for (auto& entry : groupLayout.entries)
+            {
+                auto& typeDescriptor = entry.type;
+                switch (typeDescriptor.type)
+                {
+                case BindingType::UNIFORM_BUFFER:
+                {
+                    glUniformBlockBinding(shaderProgram.GetHandle(), location, binding);
+                    break;
+                }
+                }
+            }
+        }*/
     }
 
     GraphicsPipeline::~GraphicsPipeline()

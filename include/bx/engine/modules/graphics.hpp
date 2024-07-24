@@ -48,6 +48,9 @@ public:
 
 	static BindGroupLayoutHandle GetBindGroupLayout(GraphicsPipelineHandle graphicsPipeline, u32 bindGroup);
 	static BindGroupLayoutHandle GetBindGroupLayout(ComputePipelineHandle computePipeline, u32 bindGroup);
+	static u32 GetBindGroupLayoutBindGroup(BindGroupLayoutHandle bindGroupLayout);
+	static b8 IsBindGroupLayoutGraphics(BindGroupLayoutHandle bindGroupLayout);
+	static u64 GetBindGroupLayoutPipeline(BindGroupLayoutHandle bindGroupLayout);
 
 	static const BindGroupCreateInfo& GetBindGroupCreateInfo(BindGroupHandle bindGroup);
 	static BindGroupHandle CreateBindGroup(const BindGroupCreateInfo& createInfo);

@@ -90,3 +90,77 @@ private:
 
 	T* data;
 };
+
+template <typename T>
+class OptionalView
+{
+public:
+	OptionalView()
+		: data(nullptr)
+	{}
+
+	OptionalView(const OptionalView<T>& other)
+		: data(other.data)
+	{}
+
+	OptionalView<T>& operator=(const OptionalView<T>& other)
+	{
+		data = other.data;
+		return *this;
+	}
+
+	OptionalView(OptionalView<T>&& other) noexcept
+		: data(other.data)
+	{
+		other.data = nullptr;
+	}
+
+	OptionalView<T>& operator=(OptionalView<T>&& other) noexcept
+	{
+		data = other.data;
+		other.data = nullptr;
+		return *this;
+	}
+
+	~OptionalView()
+	{}
+
+	static OptionalView<T> Some(T* view)
+	{
+		return OptionalView(view);
+	}
+
+	static OptionalView<T> None()
+	{
+		return OptionalView{};
+	}
+
+	b8 IsSome() const
+	{
+		return data;
+	}
+
+	b8 IsNone() const
+	{
+		return !data;
+	}
+
+	T& Unwrap()
+	{
+		BX_ASSERT(data, "Unwrap on a None value.");
+		return *data;
+	}
+
+	const T& Unwrap() const
+	{
+		BX_ASSERT(data, "Unwrap on a None value.");
+		return *data;
+	}
+
+private:
+	OptionalView(T* view)
+		: data(view)
+	{}
+
+	T* data;
+};
