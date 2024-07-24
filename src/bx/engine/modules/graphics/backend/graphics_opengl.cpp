@@ -367,7 +367,7 @@ BindGroupLayoutHandle Graphics::GetBindGroupLayout(ComputePipelineHandle compute
 
 u32 Graphics::GetBindGroupLayoutBindGroup(BindGroupLayoutHandle bindGroupLayout)
 {
-    return static_cast<u32>((bindGroupLayout.id >> 54) << 55);
+    return static_cast<u32>((bindGroupLayout.id << 54) >> 55);
 }
 
 b8 Graphics::IsBindGroupLayoutGraphics(BindGroupLayoutHandle bindGroupLayout)
@@ -403,7 +403,9 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
     // TODO: support multiple color attachments
     // TODO: framebuffer
     
-    glViewport(0, 0, 1920, 1080);
+    i32 w, h;
+    Window::GetSize(&w, &h);
+    glViewport(0, 0, w, h);
     glClearColor(0.3f, 0.f, 0.1f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -472,7 +474,8 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
     BX_ENSURE(bindGroupCreateInfoIter != s_createInfoCache->bindGroupCreateInfos.end());
     BindGroupCreateInfo& createInfo = bindGroupCreateInfoIter->second;
 
-    BX_ASSERT(GetBindGroupLayoutBindGroup(createInfo.layout) == index, "Index must match with layout in bind group create info.");
+    u32 layoutIndex = GetBindGroupLayoutBindGroup(createInfo.layout);
+    BX_ASSERT(layoutIndex == index, "Index {} must match with index {} in layout supplied by bind group create info.", index, layoutIndex);
     u64 rawPipeline = GetBindGroupLayoutPipeline(createInfo.layout);
     PipelineLayoutDescriptor layout;
     if (IsBindGroupLayoutGraphics(createInfo.layout))
@@ -539,7 +542,6 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
         }
         }
     }
-    // TODO
 }
 
 void Graphics::Draw(u32 vertexCount, u32 firstVertex, u32 instanceCount)
@@ -592,8 +594,18 @@ void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
     auto& bufferIter = s->buffers.find(buffer);
     BX_ENSURE(bufferIter != s->buffers.end());
 
-    auto& createInfo = GetBufferCreateInfo(buffer);
-    glNamedBufferData(bufferIter->second, createInfo.size, data, GL_DYNAMIC_DRAW);
+    glNamedBufferData(bufferIter->second, GetBufferCreateInfo(buffer).size, data, GL_DYNAMIC_DRAW);
+}
+
+void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data, SizeType size)
+{
+    BX_ENSURE(buffer);
+    BX_ASSERT(offset == 0, "Offset must be 0 for now.");
+
+    auto& bufferIter = s->buffers.find(buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+
+    glNamedBufferData(bufferIter->second, size, data, GL_DYNAMIC_DRAW);
 }
 
 void Graphics::FlushBufferWrites()

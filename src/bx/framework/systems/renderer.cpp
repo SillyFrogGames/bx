@@ -152,13 +152,13 @@ void UpdateAnimators()
                 boneBuffer = boneBufferIter->second;
             }
             
-            Graphics::WriteBuffer(boneBuffer, 0, anim.GetBoneMatrices().data());
+            Graphics::WriteBuffer(boneBuffer, 0, anim.GetBoneMatrices().data(), anim.GetBoneMatrices().size() * sizeof(Mat4));
         });
 }
 
 void UpdateLightSources()
 {
-    List<LightSourceData> lightSources = List<LightSourceData>{};
+    List<LightSourceData> lightSources{};
 
     EntityManager::ForEach<Transform, Light>(
         [&](Entity entity, const Transform& trx, const Light& l)
@@ -173,7 +173,34 @@ void UpdateLightSources()
             lightSources.emplace_back(lightSource);
         });
 
-    Graphics::WriteBuffer(s->lightSourceBuffer, 0, lightSources.data());
+    Graphics::WriteBuffer(s->lightSourceBuffer, 0, lightSources.data(), lightSources.size() * sizeof(LightSourceData));
+}
+
+void UpdateCameras()
+{
+    List<VertexConstantsUniform> viewConstants{};
+
+    EntityManager::ForEach<Transform, Camera>(
+        [&](Entity entity, const Transform& trx, Camera& camera)
+        {
+            // TODO: this shit nasty, just call camera.update()?
+            i32 width, height;
+            Window::GetSize(&width, &height);
+            camera.SetAspect((f32)width / (height == 0 ? 1.0f : (f32)height));
+            Vec3 fwd = trx.GetRotation() * Vec3::Forward();
+            camera.SetView(Mat4::LookAt(trx.GetPosition(), trx.GetPosition() + fwd, Vec3(0, 1, 0)));
+            camera.Update();
+
+            VertexConstantsUniform constants;
+            constants.view = camera.GetView();
+            constants.projection = camera.GetProjection();
+            constants.viewProjection = camera.GetViewProjection();
+            viewConstants.emplace_back(constants);
+        });
+
+    // TODO: for now just uploading last camera, maybe splitscreen support?
+    if (viewConstants.size() > 0)
+        Graphics::WriteBuffer(s->vertexConstantsBuffer, 0, &viewConstants.back(), Math::Min(viewConstants.size(), static_cast<SizeType>(1)) * sizeof(VertexConstantsUniform));
 }
 
 void Renderer::Initialize()
@@ -220,7 +247,7 @@ void Renderer::Update()
         s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
 
         // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change (except for the first time)
-        s->shaderPipelines.clear(); 
+        s->shaderPipelines.clear();
     }
 }
 
@@ -229,6 +256,7 @@ void Renderer::Render()
     // TODO: this is a better fit for the update method, however, Graphics::Update is called BEFORE all the world does its updating, leaving its state 1 frame behind
     UpdateAnimators();
     UpdateLightSources();
+    UpdateCameras();
     BuildShaderPipelines();
     Graphics::FlushBufferWrites();
 

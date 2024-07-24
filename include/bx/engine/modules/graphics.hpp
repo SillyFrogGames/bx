@@ -70,6 +70,7 @@ public:
 	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
 	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data);
+	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data, SizeType size);
 	static void FlushBufferWrites();
 	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
