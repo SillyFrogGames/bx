@@ -12,7 +12,7 @@ set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option (BX_BUILD_EDITOR "Build as editor binaries" OFF)
 option (BX_INSTALL "Install binaries" OFF)
-#option (BUILD_TESTS "Build the test binaries" ON)
+option (BX_BUILD_TESTS "Build the test binaries" ON)
 
 # Define options for window backend
 set (BX_WINDOW_BACKEND "GLFW" CACHE STRING "Choose the window backend: GLFW")
@@ -268,4 +268,9 @@ if (BX_INSTALL)
 	if (MSVC)
 		target_link_options(bx INTERFACE "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
 	endif ()
+endif ()
+
+if (BX_BUILD_TESTS)
+	enable_testing ()
+	add_subdirectory (tests)
 endif ()

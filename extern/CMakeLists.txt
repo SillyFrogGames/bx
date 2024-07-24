@@ -159,6 +159,8 @@ if (BX_BUILD_EDITOR)
 
 endif ()
 
-# GoogleTest
-set (gtest_force_shared_crt ON)
-add_subdirectory (googletest)
+if (BX_BUILD_TESTS)
+	# GoogleTest
+	set (gtest_force_shared_crt ON)
+	add_subdirectory (googletest)
+endif ()
