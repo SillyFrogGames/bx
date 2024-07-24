@@ -433,7 +433,8 @@ void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 
     auto& info = GetGraphicsPipelineCreateInfo(graphicsPipeline);
     
-    
+    // TODO: remove, depth buffer should be created and bound explicitely in render passes
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Graphics::SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice)
