@@ -11,6 +11,6 @@ public:
 	static void Reload();
 
 private:
-	static bool Initialize();
+	static bool Initialize(int argc, char** argv);
 	static void Shutdown();
 };
