@@ -56,7 +56,7 @@ b8 Graphics::Initialize()
     s_createInfoCache = std::make_unique<CreateInfoCache>();
     s = std::make_unique<GraphicsBackendState>();
 
-    Gl::Init(false);
+    Gl::Init(true);
 
     BufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.name = Optional<String>::Some("Empty Buffer");
@@ -157,6 +157,7 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
             TextureFormatToGlType(createInfo.format),
             data
         );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Required, default enables mips
     }
     else if (type == GL_TEXTURE_3D || type == GL_TEXTURE_2D_ARRAY)
     {
@@ -173,6 +174,8 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
             data
         );
     }
+
+    glBindTexture(type, 0);
 
     s->textures.insert(std::make_pair(textureHandle, texture));
 
@@ -406,7 +409,7 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
     i32 w, h;
     Window::GetSize(&w, &h);
     glViewport(0, 0, w, h);
-    glClearColor(0.3f, 0.f, 0.1f, 1.f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
@@ -504,6 +507,8 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
     }
     BX_ASSERT(groupLayout.IsSome(), "Group {} not found in layout.", index);
 
+    // TODO: FAKE BIND GROUPS WITH OFFSETS!! (needs some macros in-shader)
+
     for (auto& entry : createInfo.entries)
     {
         const BindingResource& resource = entry.resource;
@@ -539,6 +544,20 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
             {
                 BX_FAIL("Unexpected binding resource type at group {} binding {}.", index, entry.binding);
             }
+            break;
+        }
+        case BindingResourceType::BUFFER_ARRAY:
+        {
+            BX_FAIL("TODO");
+            break;
+        }
+        case BindingResourceType::TEXTURE_VIEW:
+        {
+            auto& textureViewIter = s->textureViews.find(resource.textureView);
+            BX_ENSURE(textureViewIter != s->textureViews.end());
+
+            glActiveTexture(GL_TEXTURE0 + entry.binding);
+            glBindTexture(GL_TEXTURE_2D, textureViewIter->second);
             break;
         }
         }
