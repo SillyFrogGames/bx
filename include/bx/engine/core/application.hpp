@@ -5,6 +5,7 @@ class Application
 private:
 	friend class Runtime;
 
-	static bool Initialize(int argc, char** argv);
+	static void Configure(int argc, char** argv);
+	static bool Initialize();
 	static void Shutdown();
 };

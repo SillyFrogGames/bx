@@ -72,7 +72,7 @@ int Runtime::Launch(int argc, char** argv)
 	Reload();
 	Scene::Load(scenePath);
 
-	while (IsRunning())
+	do
 	{
 		PROFILE_SECTION("Application");
 
@@ -97,9 +97,9 @@ int Runtime::Launch(int argc, char** argv)
 			SystemManager::Render();
 			Script::Render();
 		}
-		
+
 		Toolbar::Present();
-		
+
 		ImGuiImpl::EndFrame();
 		Graphics::EndFrame();
 
@@ -107,6 +107,7 @@ int Runtime::Launch(int argc, char** argv)
 
 		AssetManager::Refresh();
 	}
+	while (IsRunning());
 
 	SceneView::Shutdown();
 	//AssetsView::Shutdown();
@@ -140,24 +141,27 @@ bool Runtime::Initialize(int argc, char** argv)
 	Module::Register<Audio>(6);
 	Module::Register<GameObject>(7);
 
+	// Configure application
+	Application::Configure(argc, argv);
+
+	// Initialize modules
+	Module::Initialize();
+
 	// Initialize application
-	if (!Application::Initialize(argc, argv))
+	if (!Application::Initialize())
 	{
 		BX_LOGE("Failed to initialize application!");
 		return false;
 	}
-
-	// Initialize modules
-	Module::Initialize();
 
 	return true;
 }
 
 void Runtime::Shutdown()
 {
-	Module::Shutdown();
-
 	Application::Shutdown();
+
+	Module::Shutdown();
 
 	ResourceManager::Shutdown();
 	Data::Shutdown();

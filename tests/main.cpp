@@ -2,12 +2,16 @@
 #include <bx/engine/core/application.hpp>
 #include <bx/runtime/runtime.hpp>
 
-bool Application::Initialize(int argc, char** argv)
+void Application::Configure(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
-    int testRet = RUN_ALL_TESTS();
+}
 
+bool Application::Initialize()
+{
     Runtime::Close();
+
+    int testRet = RUN_ALL_TESTS();
     return testRet == EXIT_SUCCESS;
 }
 

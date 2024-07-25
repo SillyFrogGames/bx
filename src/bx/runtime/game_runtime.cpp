@@ -52,7 +52,7 @@ int Runtime::Launch(int argc, char** argv)
 	const String& mainScene = Data::GetString("Main Scene", "[assets]/main.scene", DataTarget::GAME);
 	Scene::Load(mainScene);
 
-	while (IsRunning())
+	do
 	{
 		PROFILE_SECTION("Runtime");
 
@@ -77,6 +77,7 @@ int Runtime::Launch(int argc, char** argv)
 
 		Window::Display();
 	}
+	while (IsRunning());
 
 	Shutdown();
 	return EXIT_SUCCESS;
@@ -104,6 +105,12 @@ bool Runtime::Initialize(int argc, char** argv)
 	Module::Register<Audio>(6);
 	Module::Register<GameObject>(7);
 
+	// Configure application
+	Application::Configure(argc, argv);
+	
+	// Initialize modules
+	Module::Initialize();
+
 	// Initialize application
 	if (!Application::Initialize(argc, argv))
 	{
@@ -111,17 +118,14 @@ bool Runtime::Initialize(int argc, char** argv)
 		return false;
 	}
 
-	// Initialize modules
-	Module::Initialize();
-
 	return true;
 }
 
 void Runtime::Shutdown()
 {
-	Module::Shutdown();
-
 	Application::Shutdown();
+
+	Module::Shutdown();
 
 	ResourceManager::Shutdown();
 	Data::Shutdown();

@@ -307,10 +307,15 @@ bool File::CreateDirectory(const String& path)
 {
 #if defined(BX_PLATFORM_PC)
 	BOOL ret = WinCreateDirectory(path.c_str(), NULL);
-	switch (GetLastError())
+	if (!ret)
 	{
-	case ERROR_ALREADY_EXISTS: BX_LOGE("Directory already exists, failed to create!"); break;
-	case ERROR_PATH_NOT_FOUND: BX_LOGE("Directory path not found, failed to create!"); break;
+		auto err = GetLastError();
+		switch (err)
+		{
+		case ERROR_ALREADY_EXISTS: BX_LOGE("Directory path \"{}\" already exists, failed to create!", path); break;
+		case ERROR_PATH_NOT_FOUND: BX_LOGE("Directory path \"{}\" not found, failed to create!", path); break;
+		default: BX_LOGE("Failed to create directory \"{}\": {}", path, err); break;
+		}
 	}
 	return ret;
 
@@ -321,9 +326,9 @@ bool File::CreateDirectory(const String& path)
 
 	switch (errno)
 	{
-	case EEXIST: BX_LOGE("Directory already exists, failed to create!"); break;
-	case ENOENT: BX_LOGE("Directory path not found, failed to create!"); break;
-	default: BX_LOGE("Failed to create directory: %s", strerror(errno)); break;
+	case EEXIST: BX_LOGE("Directory path \"{}\" already exists, failed to create!", path); break;
+	case ENOENT: BX_LOGE("Directory path \"{}\" not found, failed to create!", path); break;
+	default: BX_LOGE("Failed to create directory \"{}\": {}", path, strerror(errno)); break;
 	}
 	return false;
 #else
