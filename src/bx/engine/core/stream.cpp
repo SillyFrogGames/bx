@@ -1,7 +1,7 @@
 #include "bx/engine/core/stream.hpp"
 
 InputStringStream::InputStringStream(const String& source)
-    : m_source(source), m_length(std::strlen(source.c_str())), m_currentPos(0)
+    : m_source(source), m_length(strlen(source.c_str())), m_currentPos(0)
 {}
 
 bool InputStringStream::GetLine(String& line)

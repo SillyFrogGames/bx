@@ -44,7 +44,7 @@ void Runtime::Reload()
 
 int Runtime::Launch(int argc, char** argv)
 {
-	if (!Initialize())
+	if (!Initialize(argc, argv))
 		return EXIT_FAILURE;
 
 	Window::SetCursorMode(CursorMode::DISABLED);
@@ -82,7 +82,7 @@ int Runtime::Launch(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
-bool Runtime::Initialize()
+bool Runtime::Initialize(int argc, char** argv)
 {
 	// Initialze core
 #ifdef MEMORY_CUSTOM_CONTAINERS
@@ -105,7 +105,7 @@ bool Runtime::Initialize()
 	Module::Register<GameObject>(7);
 
 	// Initialize application
-	if (!Application::Initialize())
+	if (!Application::Initialize(argc, argv))
 	{
 		BX_LOGE("Failed to initialize application!");
 		return false;
