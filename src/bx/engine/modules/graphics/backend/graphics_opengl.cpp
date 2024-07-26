@@ -21,14 +21,6 @@ using namespace Gl;
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
 
-const static TextureHandle SWAPCHAIN_COLOR_TARGET_HANDLE = TextureHandle{ std::numeric_limits<decltype(TextureHandle::id)>::max() };
-
-struct TextureImpl
-{
-    GLuint texture = 0;
-    Optional<GLuint> framebuffer = Optional<GLuint>::None();
-};
-
 struct GraphicsBackendState : NoCopy
 {
     HandlePool<BufferApi> bufferHandlePool;
@@ -41,13 +33,14 @@ struct GraphicsBackendState : NoCopy
     HandlePool<RenderPassApi> renderPassHandlePool;
     HandlePool<BindGroupApi> bindGroupHandlePool;
 
-    HashMap<TextureHandle, TextureImpl> textures;
+    HashMap<TextureHandle, GLuint> textures;
     HashMap<TextureViewHandle, GLuint> textureViews;
     HashMap<BufferHandle, GLuint> buffers;
     HashMap<ShaderHandle, Shader> shaders;
     HashMap<GraphicsPipelineHandle, GraphicsPipeline> graphicsPipelines;
     HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
-
+    GLuint framebuffer;
+    
     RenderPassHandle activeRenderPass = RenderPassHandle::null;
     GraphicsPipelineHandle boundGraphicsPipeline = GraphicsPipelineHandle::null;
     ComputePipelineHandle boundComputePipeline = ComputePipelineHandle::null;
@@ -55,6 +48,9 @@ struct GraphicsBackendState : NoCopy
 
     BufferHandle emptyBuffer = BufferHandle::null;
     TextureHandle emptyTexture = TextureHandle::null;
+
+    TextureHandle swapchainColorTarget = TextureHandle::null;
+    TextureViewHandle swapchainColorTargetView = TextureViewHandle::null;
 };
 static std::unique_ptr<GraphicsBackendState> s;
 
@@ -63,7 +59,7 @@ b8 Graphics::Initialize()
     s_createInfoCache = std::make_unique<CreateInfoCache>();
     s = std::make_unique<GraphicsBackendState>();
 
-    Gl::Init(true);
+    Gl::Init(false);
 
     BufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.name = Optional<String>::Some("Empty Buffer");
@@ -76,6 +72,18 @@ b8 Graphics::Initialize()
     textureCreateInfo.size = Extend3D(1, 1, 1);
     textureCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING;
 
+    glCreateFramebuffers(1, &s->framebuffer);
+
+    i32 w, h;
+    Window::GetSize(&w, &h);
+
+    TextureCreateInfo swapchainColorTargetCreateInfo{};
+    swapchainColorTargetCreateInfo.name = Optional<String>::Some("Swapchain Color Target");
+    swapchainColorTargetCreateInfo.size = Extend3D(w, h, 1);
+    swapchainColorTargetCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::COPY_DST | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::RENDER_ATTACHMENT;
+    s->swapchainColorTarget = Graphics::CreateTexture(swapchainColorTargetCreateInfo);
+    s->swapchainColorTargetView = Graphics::CreateTextureView(s->swapchainColorTarget);
+
     return true;
 }
 
@@ -86,12 +94,30 @@ void Graphics::Reload()
 
 void Graphics::Shutdown()
 {
+    // TODO: clear a shitload of gl objects (textures, buffers, etc.)
+
+    glDeleteFramebuffers(1, &s->framebuffer);
+
     s.reset();
 }
 
 void Graphics::NewFrame()
 {
+    if (Window::WasResized())
+    {
+        i32 w, h;
+        Window::GetSize(&w, &h);
 
+        TextureCreateInfo swapchainColorTargetCreateInfo{};
+        swapchainColorTargetCreateInfo.name = Optional<String>::Some("Swapchain Color Target");
+        swapchainColorTargetCreateInfo.size = Extend3D(w, h, 1);
+        swapchainColorTargetCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::COPY_DST | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::RENDER_ATTACHMENT;
+        if (s->swapchainColorTarget) Graphics::DestroyTexture(s->swapchainColorTarget);
+        s->swapchainColorTarget = Graphics::CreateTexture(swapchainColorTargetCreateInfo);
+
+        if (s->swapchainColorTargetView) Graphics::DestroyTextureView(s->swapchainColorTargetView);
+        s->swapchainColorTargetView = Graphics::CreateTextureView(s->swapchainColorTarget);
+    }
 }
 
 void Graphics::EndFrame()
@@ -101,6 +127,20 @@ void Graphics::EndFrame()
     s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
     s->boundComputePipeline = ComputePipelineHandle::null;
     s->boundIndexFormat = Optional<IndexFormat>::None();
+
+    // TODO: maybe we still want to present to the screen, even if imgui will draw over it?
+#ifndef BX_EDITOR_BUILD
+    glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0, s->swapchainColorTarget, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, s->framebuffer);
+
+    i32 w, h;
+    Window::GetSize(&w, &h);
+    glBlitNamedFramebuffer(s->framebuffer, 0,
+        0, 0, w, h, 0, 0, w, h,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ImGuiImpl::EndFrame();
 }
@@ -115,20 +155,14 @@ const TextureHandle& Graphics::EmptyTexture()
     return s->emptyTexture;
 }
 
-TextureFormat Graphics::GetSwapchainFormat()
-{
-    // TODO: something like this in the WindowGLFW backend itself, can also be used on vulkan
-    /*GLFWvidmode* vid_mode = glfwGetVideoMode(glfwGetWindowMonitor(win));
-    vid_mode->redBits;
-    vid_mode->greenBits;
-    vid_mode->blueBits;*/
-    // The resulting bits will then somehow need to be converted into a `TextureFormat`
-    return TextureFormat::RGBA8_UNORM_SRGB;
-}
-
 TextureHandle Graphics::GetSwapchainColorTarget()
 {
-    return SWAPCHAIN_COLOR_TARGET_HANDLE;
+    return s->swapchainColorTarget;
+}
+
+TextureViewHandle Graphics::GetSwapchainColorTargetView()
+{
+    return s->swapchainColorTargetView;
 }
 
 TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo)
@@ -145,9 +179,9 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
 
     GLenum type = TextureDimensionToGl(createInfo.dimension, createInfo.size.depthOrArrayLayers);
 
-    TextureImpl texture{};
-    glGenTextures(1, &texture.texture);
-    glBindTexture(type, texture.texture);
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(type, texture);
 
     if (type == GL_TEXTURE_1D)
     {
@@ -187,13 +221,6 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
         );
     }
 
-    if (createInfo.usageFlags & TextureUsageFlags::RENDER_ATTACHMENT)
-    {
-        GLuint framebuffer;
-        glCreateFramebuffers(1, &framebuffer);
-        //texture.framebuffer = Optional<GLuint>::Some(framebuffer);
-    }
-
     glBindTexture(type, 0);
 
     s->textures.insert(std::make_pair(textureHandle, texture));
@@ -207,12 +234,7 @@ void Graphics::DestroyTexture(TextureHandle& texture)
 
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
-    TextureImpl& textureImpl = textureIter->second;
-    glDeleteTextures(1, &textureImpl.texture);
-    if (textureImpl.framebuffer.IsSome())
-    {
-        glDeleteFramebuffers(1, &textureImpl.framebuffer.Unwrap());
-    }
+    glDeleteTextures(1, &textureIter->second);
 
     s->textures.erase(texture);
     s_createInfoCache->textureCreateInfos.erase(texture);
@@ -228,8 +250,7 @@ TextureViewHandle Graphics::CreateTextureView(TextureHandle texture)
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
 
-    // Texture views only care about the actual texture, framebuffer is irrelevant
-    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second.texture));
+    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second));
 
     return textureViewHandle;
 }
@@ -428,9 +449,32 @@ void Graphics::DestroyBindGroup(BindGroupHandle& bindGroup)
 
 RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
 {
+    BX_ASSERT(!s->activeRenderPass, "Render pass already active.");
+
     // TODO: support multiple color attachments
     // TODO: framebuffer
     
+    for (u32 i = 0; i < descriptor.colorAttachments.size(); i++) {
+        const RenderPassColorAttachment& attachment = descriptor.colorAttachments[i];
+
+        auto& textureViewIter = s->textureViews.find(attachment.view);
+        BX_ENSURE(textureViewIter != s->textureViews.end());
+
+        glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0 + i, textureViewIter->second, 0);
+    }
+
+    if (descriptor.depthStencilAttachment.IsSome())
+    {
+        const RenderPassDepthStencilAttachment& attachment = descriptor.depthStencilAttachment.Unwrap();
+
+        auto& textureViewIter = s->textureViews.find(attachment.view);
+        BX_ENSURE(textureViewIter != s->textureViews.end());
+
+        glNamedFramebufferTexture(s->framebuffer, GL_DEPTH_STENCIL_ATTACHMENT, textureViewIter->second, 0);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, s->framebuffer);
+
     i32 w, h;
     Window::GetSize(&w, &h);
     glViewport(0, 0, w, h);
@@ -685,7 +729,7 @@ GLuint GraphicsOpenGL::GetRawTextureHandle(TextureHandle texture)
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
 
-    return textureIter->second.texture;
+    return textureIter->second;
 }
 
 // TODO: remove!

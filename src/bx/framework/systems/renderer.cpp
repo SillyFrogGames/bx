@@ -52,7 +52,7 @@ struct RendererState : NoCopy
     HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
     HashMap<UUID, BufferHandle> animatorBoneBuffers{};
 
-    TextureHandle colorTarget = TextureHandle::null;
+    //TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
 
     BufferHandle vertexConstantsBuffer = BufferHandle::null;
@@ -86,7 +86,7 @@ void BuildShaderPipelines()
     };
 
     ColorTargetState colorTargetState{};
-    colorTargetState.format = Graphics::GetTextureCreateInfo(s->colorTarget).format;
+    colorTargetState.format = Graphics::GetTextureCreateInfo(Graphics::GetSwapchainColorTarget()).format;
 
     TextureFormat depthFormat = Graphics::GetTextureCreateInfo(s->depthTarget).format;
 
@@ -203,6 +203,33 @@ void UpdateCameras()
         Graphics::WriteBuffer(s->vertexConstantsBuffer, 0, &viewConstants.back(), Math::Min(viewConstants.size(), static_cast<SizeType>(1)) * sizeof(VertexConstantsUniform));
 }
 
+void RecreateRenderTargets()
+{
+    if (Window::WasResized())
+    {
+        i32 w, h;
+        Window::GetSize(&w, &h);
+
+        /*TextureCreateInfo colorTargetCreateInfo{};
+        colorTargetCreateInfo.name = Optional<String>::Some("Color Target");
+        colorTargetCreateInfo.size = Extend3D(w, h, 1);
+        colorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
+        colorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);*/
+
+        TextureCreateInfo depthTargetCreateInfo{};
+        depthTargetCreateInfo.name = Optional<String>::Some("Depth Target");
+        depthTargetCreateInfo.size = Extend3D(w, h, 1);
+        depthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
+        depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        if (s->depthTarget) Graphics::DestroyTexture(s->depthTarget);
+        s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
+
+        // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change (except for the first time)
+        s->shaderPipelines.clear();
+    }
+}
+
 void Renderer::Initialize()
 {
     s = std::make_unique<RendererState>();
@@ -218,6 +245,8 @@ void Renderer::Initialize()
     lightSourceCreateInfo.size = sizeof(LightSourceData) * 10;
     lightSourceCreateInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::COPY_DST;
     s->lightSourceBuffer = Graphics::CreateBuffer(lightSourceCreateInfo);
+    
+    RecreateRenderTargets();
 }
 
 void Renderer::Shutdown()
@@ -227,28 +256,7 @@ void Renderer::Shutdown()
 
 void Renderer::Update()
 {
-    if (Window::WasResized())
-    {
-        i32 w, h;
-        Window::GetSize(&w, &h);
-
-        TextureCreateInfo colorTargetCreateInfo{};
-        colorTargetCreateInfo.name = Optional<String>::Some("Color Target");
-        colorTargetCreateInfo.size = Extend3D(w, h, 1);
-        colorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
-        colorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
-        s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);
-
-        TextureCreateInfo depthTargetCreateInfo{};
-        depthTargetCreateInfo.name = Optional<String>::Some("Depth Target");
-        depthTargetCreateInfo.size = Extend3D(w, h, 1);
-        depthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
-        depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
-        s->depthTarget = Graphics::CreateTexture(depthTargetCreateInfo);
-
-        // TODO: temporary safety, this line is unnecessary as long as the color target format doesn't change (except for the first time)
-        s->shaderPipelines.clear();
-    }
+    RecreateRenderTargets();
 }
 
 void Renderer::Render()
@@ -262,7 +270,7 @@ void Renderer::Render()
 
     Graphics::UpdateDebugLines();
 
-    TextureViewHandle colorTargetView = Graphics::CreateTextureView(s->colorTarget);
+    TextureViewHandle colorTargetView = Graphics::GetSwapchainColorTargetView();
     TextureViewHandle depthTargetView = Graphics::CreateTextureView(s->depthTarget);
 
     RenderPassDescriptor renderPassDescriptor{};
@@ -352,7 +360,7 @@ void Renderer::Render()
 TextureHandle Renderer::GetEditorCameraColorTarget()
 {
 #ifdef BX_EDITOR_BUILD
-    return s->colorTarget;
+    return Graphics::GetSwapchainColorTarget();
 #else
     return TextureHandle::null;
 #endif
