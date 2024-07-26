@@ -188,7 +188,7 @@ void UpdateCameras()
             Window::GetSize(&width, &height);
             camera.SetAspect((f32)width / (height == 0 ? 1.0f : (f32)height));
             Vec3 fwd = trx.GetRotation() * Vec3::Forward();
-            camera.SetView(Mat4::LookAt(trx.GetPosition(), trx.GetPosition() + fwd, Vec3(0, 1, 0)));
+            camera.SetView(Mat4::LookAt(trx.GetPosition(), trx.GetPosition() + fwd, Vec3::Up()));
             camera.Update();
 
             VertexConstantsUniform constants;
@@ -347,4 +347,13 @@ void Renderer::Render()
             });
     }
     Graphics::EndRenderPass(renderPass);
+}
+
+TextureHandle Renderer::GetEditorCameraColorTarget()
+{
+#ifdef BX_EDITOR_BUILD
+    return s->colorTarget;
+#else
+    return TextureHandle::null;
+#endif
 }

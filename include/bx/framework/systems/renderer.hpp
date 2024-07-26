@@ -20,6 +20,9 @@ public:
 
 	void BindConstants(const Mat4& viewMtx, const Mat4& projMtx, const Mat4& viewProjMtx);*/
 
+	// Returns the color target texture rendered from the editor camera, will return null handle if not in editor build
+	static TextureHandle GetEditorCameraColorTarget();
+
 private:
 	void Initialize() override;
 	void Shutdown() override;

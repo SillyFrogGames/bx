@@ -67,6 +67,12 @@ b8 ValidateTextureCreateInfo(const TextureCreateInfo& createInfo)
 		return false;
 	}
 
+	if ((createInfo.dimension != TextureDimension::D2 || createInfo.size.depthOrArrayLayers != 1) && (createInfo.usageFlags & TextureUsageFlags::RENDER_ATTACHMENT))
+	{
+		BX_LOGE("Invalid texture creation info: texture can only be used as render attachment if dimension = D2 and depthOrArrayLayers = 1.");
+		return false;
+	}
+
 	return true;
 }
 

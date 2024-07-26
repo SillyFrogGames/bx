@@ -16,6 +16,7 @@ public:
 	// Swapchain
 	// TODO: rework api a bit so it matches the old func calls better
 	static TextureFormat GetSwapchainFormat();
+	static TextureHandle GetSwapchainColorTarget();
 
 	// Resource creation and destruction
 	static const TextureCreateInfo& GetTextureCreateInfo(TextureHandle texture);

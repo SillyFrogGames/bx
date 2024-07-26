@@ -11,7 +11,6 @@
 #include "bx/engine/modules/window.hpp"
 #include "bx/engine/modules/imgui.hpp"
 
-#include "bx/engine/modules/graphics/backend/opengl/buffer.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/conversion.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/graphics_pipeline.hpp"
 #include "bx/engine/modules/graphics/backend/opengl/shader.hpp"
@@ -21,6 +20,14 @@ using namespace Gl;
 #ifdef BX_WINDOW_GLFW_BACKEND
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
+
+const static TextureHandle SWAPCHAIN_COLOR_TARGET_HANDLE = TextureHandle{ std::numeric_limits<decltype(TextureHandle::id)>::max() };
+
+struct TextureImpl
+{
+    GLuint texture = 0;
+    Optional<GLuint> framebuffer = Optional<GLuint>::None();
+};
 
 struct GraphicsBackendState : NoCopy
 {
@@ -34,7 +41,7 @@ struct GraphicsBackendState : NoCopy
     HandlePool<RenderPassApi> renderPassHandlePool;
     HandlePool<BindGroupApi> bindGroupHandlePool;
 
-    HashMap<TextureHandle, GLuint> textures;
+    HashMap<TextureHandle, TextureImpl> textures;
     HashMap<TextureViewHandle, GLuint> textureViews;
     HashMap<BufferHandle, GLuint> buffers;
     HashMap<ShaderHandle, Shader> shaders;
@@ -119,6 +126,11 @@ TextureFormat Graphics::GetSwapchainFormat()
     return TextureFormat::RGBA8_UNORM_SRGB;
 }
 
+TextureHandle Graphics::GetSwapchainColorTarget()
+{
+    return SWAPCHAIN_COLOR_TARGET_HANDLE;
+}
+
 TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo)
 {
     return CreateTexture(createInfo, nullptr);
@@ -133,9 +145,9 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
 
     GLenum type = TextureDimensionToGl(createInfo.dimension, createInfo.size.depthOrArrayLayers);
 
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(type, texture);
+    TextureImpl texture{};
+    glGenTextures(1, &texture.texture);
+    glBindTexture(type, texture.texture);
 
     if (type == GL_TEXTURE_1D)
     {
@@ -175,6 +187,13 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
         );
     }
 
+    if (createInfo.usageFlags & TextureUsageFlags::RENDER_ATTACHMENT)
+    {
+        GLuint framebuffer;
+        glCreateFramebuffers(1, &framebuffer);
+        //texture.framebuffer = Optional<GLuint>::Some(framebuffer);
+    }
+
     glBindTexture(type, 0);
 
     s->textures.insert(std::make_pair(textureHandle, texture));
@@ -188,7 +207,12 @@ void Graphics::DestroyTexture(TextureHandle& texture)
 
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
-    glDeleteTextures(1, &textureIter->second);
+    TextureImpl& textureImpl = textureIter->second;
+    glDeleteTextures(1, &textureImpl.texture);
+    if (textureImpl.framebuffer.IsSome())
+    {
+        glDeleteFramebuffers(1, &textureImpl.framebuffer.Unwrap());
+    }
 
     s->textures.erase(texture);
     s_createInfoCache->textureCreateInfos.erase(texture);
@@ -204,7 +228,8 @@ TextureViewHandle Graphics::CreateTextureView(TextureHandle texture)
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
 
-    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second));
+    // Texture views only care about the actual texture, framebuffer is irrelevant
+    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second.texture));
 
     return textureViewHandle;
 }
@@ -641,6 +666,26 @@ void Graphics::WriteTexture(TextureHandle texture, const u8* data, const ImageDa
 void Graphics::FlushTextureWrites()
 {
 
+}
+
+GLuint GraphicsOpenGL::GetRawBufferHandle(BufferHandle buffer)
+{
+    BX_ENSURE(buffer);
+
+    auto& bufferIter = s->buffers.find(buffer);
+    BX_ENSURE(bufferIter != s->buffers.end());
+
+    return bufferIter->second;
+}
+
+GLuint GraphicsOpenGL::GetRawTextureHandle(TextureHandle texture)
+{
+    BX_ENSURE(texture);
+
+    auto& textureIter = s->textures.find(texture);
+    BX_ENSURE(textureIter != s->textures.end());
+
+    return textureIter->second.texture;
 }
 
 // TODO: remove!

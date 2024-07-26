@@ -489,7 +489,12 @@ void SceneView::Present(bool& show)
     // TODO: ???
     //ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
 #elif defined BX_GRAPHICS_OPENGL_BACKEND
-    //ImGui::Image((void*)(intptr_t)GraphicsOpenGL::GetTextureHandle(g_renderTarget), contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
+    TextureHandle editorCameraColorTarget = Renderer::GetEditorCameraColorTarget();
+    if (editorCameraColorTarget)
+    {
+        GLuint rawEditorCameraColorTarget = GraphicsOpenGL::GetRawTextureHandle(editorCameraColorTarget);
+        ImGui::Image((void*)(intptr_t)rawEditorCameraColorTarget, contentRegionAvail, ImVec2(0, 1), ImVec2(1, 0));
+    }
 #endif
     ImGui::SetCursorScreenPos(gizmoPos);
 
@@ -529,7 +534,7 @@ void SceneView::Present(bool& show)
         ImVec2 relMousePos = ImVec2(mousePos.x - windowPos.x, windowPos.y + windowSize.y - mousePos.y);
         
         u64 pixelData = 0;
-        Graphics::ReadPixels((u32)relMousePos.x, (u32)relMousePos.y, 1, 1, &pixelData, g_renderTargetIDs);
+        //Graphics::ReadPixels((u32)relMousePos.x, (u32)relMousePos.y, 1, 1, &pixelData, g_renderTargetIDs);
         if (pixelData != 0)
         {
             Selection::SetSelected(Object<Entity>(pixelData));

@@ -178,7 +178,6 @@ endif()
 # Setup graphics backend
 if (BX_GRAPHICS_BACKEND STREQUAL "OpenGL")
 	set (BX_SRCS ${BX_SRCS}
-		"src/bx/engine/modules/graphics/backend/opengl/buffer.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/conversion.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/graphics_pipeline.cpp"
 		"src/bx/engine/modules/graphics/backend/opengl/opengl_api.cpp"
