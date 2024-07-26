@@ -672,4 +672,75 @@ namespace Gl
 			BX_FAIL("Vertex format not supported.");
 		}
 	}
+
+	b8 IsVertexFormatInt(const VertexFormat& format)
+	{
+		switch (format)
+		{
+		case VertexFormat::UINT_8X2:
+			return true;
+		case VertexFormat::UINT_8X4:
+			return true;
+		case VertexFormat::SINT_8X2:
+			return true;
+		case VertexFormat::SINT_8X4:
+			return true;
+		case VertexFormat::UNORM_8X2:
+			return false;
+		case VertexFormat::UNORM_8X4:
+			return false;
+		case VertexFormat::SNORM_8X2:
+			return false;
+		case VertexFormat::SNORM_8X4:
+			return false;
+
+		case VertexFormat::UINT_16X2:
+			return true;
+		case VertexFormat::UINT_16X4:
+			return true;
+		case VertexFormat::SINT_16X2:
+			return true;
+		case VertexFormat::SINT_16X4:
+			return true;
+		case VertexFormat::UNORM_16X2:
+			return false;
+		case VertexFormat::UNORM_16X4:
+			return false;
+		case VertexFormat::SNORM_16X2:
+			return false;
+		case VertexFormat::SNORM_16X4:
+			return false;
+		case VertexFormat::FLOAT_16X2:
+			return false;
+		case VertexFormat::FLOAT_16X4:
+			return false;
+
+		case VertexFormat::FLOAT_32:
+			return false;
+		case VertexFormat::FLOAT_32X2:
+			return false;
+		case VertexFormat::FLOAT_32X3:
+			return false;
+		case VertexFormat::FLOAT_32X4:
+			return false;
+		case VertexFormat::UINT_32:
+			return true;
+		case VertexFormat::UINT_32X2:
+			return true;
+		case VertexFormat::UINT_32X3:
+			return true;
+		case VertexFormat::UINT_32X4:
+			return true;
+		case VertexFormat::SINT_32:
+			return true;
+		case VertexFormat::SINT_32X2:
+			return true;
+		case VertexFormat::SINT_32X3:
+			return true;
+		case VertexFormat::SINT_32X4:
+			return true;
+		default:
+			BX_FAIL("Vertex format not supported.");
+		}
+	}
 }

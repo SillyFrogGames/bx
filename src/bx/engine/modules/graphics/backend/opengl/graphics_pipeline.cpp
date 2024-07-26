@@ -13,7 +13,6 @@ namespace Gl
         glGenVertexArrays(1, &vao);
 
         glBindVertexArray(vao);
-        // TODO: support multiple vertex buffers
         for (u32 i = 0; i < 1; i++)
         {
             auto& layout = vertexBuffers[i];
@@ -22,28 +21,15 @@ namespace Gl
             {
                 auto& attribute = layout.attributes[j];
                 
-                glVertexArrayAttribFormat(vao, attribute.location, VertexFormatToGlSize(attribute.format), VertexFormatToGlType(attribute.format), GL_FALSE, attribute.offset);
+                if (IsVertexFormatInt(attribute.format))
+                    glVertexArrayAttribIFormat(vao, attribute.location, VertexFormatToGlSize(attribute.format), VertexFormatToGlType(attribute.format), attribute.offset);
+                else
+                    glVertexArrayAttribFormat(vao, attribute.location, VertexFormatToGlSize(attribute.format), VertexFormatToGlType(attribute.format), GL_FALSE, attribute.offset);
                 glEnableVertexArrayAttrib(vao, attribute.location);
                 glVertexArrayAttribBinding(vao, attribute.location, i);
             }
         }
         glBindVertexArray(0);
-
-        /*for (auto& groupLayout : layout.bindGroupLayouts)
-        {
-            for (auto& entry : groupLayout.entries)
-            {
-                auto& typeDescriptor = entry.type;
-                switch (typeDescriptor.type)
-                {
-                case BindingType::UNIFORM_BUFFER:
-                {
-                    glUniformBlockBinding(shaderProgram.GetHandle(), location, binding);
-                    break;
-                }
-                }
-            }
-        }*/
     }
 
     GraphicsPipeline::~GraphicsPipeline()
