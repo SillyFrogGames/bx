@@ -128,8 +128,6 @@ void Graphics::EndFrame()
     s->boundComputePipeline = ComputePipelineHandle::null;
     s->boundIndexFormat = Optional<IndexFormat>::None();
 
-    // TODO: maybe we still want to present to the screen, even if imgui will draw over it?
-#ifndef BX_EDITOR_BUILD
     glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0, s->swapchainColorTarget, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, s->framebuffer);
 
@@ -138,7 +136,6 @@ void Graphics::EndFrame()
     glBlitNamedFramebuffer(s->framebuffer, 0,
         0, 0, w, h, 0, 0, w, h,
         GL_COLOR_BUFFER_BIT, GL_NEAREST);
-#endif
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

@@ -254,7 +254,7 @@ static void Update(const ImVec2& size)
     g_sceneCam.SetView(Mat4::LookAt(g_sceneTrx.GetPosition(), g_sceneTrx.GetPosition() + (g_sceneTrx.GetRotation() * Vec3::Forward()), Vec3::Up()));
 }
 
-static void Render(const ImVec2& size)
+void SceneView::Render(const ImVec2& size)
 {
     if (g_sceneSize.x != size.x || g_sceneSize.y != size.y)
     {
@@ -333,6 +333,10 @@ static void Render(const ImVec2& size)
             Physics::SetCharacterControllerMatrix(cc.GetCharacterController(), trx.GetMatrix());
         });
 
+    Renderer& renderer = SystemManager::GetSystem<Renderer>();
+    renderer.editorCamera = OptionalView<Camera>::Some(&g_sceneCam);
+    renderer.Render();
+    renderer.editorCamera = OptionalView<Camera>::None();
     /*auto& renderer = SystemManager::GetSystem<Renderer>();
     renderer.UpdateAnimators();
     renderer.UpdateCameras();

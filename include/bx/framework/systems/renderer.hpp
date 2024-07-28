@@ -4,6 +4,9 @@
 #include <bx/engine/core/math.hpp>
 #include <bx/engine/modules/graphics.hpp>
 
+class SceneView;
+class Camera;
+
 class Renderer : public System
 {
 public:
@@ -24,9 +27,15 @@ public:
 	static TextureHandle GetEditorCameraColorTarget();
 
 private:
+	friend class SceneView;
+
 	void Initialize() override;
 	void Shutdown() override;
 
 	void Update() override;
 	void Render() override;
+
+	OptionalView<Camera> editorCamera = OptionalView<Camera>::None();
+
+	void UpdateCameras();
 };

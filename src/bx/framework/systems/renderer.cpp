@@ -176,7 +176,7 @@ void UpdateLightSources()
     Graphics::WriteBuffer(s->lightSourceBuffer, 0, lightSources.data(), lightSources.size() * sizeof(LightSourceData));
 }
 
-void UpdateCameras()
+void Renderer::UpdateCameras()
 {
     List<VertexConstantsUniform> viewConstants{};
 
@@ -198,9 +198,22 @@ void UpdateCameras()
             viewConstants.emplace_back(constants);
         });
 
+    if (editorCamera.IsSome())
+    {
+        Camera& camera = editorCamera.Unwrap();
+
+        VertexConstantsUniform constants;
+        constants.view = camera.GetView();
+        constants.projection = camera.GetProjection();
+        constants.viewProjection = camera.GetViewProjection();
+        viewConstants.emplace_back(constants);
+    }
+
     // TODO: for now just uploading last camera, maybe splitscreen support?
     if (viewConstants.size() > 0)
+    {
         Graphics::WriteBuffer(s->vertexConstantsBuffer, 0, &viewConstants.back(), Math::Min(viewConstants.size(), static_cast<SizeType>(1)) * sizeof(VertexConstantsUniform));
+    }
 }
 
 void RecreateRenderTargets()
