@@ -68,6 +68,11 @@ public:
 	static void DrawIndexed(u32 indexCount, u32 instanceCount = 1);
 	static void EndRenderPass(RenderPassHandle& renderPass);
 
+	static ComputePassHandle BeginComputePass(const ComputePassDescriptor& descriptor);
+	static void SetComputePipeline(ComputePipelineHandle computePipeline);
+	static void DispatchWorkgroups(u32 x, u32 y, u32 z);
+	static void EndComputePass(ComputePassHandle& computePass);
+
 	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
 	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data);

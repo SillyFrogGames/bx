@@ -342,7 +342,7 @@ void Renderer::Render()
 
                     // TODO: very lazy, shouldn't be created every frame probably
                     BindGroupCreateInfo createInfo{};
-                    createInfo.name = Optional<String>::Some("Renderer Core Bindgroup");
+                    createInfo.name = Optional<String>::Some("Renderer Core BindGroup");
                     createInfo.layout = Graphics::GetBindGroupLayout(graphicsPipeline, 0);
                     createInfo.entries = {
                         BindGroupEntry(0, BindingResource::Buffer(BufferBinding(s->vertexConstantsBuffer))),
