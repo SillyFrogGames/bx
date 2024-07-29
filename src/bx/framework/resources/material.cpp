@@ -78,6 +78,6 @@ BindGroupHandle Material::GetBindGroup(BindGroupLayoutHandle layout) const
 BindGroupLayoutDescriptor Material::GetBindGroupLayout()
 {
     return BindGroupLayoutDescriptor(Material::SHADER_BIND_GROUP, {
-        BindGroupLayoutEntry(3, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Sampler())           // layout (binding = 3) uniform sampler2D Albedo;
+        BindGroupLayoutEntry(3, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Texture(TextureSampleType::FLOAT)) // layout (binding = 3) uniform sampler2D Albedo;
     });
 }

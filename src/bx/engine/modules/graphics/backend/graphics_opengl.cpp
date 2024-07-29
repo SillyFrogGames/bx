@@ -21,6 +21,12 @@ using namespace Gl;
 #include "bx/engine/modules/window/backend/window_glfw.hpp"
 #endif
 
+struct TextureView
+{
+    TextureHandle handle;
+    GLuint texture;
+};
+
 struct GraphicsBackendState : NoCopy
 {
     HandlePool<BufferApi> bufferHandlePool;
@@ -31,10 +37,11 @@ struct GraphicsBackendState : NoCopy
     HandlePool<GraphicsPipelineApi> graphicsPipelineHandlePool;
     HandlePool<ComputePipelineApi> computePipelineHandlePool;
     HandlePool<RenderPassApi> renderPassHandlePool;
+    HandlePool<ComputePassApi> computePassHandlePool;
     HandlePool<BindGroupApi> bindGroupHandlePool;
 
     HashMap<TextureHandle, GLuint> textures;
-    HashMap<TextureViewHandle, GLuint> textureViews;
+    HashMap<TextureViewHandle, TextureView> textureViews;
     HashMap<BufferHandle, GLuint> buffers;
     HashMap<ShaderHandle, Shader> shaders;
     HashMap<GraphicsPipelineHandle, GraphicsPipeline> graphicsPipelines;
@@ -42,6 +49,7 @@ struct GraphicsBackendState : NoCopy
     GLuint framebuffer;
     
     RenderPassHandle activeRenderPass = RenderPassHandle::null;
+    ComputePassHandle activeComputePass = ComputePassHandle::null;
     GraphicsPipelineHandle boundGraphicsPipeline = GraphicsPipelineHandle::null;
     ComputePipelineHandle boundComputePipeline = ComputePipelineHandle::null;
     Optional<IndexFormat> boundIndexFormat = Optional<IndexFormat>::None();
@@ -123,7 +131,8 @@ void Graphics::NewFrame()
 void Graphics::EndFrame()
 {
     BX_ASSERT(s->activeRenderPass == RenderPassHandle::null, "Render pass must have been ended before the end of the frame.");
-    
+    BX_ASSERT(s->activeComputePass == ComputePassHandle::null, "Compute pass must have been ended before the end of the frame.");
+
     s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
     s->boundComputePipeline = ComputePipelineHandle::null;
     s->boundIndexFormat = Optional<IndexFormat>::None();
@@ -247,7 +256,11 @@ TextureViewHandle Graphics::CreateTextureView(TextureHandle texture)
     auto& textureIter = s->textures.find(texture);
     BX_ENSURE(textureIter != s->textures.end());
 
-    s->textureViews.insert(std::make_pair(textureViewHandle, textureIter->second));
+    TextureView textureView;
+    textureView.handle = texture;
+    textureView.texture = textureIter->second;
+
+    s->textureViews.insert(std::make_pair(textureViewHandle, textureView));
 
     return textureViewHandle;
 }
@@ -312,7 +325,7 @@ ShaderHandle Graphics::CreateShader(const ShaderCreateInfo& createInfo)
     ShaderHandle shaderHandle = s->shaderHandlePool.Create();
     s_createInfoCache->shaderCreateInfos.insert(std::make_pair(shaderHandle, createInfo));
 
-    String meta = String("#version 420 core\n");
+    String meta = String("#version 450\n");
     switch (createInfo.shaderType)
     {
     case ShaderType::VERTEX:
@@ -457,7 +470,7 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
         auto& textureViewIter = s->textureViews.find(attachment.view);
         BX_ENSURE(textureViewIter != s->textureViews.end());
 
-        glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0 + i, textureViewIter->second, 0);
+        glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0 + i, textureViewIter->second.texture, 0);
     }
 
     if (descriptor.depthStencilAttachment.IsSome())
@@ -467,7 +480,7 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
         auto& textureViewIter = s->textureViews.find(attachment.view);
         BX_ENSURE(textureViewIter != s->textureViews.end());
 
-        glNamedFramebufferTexture(s->framebuffer, GL_DEPTH_STENCIL_ATTACHMENT, textureViewIter->second, 0);
+        glNamedFramebufferTexture(s->framebuffer, GL_DEPTH_STENCIL_ATTACHMENT, textureViewIter->second.texture, 0);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, s->framebuffer);
@@ -537,7 +550,7 @@ void Graphics::SetIndexBuffer(const BufferSlice& bufferSlice, IndexFormat format
 
 void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
 {
-    BX_ASSERT(s->activeRenderPass, "No render pass active.");
+    BX_ASSERT(s->activeRenderPass || s->activeComputePass, "No render pass or compute pass active.");
     BX_ENSURE(bindGroup);
 
     auto& bindGroupCreateInfoIter = s_createInfoCache->bindGroupCreateInfos.find(bindGroup);
@@ -622,8 +635,25 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
             auto& textureViewIter = s->textureViews.find(resource.textureView);
             BX_ENSURE(textureViewIter != s->textureViews.end());
 
-            glActiveTexture(GL_TEXTURE0 + entry.binding);
-            glBindTexture(GL_TEXTURE_2D, textureViewIter->second);
+            if (groupLayoutEntry.Unwrap().type.type == BindingType::TEXTURE)
+            {
+                glActiveTexture(GL_TEXTURE0 + entry.binding);
+                glBindTexture(GL_TEXTURE_2D, textureViewIter->second.texture);
+            }
+            else if (groupLayoutEntry.Unwrap().type.type == BindingType::STORAGE_TEXTURE)
+            {
+                TextureFormat format = GetTextureCreateInfo(textureViewIter->second.handle).format;
+                GLenum internalFormat = TextureFormatToGlInternalFormat(format);
+
+                b8 readOnly = groupLayoutEntry.Unwrap().type.storageBuffer.readOnly;
+                GLenum access = readOnly ? GL_READ_ONLY : GL_READ_WRITE;
+
+                glBindImageTexture(entry.binding, textureViewIter->second.texture, 0, GL_FALSE, 0, access, internalFormat);
+            }
+            else
+            {
+                BX_FAIL("Unexpected binding resource type at group {} binding {}.", index, entry.binding);
+            }
             break;
         }
         }
@@ -663,12 +693,57 @@ void Graphics::DrawIndexed(u32 indexCount, u32 instanceCount)
 
 void Graphics::EndRenderPass(RenderPassHandle& renderPass)
 {
+    BX_ASSERT(s->activeRenderPass, "No render pass active.");
     BX_ENSURE(renderPass);
     
     s->activeRenderPass = RenderPassHandle::null;
     s->renderPassHandlePool.Destroy(renderPass);
 
     s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
+}
+
+ComputePassHandle Graphics::BeginComputePass(const ComputePassDescriptor& descriptor)
+{
+    BX_ASSERT(!s->activeComputePass, "Compute pass already active.");
+
+    ComputePassHandle computePassHandle = s->computePassHandlePool.Create();
+    //s_createInfoCache->renderPass.insert(std::make_pair(renderPass, descriptor));
+
+    s->activeComputePass = computePassHandle;
+
+    return computePassHandle;
+}
+
+void Graphics::SetComputePipeline(ComputePipelineHandle computePipeline)
+{
+    BX_ASSERT(s->activeComputePass, "No compute pass active.");
+    BX_ENSURE(computePipeline);
+
+    s->boundComputePipeline = computePipeline;
+
+    auto& pipelineIter = s->computePipelines.find(computePipeline);
+    BX_ENSURE(pipelineIter != s->computePipelines.end());
+    auto& pipeline = pipelineIter->second;
+
+    glUseProgram(pipeline.GetHandle());
+}
+
+void Graphics::DispatchWorkgroups(u32 x, u32 y, u32 z)
+{
+    BX_ASSERT(s->activeComputePass, "No compute pass active.");
+    BX_ASSERT(s->boundComputePipeline, "No compute pipeline bound.");
+
+    glDispatchCompute(x, y, z);
+}
+
+void Graphics::EndComputePass(ComputePassHandle& computePass)
+{
+    BX_ASSERT(s->activeComputePass, "No compute pass active.");
+    BX_ENSURE(computePass);
+
+    s->activeComputePass = ComputePassHandle::null;
+    s->computePassHandlePool.Destroy(computePass);
+
     s->boundComputePipeline = ComputePipelineHandle::null;
 }
 

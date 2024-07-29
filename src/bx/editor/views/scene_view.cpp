@@ -16,6 +16,7 @@
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 #include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
+#include <bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp>
 
 #include <bx/framework/components/transform.hpp>
 #include <bx/framework/components/camera.hpp>
@@ -50,6 +51,8 @@ static Vec3 g_eulerAngles;
 static ImVec2 g_sceneSize;
 
 static bool g_physicsDebugDraw = false;
+
+static TextureHandle g_sceneViewColorTarget = TextureHandle::null;
 
 //static GraphicsHandle g_vertShader = INVALID_GRAPHICS_HANDLE;
 //static GraphicsHandle g_pixelShader = INVALID_GRAPHICS_HANDLE;
@@ -337,6 +340,21 @@ void SceneView::Render(const ImVec2& size)
     renderer.editorCamera = OptionalView<Camera>::Some(&g_sceneCam);
     renderer.Render();
     renderer.editorCamera = OptionalView<Camera>::None();
+
+    TextureCreateInfo sceneViewOutCreateInfo{};
+    sceneViewOutCreateInfo.name = Optional<String>::Some("Scene View Out");
+    sceneViewOutCreateInfo.size = Graphics::GetTextureCreateInfo(renderer.GetEditorCameraColorTarget()).size;
+    sceneViewOutCreateInfo.format = TextureFormat::RGBA8_UNORM;
+    sceneViewOutCreateInfo.usageFlags = TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::COPY_SRC;
+    if (g_sceneViewColorTarget) Graphics::DestroyTexture(g_sceneViewColorTarget);
+    g_sceneViewColorTarget = Graphics::CreateTexture(sceneViewOutCreateInfo);
+
+    if (renderer.GetEditorCameraColorTarget())
+    {
+        SrgbToLinearPass srgbToLinearPass(renderer.GetEditorCameraColorTarget(), g_sceneViewColorTarget);
+        srgbToLinearPass.Dispatch();
+    }
+
     /*auto& renderer = SystemManager::GetSystem<Renderer>();
     renderer.UpdateAnimators();
     renderer.UpdateCameras();

@@ -25,6 +25,8 @@ struct ComputePipelineApi {};
 using ComputePipelineHandle = Handle<ComputePipelineApi>;
 struct RenderPassApi {};
 using RenderPassHandle = Handle<RenderPassApi>;
+struct ComputePassApi {};
+using ComputePassHandle = Handle<ComputePassApi>;
 struct BindGroupLayoutApi {};
 using BindGroupLayoutHandle = Handle<BindGroupLayoutApi>;
 struct BindGroupApi {};
@@ -292,6 +294,13 @@ struct Extend3D
 	Extend3D() = default;
 	Extend3D(u32 width, u32 height, u32 depthOrArrayLayers)
 		: width(width), height(height), depthOrArrayLayers(depthOrArrayLayers) {}
+
+	b8 operator==(const Extend3D& other) const
+	{
+		return width == other.width &&
+			height == other.height &&
+			depthOrArrayLayers == other.depthOrArrayLayers;
+	}
 
 	u32 width = 1;
 	u32 height = 1;
@@ -588,6 +597,11 @@ struct RenderPassDescriptor
 
 	List<RenderPassColorAttachment> colorAttachments = List<RenderPassColorAttachment>{};
 	Optional<RenderPassDepthStencilAttachment> depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::None();
+};
+
+struct ComputePassDescriptor
+{
+	Optional<String> name = Optional<String>::None();
 };
 
 struct DebugVertex
