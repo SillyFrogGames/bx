@@ -2,6 +2,9 @@
 
 #include "bx/engine/modules/graphics/type_validation.hpp"
 
+#include "bx/engine/modules/graphics/toolkit/present.hpp"
+#include "bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp"
+
 #include "bx/engine/core/log.hpp"
 #include "bx/engine/core/guard.hpp"
 #include "bx/engine/core/file.hpp"
@@ -80,6 +83,12 @@ const RenderPassDescriptor& Graphics::GetRenderPassDescriptor(RenderPassHandle r
     auto& createInfoIter = s_createInfoCache->renderPassCreateInfos.find(renderPass);
     BX_ENSURE(createInfoIter != s_createInfoCache->renderPassCreateInfos.end());
     return createInfoIter->second;
+}
+
+void Graphics::ClearPipelineCaches()
+{
+    PresentPass::ClearPipelineCache();
+    SrgbToLinearPass::ClearPipelineCache();
 }
 
 // TODO: move debug lines somewhere else

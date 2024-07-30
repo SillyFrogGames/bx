@@ -102,6 +102,8 @@ void Graphics::Reload()
 
 void Graphics::Shutdown()
 {
+    ClearPipelineCaches();
+
     // TODO: clear a shitload of gl objects (textures, buffers, etc.)
 
     glDeleteFramebuffers(1, &s->framebuffer);

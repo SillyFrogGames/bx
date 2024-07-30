@@ -12,9 +12,9 @@ public:
 
 	void Dispatch();
 
-private:
-	static GraphicsPipelineHandle Pipeline();
+	static void ClearPipelineCache();
 
+private:
 	BindGroupHandle bindGroup;
 	TextureViewHandle hdrTextureView;
 	u32 width, height;

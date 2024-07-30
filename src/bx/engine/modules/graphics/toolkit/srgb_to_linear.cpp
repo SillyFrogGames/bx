@@ -1,5 +1,7 @@
 #include "bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp"
 
+#include "bx/engine/containers/lazy_init.hpp"
+
 const char* SRGB_TO_LINEAR_SHADER_SRC = R""""(
 
 layout (binding = 0) uniform sampler2D InTexture;
@@ -20,7 +22,7 @@ void main()
 
 )"""";
 
-struct SrgbToLinearPipeline : NoCopy
+struct SrgbToLinearPipeline : public LazyInit<SrgbToLinearPipeline, ComputePipelineHandle>
 {
     SrgbToLinearPipeline()
     {
@@ -42,33 +44,13 @@ struct SrgbToLinearPipeline : NoCopy
         pipelineCreateInfo.name = Optional<String>::Some("Srgb to Linear Pipeline");
         pipelineCreateInfo.layout = pipelineLayoutDescriptor;
         pipelineCreateInfo.shader = shader;
-        pipeline = Graphics::CreateComputePipeline(pipelineCreateInfo);
+        data = Graphics::CreateComputePipeline(pipelineCreateInfo);
 
         Graphics::DestroyShader(shader);
     }
-
-    ~SrgbToLinearPipeline()
-    {
-        // TODO: shader db, static destructor order messes up this approach
-        Graphics::DestroyComputePipeline(pipeline);
-    }
-
-    ComputePipelineHandle Pipeline() const { return pipeline; }
-
-private:
-    ComputePipelineHandle pipeline;
 };
 
-ComputePipelineHandle SrgbToLinearPass::Pipeline()
-{
-    static std::unique_ptr<SrgbToLinearPipeline> pipeline = nullptr;
-    if (!pipeline)
-    {
-        pipeline = std::make_unique<SrgbToLinearPipeline>();
-    }
-
-    return pipeline->Pipeline();
-}
+std::unique_ptr<SrgbToLinearPipeline> LazyInit<SrgbToLinearPipeline, ComputePipelineHandle>::cache = nullptr;
 
 SrgbToLinearPass::SrgbToLinearPass(TextureHandle srgbTexture, TextureHandle linearTexture)
 {
@@ -86,7 +68,7 @@ SrgbToLinearPass::SrgbToLinearPass(TextureHandle srgbTexture, TextureHandle line
 
     BindGroupCreateInfo createInfo{};
     createInfo.name = Optional<String>::Some("Srgb to Linear BindGroup");
-    createInfo.layout = Graphics::GetBindGroupLayout(Pipeline(), 0);
+    createInfo.layout = Graphics::GetBindGroupLayout(SrgbToLinearPipeline::Get(), 0);
     createInfo.entries = {
         BindGroupEntry(0, BindingResource::TextureView(srgbTextureView)),
         BindGroupEntry(1, BindingResource::TextureView(linearTextureView))
@@ -108,9 +90,14 @@ void SrgbToLinearPass::Dispatch()
 
     ComputePassHandle computePass = Graphics::BeginComputePass(computePassDescriptor);
     {
-        Graphics::SetComputePipeline(Pipeline());
+        Graphics::SetComputePipeline(SrgbToLinearPipeline::Get());
         Graphics::SetBindGroup(0, bindGroup);
         Graphics::DispatchWorkgroups(Math::DivCeil(width, 16), Math::DivCeil(height, 16), 1);
     }
     Graphics::EndComputePass(computePass);
+}
+
+void SrgbToLinearPass::ClearPipelineCache()
+{
+    SrgbToLinearPipeline::Clear();
 }

@@ -1,5 +1,7 @@
 #include "bx/engine/modules/graphics/toolkit/present.hpp"
 
+#include "bx/engine/containers/lazy_init.hpp"
+
 const char* PRESENT_SHADER_SRC = R""""(
 
 #ifdef VERTEX
@@ -41,6 +43,12 @@ vec3 gammaCorrect(vec3 x, float gamma)
 void main()
 {
     vec3 hdrColor = texture(colorImage, fragTexCoord).rgb;
+
+    // acesg -> acescct (matrix mult)
+
+    // 2 luts, 1d & 3d textures
+    // acescct , apply output transform (monitor dependant)
+    
     
     vec3 sdrColor = aces(hdrColor);
     sdrColor = gammaCorrect(sdrColor, 2.2);
@@ -52,7 +60,7 @@ void main()
 
 )"""";
 
-struct PresentPipeline : NoCopy
+struct PresentPipeline : public LazyInit<PresentPipeline, GraphicsPipelineHandle>
 {
     PresentPipeline()
     {
@@ -86,34 +94,14 @@ struct PresentPipeline : NoCopy
         pipelineCreateInfo.vertexBuffers = {};
         pipelineCreateInfo.cullMode = Optional<Face>::None();
         pipelineCreateInfo.colorTarget = Optional<ColorTargetState>::Some(colorTargetState);
-        pipeline = Graphics::CreateGraphicsPipeline(pipelineCreateInfo);
+        data = Graphics::CreateGraphicsPipeline(pipelineCreateInfo);
 
         Graphics::DestroyShader(vertexShader);
         Graphics::DestroyShader(fragmentShader);
     }
-
-    ~PresentPipeline()
-    {
-        // TODO: shader db, static destructor order messes up this approach
-        Graphics::DestroyGraphicsPipeline(pipeline);
-    }
-
-    GraphicsPipelineHandle Pipeline() const { return pipeline; }
-
-private:
-    GraphicsPipelineHandle pipeline;
 };
 
-GraphicsPipelineHandle PresentPass::Pipeline()
-{
-    static std::unique_ptr<PresentPipeline> pipeline = nullptr;
-    if (!pipeline)
-    {
-        pipeline = std::make_unique<PresentPipeline>();
-    }
-
-    return pipeline->Pipeline();
-}
+std::unique_ptr<PresentPipeline> LazyInit<PresentPipeline, GraphicsPipelineHandle>::cache = nullptr;
 
 PresentPass::PresentPass(TextureHandle hdrTexture)
 {
@@ -127,7 +115,7 @@ PresentPass::PresentPass(TextureHandle hdrTexture)
 
     BindGroupCreateInfo createInfo{};
     createInfo.name = Optional<String>::Some("Present BindGroup");
-    createInfo.layout = Graphics::GetBindGroupLayout(Pipeline(), 0);
+    createInfo.layout = Graphics::GetBindGroupLayout(PresentPipeline::Get(), 0);
     createInfo.entries = {
         BindGroupEntry(0, BindingResource::TextureView(hdrTextureView)),
     };
@@ -148,9 +136,14 @@ void PresentPass::Dispatch()
 
     RenderPassHandle renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
     {
-        Graphics::SetGraphicsPipeline(Pipeline());
+        Graphics::SetGraphicsPipeline(PresentPipeline::Get());
         Graphics::SetBindGroup(0, bindGroup);
         Graphics::Draw(3);
     }
     Graphics::EndRenderPass(renderPass);
+}
+
+void PresentPass::ClearPipelineCache()
+{
+    PresentPipeline::Clear();
 }

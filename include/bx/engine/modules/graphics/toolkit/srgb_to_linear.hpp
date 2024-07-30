@@ -12,9 +12,9 @@ public:
 
 	void Dispatch();
 
-private:
-	static ComputePipelineHandle Pipeline();
+	static void ClearPipelineCache();
 
+private:
 	BindGroupHandle bindGroup;
 	TextureViewHandle srgbTextureView;
 	TextureViewHandle linearTextureView;
