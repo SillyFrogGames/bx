@@ -119,6 +119,7 @@ void Graphics::NewFrame()
         TextureCreateInfo swapchainColorTargetCreateInfo{};
         swapchainColorTargetCreateInfo.name = Optional<String>::Some("Swapchain Color Target");
         swapchainColorTargetCreateInfo.size = Extend3D(w, h, 1);
+        swapchainColorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM;
         swapchainColorTargetCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::COPY_DST | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::RENDER_ATTACHMENT;
         if (s->swapchainColorTarget) Graphics::DestroyTexture(s->swapchainColorTarget);
         s->swapchainColorTarget = Graphics::CreateTexture(swapchainColorTargetCreateInfo);
@@ -460,11 +461,9 @@ void Graphics::DestroyBindGroup(BindGroupHandle& bindGroup)
 RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descriptor)
 {
     BX_ASSERT(!s->activeRenderPass, "Render pass already active.");
-
-    // TODO: support multiple color attachments
-    // TODO: framebuffer
     
-    for (u32 i = 0; i < descriptor.colorAttachments.size(); i++) {
+    for (u32 i = 0; i < descriptor.colorAttachments.size(); i++)
+    {
         const RenderPassColorAttachment& attachment = descriptor.colorAttachments[i];
 
         auto& textureViewIter = s->textureViews.find(attachment.view);
@@ -492,7 +491,7 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     RenderPassHandle renderPassHandle = s->renderPassHandlePool.Create();
-    //s_createInfoCache->renderPass.insert(std::make_pair(renderPass, descriptor));
+    s_createInfoCache->renderPassCreateInfos.insert(std::make_pair(renderPassHandle, descriptor));
 
     s->activeRenderPass = renderPassHandle;
 
@@ -515,8 +514,14 @@ void Graphics::SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline)
 
     auto& info = GetGraphicsPipelineCreateInfo(graphicsPipeline);
     
-    // TODO: remove, depth buffer should be created and bound explicitely in render passes
-    glEnable(GL_DEPTH_TEST);
+    if (info.depthFormat.IsSome())
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
 }
 
 void Graphics::SetVertexBuffer(u32 slot, const BufferSlice& bufferSlice)
@@ -643,10 +648,10 @@ void Graphics::SetBindGroup(u32 index, BindGroupHandle bindGroup)
             else if (groupLayoutEntry.Unwrap().type.type == BindingType::STORAGE_TEXTURE)
             {
                 TextureFormat format = GetTextureCreateInfo(textureViewIter->second.handle).format;
-                GLenum internalFormat = TextureFormatToGlInternalFormat(format);
+                BX_ASSERT(!IsTextureFormatSrgb(format), "Storage texture format cannot be srgb.");
 
-                b8 readOnly = groupLayoutEntry.Unwrap().type.storageBuffer.readOnly;
-                GLenum access = readOnly ? GL_READ_ONLY : GL_READ_WRITE;
+                GLenum internalFormat = TextureFormatToGlInternalFormat(format);
+                GLenum access = StorageTextureAccessToGl(groupLayoutEntry.Unwrap().type.storageTexture.access);
 
                 glBindImageTexture(entry.binding, textureViewIter->second.texture, 0, GL_FALSE, 0, access, internalFormat);
             }
@@ -695,9 +700,20 @@ void Graphics::EndRenderPass(RenderPassHandle& renderPass)
 {
     BX_ASSERT(s->activeRenderPass, "No render pass active.");
     BX_ENSURE(renderPass);
+
+    const RenderPassDescriptor& descriptor = Graphics::GetRenderPassDescriptor(renderPass);
+    for (u32 i = 0; i < descriptor.colorAttachments.size(); i++)
+    {
+        glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0 + i, 0, 0);
+    }
+    if (descriptor.depthStencilAttachment.IsSome())
+    {
+        glNamedFramebufferTexture(s->framebuffer, GL_DEPTH_STENCIL_ATTACHMENT, 0, 0);
+    }
     
     s->activeRenderPass = RenderPassHandle::null;
     s->renderPassHandlePool.Destroy(renderPass);
+    s_createInfoCache->renderPassCreateInfos.erase(renderPass);
 
     s->boundGraphicsPipeline = GraphicsPipelineHandle::null;
 }

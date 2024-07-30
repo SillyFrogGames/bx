@@ -58,6 +58,7 @@ public:
 	static void DestroyBindGroup(BindGroupHandle& bindGroup);
 
 	// Cmds
+	static const RenderPassDescriptor& GetRenderPassDescriptor(RenderPassHandle renderPass);
 	static RenderPassHandle BeginRenderPass(const RenderPassDescriptor& descriptor);
 	// Set a graphics pipeline, will unbind any vertex and index buffers previously bound
 	static void SetGraphicsPipeline(GraphicsPipelineHandle graphicsPipeline);
@@ -108,6 +109,7 @@ private:
 		HashMap<GraphicsPipelineHandle, GraphicsPipelineCreateInfo> graphicsPipelineCreateInfos;
 		HashMap<ComputePipelineHandle, ComputePipelineCreateInfo> computePipelineCreateInfos;
 		HashMap<BindGroupHandle, BindGroupCreateInfo> bindGroupCreateInfos;
+		HashMap<RenderPassHandle, RenderPassDescriptor> renderPassCreateInfos;
 	};
 	static std::unique_ptr<CreateInfoCache> s_createInfoCache;
 

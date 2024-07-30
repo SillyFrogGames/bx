@@ -73,6 +73,15 @@ const BindGroupCreateInfo& Graphics::GetBindGroupCreateInfo(BindGroupHandle bind
     return createInfoIter->second;
 }
 
+const RenderPassDescriptor& Graphics::GetRenderPassDescriptor(RenderPassHandle renderPass)
+{
+    BX_ENSURE(renderPass);
+
+    auto& createInfoIter = s_createInfoCache->renderPassCreateInfos.find(renderPass);
+    BX_ENSURE(createInfoIter != s_createInfoCache->renderPassCreateInfos.end());
+    return createInfoIter->second;
+}
+
 // TODO: move debug lines somewhere else
 
 struct DebugLineData

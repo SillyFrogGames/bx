@@ -1,6 +1,6 @@
 #include "bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp"
 
-const char* SHADER_SRC = R""""(
+const char* SRGB_TO_LINEAR_SHADER_SRC = R""""(
 
 layout (binding = 0) uniform sampler2D InTexture;
 layout (binding = 1, rgba8) uniform image2D OutTexture;
@@ -27,7 +27,7 @@ struct SrgbToLinearPipeline : NoCopy
         ShaderCreateInfo shaderCreateInfo{};
         shaderCreateInfo.name = Optional<String>::Some("Srgb to Linear Shader");
         shaderCreateInfo.shaderType = ShaderType::COMPUTE;
-        shaderCreateInfo.src = SHADER_SRC;
+        shaderCreateInfo.src = SRGB_TO_LINEAR_SHADER_SRC;
         ShaderHandle shader = Graphics::CreateShader(shaderCreateInfo);
 
         PipelineLayoutDescriptor pipelineLayoutDescriptor{};

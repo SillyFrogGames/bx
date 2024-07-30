@@ -1,0 +1,156 @@
+#include "bx/engine/modules/graphics/toolkit/present.hpp"
+
+const char* PRESENT_SHADER_SRC = R""""(
+
+#ifdef VERTEX
+
+layout (location = 0) out vec2 fragTexCoord;
+
+void main()
+{
+	vec2 vertices[3]=vec2[3](vec2(-1,-1), vec2(3,-1), vec2(-1, 3));
+	gl_Position = vec4(vertices[gl_VertexID],0,1);
+	fragTexCoord = 0.5 * gl_Position.xy + vec2(0.5);
+}
+
+#endif // VERTEX
+
+#ifdef FRAGMENT
+
+layout (location = 0) in vec2 fragTexCoord;
+
+layout(location = 0) out vec4 outColor;
+
+layout(binding = 0) uniform sampler2D colorImage;
+
+vec3 aces(vec3 x)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
+
+vec3 gammaCorrect(vec3 x, float gamma)
+{
+    return pow(x, vec3(1.0 / gamma));
+}
+
+void main()
+{
+    vec3 hdrColor = texture(colorImage, fragTexCoord).rgb;
+    
+    vec3 sdrColor = aces(hdrColor);
+    sdrColor = gammaCorrect(sdrColor, 2.2);
+
+    outColor = vec4(sdrColor, 1.0);
+}
+
+#endif // FRAGMENT
+
+)"""";
+
+struct PresentPipeline : NoCopy
+{
+    PresentPipeline()
+    {
+        ShaderCreateInfo vertexCreateInfo{};
+        vertexCreateInfo.name = Optional<String>::Some("Present Vertex Shader");
+        vertexCreateInfo.shaderType = ShaderType::VERTEX;
+        vertexCreateInfo.src = PRESENT_SHADER_SRC;
+        ShaderHandle vertexShader = Graphics::CreateShader(vertexCreateInfo);
+
+        ShaderCreateInfo fragmentCreateInfo{};
+        fragmentCreateInfo.name = Optional<String>::Some("Present Fragment Shader");
+        fragmentCreateInfo.shaderType = ShaderType::FRAGMENT;
+        fragmentCreateInfo.src = PRESENT_SHADER_SRC;
+        ShaderHandle fragmentShader = Graphics::CreateShader(fragmentCreateInfo);
+
+        PipelineLayoutDescriptor pipelineLayoutDescriptor{};
+        pipelineLayoutDescriptor.bindGroupLayouts = {
+            BindGroupLayoutDescriptor(0, {
+                BindGroupLayoutEntry(0, ShaderStageFlags::FRAGMENT, BindingTypeDescriptor::Texture(TextureSampleType::FLOAT)),
+            })
+        };
+
+        ColorTargetState colorTargetState{};
+        colorTargetState.format = Graphics::GetTextureCreateInfo(Graphics::GetSwapchainColorTarget()).format;
+
+        GraphicsPipelineCreateInfo pipelineCreateInfo{};
+        pipelineCreateInfo.name = Optional<String>::Some("Present Pipeline");
+        pipelineCreateInfo.layout = pipelineLayoutDescriptor;
+        pipelineCreateInfo.vertexShader = vertexShader;
+        pipelineCreateInfo.fragmentShader = fragmentShader;
+        pipelineCreateInfo.vertexBuffers = {};
+        pipelineCreateInfo.cullMode = Optional<Face>::None();
+        pipelineCreateInfo.colorTarget = Optional<ColorTargetState>::Some(colorTargetState);
+        pipeline = Graphics::CreateGraphicsPipeline(pipelineCreateInfo);
+
+        Graphics::DestroyShader(vertexShader);
+        Graphics::DestroyShader(fragmentShader);
+    }
+
+    ~PresentPipeline()
+    {
+        // TODO: shader db, static destructor order messes up this approach
+        Graphics::DestroyGraphicsPipeline(pipeline);
+    }
+
+    GraphicsPipelineHandle Pipeline() const { return pipeline; }
+
+private:
+    GraphicsPipelineHandle pipeline;
+};
+
+GraphicsPipelineHandle PresentPass::Pipeline()
+{
+    static std::unique_ptr<PresentPipeline> pipeline = nullptr;
+    if (!pipeline)
+    {
+        pipeline = std::make_unique<PresentPipeline>();
+    }
+
+    return pipeline->Pipeline();
+}
+
+PresentPass::PresentPass(TextureHandle hdrTexture)
+{
+    const TextureCreateInfo& textureCreateInfo = Graphics::GetTextureCreateInfo(hdrTexture);
+    BX_ASSERT(textureCreateInfo.format == TextureFormat::RGBA32_FLOAT, "hdr texture must be in RGBA32_FLOAT.");
+
+    width = textureCreateInfo.size.width;
+    height = textureCreateInfo.size.height;
+
+    hdrTextureView = Graphics::CreateTextureView(hdrTexture);
+
+    BindGroupCreateInfo createInfo{};
+    createInfo.name = Optional<String>::Some("Present BindGroup");
+    createInfo.layout = Graphics::GetBindGroupLayout(Pipeline(), 0);
+    createInfo.entries = {
+        BindGroupEntry(0, BindingResource::TextureView(hdrTextureView)),
+    };
+    bindGroup = Graphics::CreateBindGroup(createInfo);
+}
+
+PresentPass::~PresentPass()
+{
+    Graphics::DestroyBindGroup(bindGroup);
+    Graphics::DestroyTextureView(hdrTextureView);
+}
+
+void PresentPass::Dispatch()
+{
+    RenderPassDescriptor renderPassDescriptor{};
+    renderPassDescriptor.name = Optional<String>::Some("Present");
+    renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(Graphics::GetSwapchainColorTargetView()) };
+
+    RenderPassHandle renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
+    {
+        Graphics::SetGraphicsPipeline(Pipeline());
+        Graphics::SetBindGroup(0, bindGroup);
+        Graphics::Draw(3);
+    }
+    Graphics::EndRenderPass(renderPass);
+}

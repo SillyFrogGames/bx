@@ -136,6 +136,7 @@ set (BX_SRCS
 	"src/bx/engine/modules/window.cpp"
 	"src/bx/engine/modules/imgui.cpp"
 
+	"src/bx/engine/modules/graphics/toolkit/present.cpp"
 	"src/bx/engine/modules/graphics/toolkit/srgb_to_linear.cpp"
 	"src/bx/engine/modules/graphics/type.cpp"
 	"src/bx/engine/modules/graphics/type_validation.cpp"

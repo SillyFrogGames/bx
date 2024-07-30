@@ -604,6 +604,10 @@ struct ComputePassDescriptor
 	Optional<String> name = Optional<String>::None();
 };
 
+b8 IsVertexFormatInt(const VertexFormat& format);
+b8 IsTextureFormatSrgb(const TextureFormat& format);
+
+// TODO: remove
 struct DebugVertex
 {
 	DebugVertex() {}

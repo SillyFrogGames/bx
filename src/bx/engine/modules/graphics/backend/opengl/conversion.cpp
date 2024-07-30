@@ -673,74 +673,18 @@ namespace Gl
 		}
 	}
 
-	b8 IsVertexFormatInt(const VertexFormat& format)
+	GLenum StorageTextureAccessToGl(const StorageTextureAccess& access)
 	{
-		switch (format)
+		switch (access)
 		{
-		case VertexFormat::UINT_8X2:
-			return true;
-		case VertexFormat::UINT_8X4:
-			return true;
-		case VertexFormat::SINT_8X2:
-			return true;
-		case VertexFormat::SINT_8X4:
-			return true;
-		case VertexFormat::UNORM_8X2:
-			return false;
-		case VertexFormat::UNORM_8X4:
-			return false;
-		case VertexFormat::SNORM_8X2:
-			return false;
-		case VertexFormat::SNORM_8X4:
-			return false;
-
-		case VertexFormat::UINT_16X2:
-			return true;
-		case VertexFormat::UINT_16X4:
-			return true;
-		case VertexFormat::SINT_16X2:
-			return true;
-		case VertexFormat::SINT_16X4:
-			return true;
-		case VertexFormat::UNORM_16X2:
-			return false;
-		case VertexFormat::UNORM_16X4:
-			return false;
-		case VertexFormat::SNORM_16X2:
-			return false;
-		case VertexFormat::SNORM_16X4:
-			return false;
-		case VertexFormat::FLOAT_16X2:
-			return false;
-		case VertexFormat::FLOAT_16X4:
-			return false;
-
-		case VertexFormat::FLOAT_32:
-			return false;
-		case VertexFormat::FLOAT_32X2:
-			return false;
-		case VertexFormat::FLOAT_32X3:
-			return false;
-		case VertexFormat::FLOAT_32X4:
-			return false;
-		case VertexFormat::UINT_32:
-			return true;
-		case VertexFormat::UINT_32X2:
-			return true;
-		case VertexFormat::UINT_32X3:
-			return true;
-		case VertexFormat::UINT_32X4:
-			return true;
-		case VertexFormat::SINT_32:
-			return true;
-		case VertexFormat::SINT_32X2:
-			return true;
-		case VertexFormat::SINT_32X3:
-			return true;
-		case VertexFormat::SINT_32X4:
-			return true;
+		case StorageTextureAccess::READ:
+			return GL_READ_ONLY;
+		case StorageTextureAccess::WRITE:
+			return GL_WRITE_ONLY;
+		case StorageTextureAccess::READ_WRITE:
+			return GL_READ_WRITE;
 		default:
-			BX_FAIL("Vertex format not supported.");
+			BX_FAIL("Storage texture access not supported.");
 		}
 	}
 }

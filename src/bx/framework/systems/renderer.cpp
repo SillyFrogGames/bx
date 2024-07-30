@@ -7,6 +7,8 @@
 #include "bx/framework/components/animator.hpp"
 #include "bx/framework/components/light.hpp"
 
+#include "bx/engine/modules/graphics/toolkit/present.hpp"
+
 #include <bx/engine/core/file.hpp>
 #include <bx/engine/core/data.hpp>
 #include <bx/engine/core/profiler.hpp>
@@ -52,7 +54,7 @@ struct RendererState : NoCopy
     HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
     HashMap<UUID, BufferHandle> animatorBoneBuffers{};
 
-    //TextureHandle colorTarget = TextureHandle::null;
+    TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
 
     BufferHandle vertexConstantsBuffer = BufferHandle::null;
@@ -223,12 +225,13 @@ void RecreateRenderTargets()
         i32 w, h;
         Window::GetSize(&w, &h);
 
-        /*TextureCreateInfo colorTargetCreateInfo{};
+        TextureCreateInfo colorTargetCreateInfo{};
         colorTargetCreateInfo.name = Optional<String>::Some("Color Target");
         colorTargetCreateInfo.size = Extend3D(w, h, 1);
-        colorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
+        colorTargetCreateInfo.format = TextureFormat::RGBA32_FLOAT;
         colorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
-        s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);*/
+        if (s->colorTarget) Graphics::DestroyTexture(s->colorTarget);
+        s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);
 
         TextureCreateInfo depthTargetCreateInfo{};
         depthTargetCreateInfo.name = Optional<String>::Some("Depth Target");
@@ -283,7 +286,7 @@ void Renderer::Render()
 
     Graphics::UpdateDebugLines();
 
-    TextureViewHandle colorTargetView = Graphics::GetSwapchainColorTargetView();
+    TextureViewHandle colorTargetView = Graphics::CreateTextureView(s->colorTarget);
     TextureViewHandle depthTargetView = Graphics::CreateTextureView(s->depthTarget);
 
     RenderPassDescriptor renderPassDescriptor{};
@@ -368,6 +371,9 @@ void Renderer::Render()
             });
     }
     Graphics::EndRenderPass(renderPass);
+
+    PresentPass presentPass(s->colorTarget);
+    presentPass.Dispatch();
 }
 
 TextureHandle Renderer::GetEditorCameraColorTarget()

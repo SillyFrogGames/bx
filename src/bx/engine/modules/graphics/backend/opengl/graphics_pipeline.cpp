@@ -13,7 +13,7 @@ namespace Gl
         glGenVertexArrays(1, &vao);
 
         glBindVertexArray(vao);
-        for (u32 i = 0; i < 1; i++)
+        for (u32 i = 0; i < vertexBuffers.size(); i++)
         {
             auto& layout = vertexBuffers[i];
 

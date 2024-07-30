@@ -22,5 +22,6 @@ namespace Gl
 
 	GLint VertexFormatToGlSize(const VertexFormat& format);
 	GLenum VertexFormatToGlType(const VertexFormat& format);
-	b8 IsVertexFormatInt(const VertexFormat& format);
+
+	GLenum StorageTextureAccessToGl(const StorageTextureAccess& access);
 }
