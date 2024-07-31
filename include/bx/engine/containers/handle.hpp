@@ -35,7 +35,8 @@ public:
 
 	Handle<T> Create()
 	{
-		BX_ASSERT(++m_count != 18446744073709551615, "Failed to create handles, pool is emtpy.");
+		m_count++;
+		BX_ASSERT(m_count != 18446744073709551615, "Failed to create handles, pool is emtpy.");
 
 		return Handle<T>{ m_count };
 	}

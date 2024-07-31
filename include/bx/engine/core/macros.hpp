@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "bx/engine/core/byte_types.hpp"
@@ -37,9 +38,9 @@
 #define BX_LOGW(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_WARNING, Log::Format(__VA_ARGS__))
 #define BX_LOGE(...) Log::Print(__FILE__, __LINE__, __func__, LogLevel::LOG_ERROR, Log::Format(__VA_ARGS__))
 
-#define BX_ASSERT(condition, message) (condition)
-#define BX_ENSURE(condition) (condition)
-#define BX_FAIL(message)
+#define BX_ASSERT(condition, ...)
+#define BX_ENSURE(condition)
+#define BX_FAIL(...)
 
 #endif
 

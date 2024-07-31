@@ -7,7 +7,8 @@ namespace Gl
     void GlDebugCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message,
         const void*)
     {
-        BX_ASSERT(severity != GL_DEBUG_SEVERITY_HIGH, "GL: {}", message);
+        if (severity == GL_DEBUG_SEVERITY_HIGH)
+            BX_FAIL("GL: {}", message);
     }
 
     void DebugNames::Set(GLenum identifier, GLuint object, const std::string& name)

@@ -16,6 +16,7 @@ namespace Gl
 			return GL_TEXTURE_3D;
 		default:
 			BX_FAIL("Texture dimension not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -160,6 +161,7 @@ namespace Gl
 
 		default:
 			BX_FAIL("Texture format not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -304,6 +306,7 @@ namespace Gl
 
 		default:
 			BX_FAIL("Texture format not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -448,6 +451,7 @@ namespace Gl
 
 		default:
 			BX_FAIL("Texture format not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -465,6 +469,7 @@ namespace Gl
 			return GL_COMPUTE_SHADER;
 		default:
 			BX_FAIL("Shader type not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -496,6 +501,7 @@ namespace Gl
 			return GL_SRC_ALPHA_SATURATE;
 		default:
 			BX_FAIL("Blend factor not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -515,6 +521,7 @@ namespace Gl
 			return GL_TRIANGLE_STRIP;
 		default:
 			BX_FAIL("Primitive topology not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -528,6 +535,7 @@ namespace Gl
 			return GL_UNSIGNED_INT;
 		default:
 			BX_FAIL("Index format not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -599,6 +607,7 @@ namespace Gl
 			return 4;
 		default:
 			BX_FAIL("Vertex format not supported.");
+			return 0;
 		}
 	}
 
@@ -670,6 +679,7 @@ namespace Gl
 			return GL_INT;
 		default:
 			BX_FAIL("Vertex format not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 
@@ -685,6 +695,7 @@ namespace Gl
 			return GL_READ_WRITE;
 		default:
 			BX_FAIL("Storage texture access not supported.");
+			return GL_INVALID_ENUM;
 		}
 	}
 }

@@ -195,6 +195,7 @@ b8 IsVertexFormatInt(const VertexFormat& format)
 		return true;
 	default:
 		BX_FAIL("Vertex format not supported.");
+		return false;
 	}
 }
 
@@ -359,5 +360,6 @@ u32 SizeOfTextureFormat(const TextureFormat& format)
 
 	default:
 		BX_FAIL("Texture format not supported.");
+		return 0;
 	}
 }
