@@ -7,7 +7,7 @@
 #include "bx/framework/components/animator.hpp"
 #include "bx/framework/components/light.hpp"
 
-#include "bx/engine/modules/graphics/toolkit/present.hpp"
+#include "bx/engine/modules/graphics/toolkit/present_pass.hpp"
 
 #include <bx/engine/core/file.hpp>
 #include <bx/engine/core/data.hpp>

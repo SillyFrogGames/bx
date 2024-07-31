@@ -2,8 +2,9 @@
 
 #include "bx/engine/modules/graphics/type_validation.hpp"
 
-#include "bx/engine/modules/graphics/toolkit/present.hpp"
-#include "bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp"
+#include "bx/engine/modules/graphics/toolkit/id_pass.hpp"
+#include "bx/engine/modules/graphics/toolkit/present_pass.hpp"
+#include "bx/engine/modules/graphics/toolkit/srgb_to_linear_pass.hpp"
 
 #include "bx/engine/core/log.hpp"
 #include "bx/engine/core/guard.hpp"
@@ -87,6 +88,7 @@ const RenderPassDescriptor& Graphics::GetRenderPassDescriptor(RenderPassHandle r
 
 void Graphics::ClearPipelineCaches()
 {
+    IdPass::ClearPipelineCache();
     PresentPass::ClearPipelineCache();
     SrgbToLinearPass::ClearPipelineCache();
 }

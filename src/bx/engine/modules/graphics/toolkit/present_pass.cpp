@@ -1,4 +1,4 @@
-#include "bx/engine/modules/graphics/toolkit/present.hpp"
+#include "bx/engine/modules/graphics/toolkit/present_pass.hpp"
 
 #include "bx/engine/containers/lazy_init.hpp"
 
@@ -103,21 +103,20 @@ struct PresentPipeline : public LazyInit<PresentPipeline, GraphicsPipelineHandle
 
 std::unique_ptr<PresentPipeline> LazyInit<PresentPipeline, GraphicsPipelineHandle>::cache = nullptr;
 
-PresentPass::PresentPass(TextureHandle hdrTexture)
+PresentPass::PresentPass(TextureHandle texture)
 {
-    const TextureCreateInfo& textureCreateInfo = Graphics::GetTextureCreateInfo(hdrTexture);
-    BX_ASSERT(textureCreateInfo.format == TextureFormat::RGBA32_FLOAT, "hdr texture must be in RGBA32_FLOAT.");
+    const TextureCreateInfo& textureCreateInfo = Graphics::GetTextureCreateInfo(texture);
 
     width = textureCreateInfo.size.width;
     height = textureCreateInfo.size.height;
 
-    hdrTextureView = Graphics::CreateTextureView(hdrTexture);
+    textureView = Graphics::CreateTextureView(texture);
 
     BindGroupCreateInfo createInfo{};
     createInfo.name = Optional<String>::Some("Present BindGroup");
     createInfo.layout = Graphics::GetBindGroupLayout(PresentPipeline::Get(), 0);
     createInfo.entries = {
-        BindGroupEntry(0, BindingResource::TextureView(hdrTextureView)),
+        BindGroupEntry(0, BindingResource::TextureView(textureView)),
     };
     bindGroup = Graphics::CreateBindGroup(createInfo);
 }
@@ -125,7 +124,7 @@ PresentPass::PresentPass(TextureHandle hdrTexture)
 PresentPass::~PresentPass()
 {
     Graphics::DestroyBindGroup(bindGroup);
-    Graphics::DestroyTextureView(hdrTextureView);
+    Graphics::DestroyTextureView(textureView);
 }
 
 void PresentPass::Dispatch()

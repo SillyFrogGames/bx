@@ -16,7 +16,6 @@
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 #include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
-#include <bx/engine/modules/graphics/toolkit/srgb_to_linear.hpp>
 
 #include <bx/framework/components/transform.hpp>
 #include <bx/framework/components/camera.hpp>

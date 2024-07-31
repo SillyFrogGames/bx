@@ -4,10 +4,12 @@
 
 #include "bx/engine/modules/graphics.hpp"
 
+// Draw a texture to the screen using a fullscreen triangle.
+// Texture must be in ACEScg space and will be converted to the appropriated color space based on the output window.
 class PresentPass : NoCopy
 {
 public:
-	PresentPass(TextureHandle hdrTexture);
+	PresentPass(TextureHandle texture);
 	~PresentPass();
 
 	void Dispatch();
@@ -16,6 +18,6 @@ public:
 
 private:
 	BindGroupHandle bindGroup;
-	TextureViewHandle hdrTextureView;
+	TextureViewHandle textureView;
 	u32 width, height;
 };
