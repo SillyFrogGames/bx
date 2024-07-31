@@ -805,7 +805,7 @@ void Graphics::EndComputePass(ComputePassHandle& computePass)
 
 void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
 {
-    BX_ENSURE(buffer);
+    BX_ENSURE(buffer && data);
     BX_ASSERT(offset == 0, "Offset must be 0 for now.");
 
     auto& bufferIter = s->buffers.find(buffer);
@@ -816,7 +816,7 @@ void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data)
 
 void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data, SizeType size)
 {
-    BX_ENSURE(buffer);
+    BX_ENSURE(buffer && data);
     BX_ASSERT(offset == 0, "Offset must be 0 for now.");
 
     auto& bufferIter = s->buffers.find(buffer);
@@ -825,14 +825,33 @@ void Graphics::WriteBuffer(BufferHandle buffer, u64 offset, const void* data, Si
     glNamedBufferData(bufferIter->second, size, data, GL_DYNAMIC_DRAW);
 }
 
-void Graphics::FlushBufferWrites()
+void Graphics::WriteTexture(TextureHandle texture, const void* data, const Extend3D& offset, const Extend3D& size)
 {
+    BX_ENSURE(texture && data);
 
-}
+    auto& textureIter = s->textures.find(texture);
+    BX_ENSURE(textureIter != s->textures.end());
 
-void Graphics::WriteTexture(TextureHandle texture, const void* data, const ImageDataLayout& dataLayout, const Extend3D& size)
-{
-    BX_FAIL("TODO");
+    auto createInfo = GetTextureCreateInfo(texture);
+
+    if (createInfo.dimension == TextureDimension::D2 || createInfo.size.depthOrArrayLayers == 1)
+    {
+        glTextureSubImage2D(
+            textureIter->second,
+            0,
+            offset.width,
+            offset.height,
+            size.width,
+            size.height,
+            TextureFormatToGlFormat(createInfo.format),
+            TextureFormatToGlType(createInfo.format),
+            data
+        );
+    }
+    else
+    {
+        BX_FAIL("TODO");
+    }
 }
 
 void Graphics::ReadTexture(TextureHandle texture, void* data, const Extend3D& offset, const Extend3D& size)
@@ -854,11 +873,6 @@ void Graphics::ReadTexture(TextureHandle texture, void* data, const Extend3D& of
         SizeOfTextureFormat(createInfo.format),
         data
     );
-}
-
-void Graphics::FlushTextureWrites()
-{
-
 }
 
 GLuint GraphicsOpenGL::GetRawBufferHandle(BufferHandle buffer)

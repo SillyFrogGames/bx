@@ -282,7 +282,6 @@ void Renderer::Render()
     UpdateLightSources();
     UpdateCameras();
     BuildShaderPipelines();
-    Graphics::FlushBufferWrites();
 
     Graphics::UpdateDebugLines();
 

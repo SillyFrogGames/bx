@@ -74,16 +74,11 @@ public:
 	static void DispatchWorkgroups(u32 x, u32 y, u32 z);
 	static void EndComputePass(ComputePassHandle& computePass);
 
-	// Write data to buffer, write is queued untill `FlushBufferWrites` is called, a compute or render pass is started or when the frame is finished.
-	// Data is copied over immediately and can be freed after calling
 	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data);
 	static void WriteBuffer(BufferHandle buffer, u64 offset, const void* data, SizeType size);
-	static void FlushBufferWrites();
-	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
-	// Data is copied over immediately and can be freed after calling
-	static void WriteTexture(TextureHandle texture, const void* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+
+	static void WriteTexture(TextureHandle texture, const void* data, const Extend3D& offset, const Extend3D& size);
 	static void ReadTexture(TextureHandle texture, void* data,  const Extend3D& offset, const Extend3D& size);
-	static void FlushTextureWrites();
 
 	// Debug draw utilities
 	static void DebugLine(const Vec3& a, const Vec3& b, u32 color = 0xFFFFFFFF, f32 lifespan = 0.0f);
