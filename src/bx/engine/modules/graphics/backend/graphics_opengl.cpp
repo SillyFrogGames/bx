@@ -1,3 +1,4 @@
+
 #include "bx/engine/modules/graphics/backend/graphics_opengl.hpp"
 
 #include "bx/engine/modules/graphics/type_validation.hpp"
@@ -47,7 +48,8 @@ struct GraphicsBackendState : NoCopy
     HashMap<GraphicsPipelineHandle, GraphicsPipeline> graphicsPipelines;
     HashMap<ComputePipelineHandle, ShaderProgram> computePipelines;
     GLuint framebuffer;
-    
+    GLuint readbackFramebuffer;
+
     RenderPassHandle activeRenderPass = RenderPassHandle::null;
     ComputePassHandle activeComputePass = ComputePassHandle::null;
     GraphicsPipelineHandle boundGraphicsPipeline = GraphicsPipelineHandle::null;
@@ -81,6 +83,7 @@ b8 Graphics::Initialize()
     textureCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING;
 
     glCreateFramebuffers(1, &s->framebuffer);
+    glCreateFramebuffers(1, &s->readbackFramebuffer);
 
     i32 w, h;
     Window::GetSize(&w, &h);
@@ -107,6 +110,7 @@ void Graphics::Shutdown()
     // TODO: clear a shitload of gl objects (textures, buffers, etc.)
 
     glDeleteFramebuffers(1, &s->framebuffer);
+    glDeleteFramebuffers(1, &s->readbackFramebuffer);
 
     s.reset();
 }
@@ -201,17 +205,34 @@ TextureHandle Graphics::CreateTexture(const TextureCreateInfo& createInfo, const
     {
         u32 height = (type == GL_TEXTURE_1D_ARRAY) ? createInfo.size.depthOrArrayLayers : createInfo.size.height;
 
-        glTexImage2D(
-            type,
-            0,
-            TextureFormatToGlInternalFormat(createInfo.format),
-            createInfo.size.width,
-            height,
-            0,
-            TextureFormatToGlFormat(createInfo.format),
-            TextureFormatToGlType(createInfo.format),
-            data
-        );
+        if (createInfo.format == TextureFormat::RG32_UINT)
+        {
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                TextureFormatToGlInternalFormat(createInfo.format),
+                createInfo.size.width,
+                height,
+                0,
+                TextureFormatToGlFormat(createInfo.format),
+                TextureFormatToGlType(createInfo.format),
+                data
+            );
+        }
+        else
+        {
+            glTexImage2D(
+                type,
+                0,
+                TextureFormatToGlInternalFormat(createInfo.format),
+                createInfo.size.width,
+                height,
+                0,
+                TextureFormatToGlFormat(createInfo.format),
+                TextureFormatToGlType(createInfo.format),
+                data
+            );
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Required, default enables mips
     }
     else if (type == GL_TEXTURE_3D || type == GL_TEXTURE_2D_ARRAY)
@@ -464,6 +485,9 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
 {
     BX_ASSERT(!s->activeRenderPass, "Render pass already active.");
     
+    u32 width = 0;
+    u32 height = 0;
+
     for (u32 i = 0; i < descriptor.colorAttachments.size(); i++)
     {
         const RenderPassColorAttachment& attachment = descriptor.colorAttachments[i];
@@ -472,6 +496,13 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
         BX_ENSURE(textureViewIter != s->textureViews.end());
 
         glNamedFramebufferTexture(s->framebuffer, GL_COLOR_ATTACHMENT0 + i, textureViewIter->second.texture, 0);
+
+        if (width == 0 && height == 0)
+        {
+            auto createInfo = GetTextureCreateInfo(textureViewIter->second.handle);
+            width = createInfo.size.width;
+            height = createInfo.size.height;
+        }
     }
 
     if (descriptor.depthStencilAttachment.IsSome())
@@ -482,13 +513,20 @@ RenderPassHandle Graphics::BeginRenderPass(const RenderPassDescriptor& descripto
         BX_ENSURE(textureViewIter != s->textureViews.end());
 
         glNamedFramebufferTexture(s->framebuffer, GL_DEPTH_STENCIL_ATTACHMENT, textureViewIter->second.texture, 0);
+
+        if (width == 0 && height == 0)
+        {
+            auto createInfo = GetTextureCreateInfo(textureViewIter->second.handle);
+            width = createInfo.size.width;
+            height = createInfo.size.height;
+        }
     }
+
+    BX_ENSURE(width != 0 && height != 0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, s->framebuffer);
 
-    i32 w, h;
-    Window::GetSize(&w, &h);
-    glViewport(0, 0, w, h);
+    glViewport(0, 0, width, height);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -792,9 +830,30 @@ void Graphics::FlushBufferWrites()
 
 }
 
-void Graphics::WriteTexture(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size)
+void Graphics::WriteTexture(TextureHandle texture, const void* data, const ImageDataLayout& dataLayout, const Extend3D& size)
 {
     BX_FAIL("TODO");
+}
+
+void Graphics::ReadTexture(TextureHandle texture, void* data, const Extend3D& offset, const Extend3D& size)
+{
+    BX_ENSURE(texture);
+
+    auto& textureIter = s->textures.find(texture);
+    BX_ENSURE(textureIter != s->textures.end());
+
+    auto createInfo = GetTextureCreateInfo(texture);
+
+    glGetTextureSubImage(
+        textureIter->second,
+        0,
+        offset.width, offset.height, offset.depthOrArrayLayers,
+        size.width, size.height, size.depthOrArrayLayers,
+        TextureFormatToGlFormat(createInfo.format),
+        TextureFormatToGlType(createInfo.format),
+        SizeOfTextureFormat(createInfo.format),
+        data
+    );
 }
 
 void Graphics::FlushTextureWrites()

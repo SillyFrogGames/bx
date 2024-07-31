@@ -16,6 +16,7 @@
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 #include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
+#include <bx/engine/modules/graphics/toolkit/id_pass.hpp>
 
 #include <bx/framework/components/transform.hpp>
 #include <bx/framework/components/camera.hpp>
@@ -50,6 +51,9 @@ static Vec3 g_eulerAngles;
 static ImVec2 g_sceneSize;
 
 static bool g_physicsDebugDraw = false;
+
+TextureHandle g_idColorTarget = TextureHandle::null;
+TextureHandle g_idDepthTarget = TextureHandle::null;
 
 //static GraphicsHandle g_vertShader = INVALID_GRAPHICS_HANDLE;
 //static GraphicsHandle g_pixelShader = INVALID_GRAPHICS_HANDLE;
@@ -267,34 +271,21 @@ void SceneView::Render(const ImVec2& size)
         g_sceneCam.SetZNear(0.1f);
         g_sceneCam.SetZFar(1000.0f);
 
-        //// Check if there are old render targets
-        //if (g_renderTargetIDs != INVALID_GRAPHICS_HANDLE)
-        //    Graphics::DestroyTexture(g_renderTargetIDs);
+        TextureCreateInfo idColorTargetCreateInfo{};
+        idColorTargetCreateInfo.name = Optional<String>::Some("Id Pass Color Target");
+        idColorTargetCreateInfo.size = Extend3D(g_sceneSize.x, g_sceneSize.y, 1);
+        idColorTargetCreateInfo.format = TextureFormat::RG32_UINT;
+        idColorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        if (g_idColorTarget) Graphics::DestroyTexture(g_idColorTarget);
+        g_idColorTarget = Graphics::CreateTexture(idColorTargetCreateInfo);
 
-        //if (g_renderTarget != INVALID_GRAPHICS_HANDLE)
-        //    Graphics::DestroyTexture(g_renderTarget);
-
-        //if (g_depthStencil != INVALID_GRAPHICS_HANDLE)
-        //    Graphics::DestroyTexture(g_depthStencil);
-
-        //// Create render targets
-        //{
-        //    TextureInfo info;
-        //    info.width = (u32)g_sceneSize.x;
-        //    info.height = (u32)g_sceneSize.y;
-
-        //    info.format = TextureFormat::RG32_UINT;
-        //    info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
-        //    g_renderTargetIDs = Graphics::CreateTexture(info);
-
-        //    info.format = TextureFormat::RGBA8_UNORM;
-        //    info.flags = TextureFlags::SHADER_RESOURCE | TextureFlags::RENDER_TARGET;
-        //    g_renderTarget = Graphics::CreateTexture(info);
-
-        //    info.format = TextureFormat::D24_UNORM_S8_UINT;
-        //    info.flags = TextureFlags::DEPTH_STENCIL;
-        //    g_depthStencil = Graphics::CreateTexture(info);
-        //}
+        TextureCreateInfo idDepthTargetCreateInfo{};
+        idDepthTargetCreateInfo.name = Optional<String>::Some("Id Pass Depth Target");
+        idDepthTargetCreateInfo.size = Extend3D(g_sceneSize.x, g_sceneSize.y, 1);
+        idDepthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
+        idDepthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
+        if (g_idDepthTarget) Graphics::DestroyTexture(g_idDepthTarget);
+        g_idDepthTarget = Graphics::CreateTexture(idDepthTargetCreateInfo);
     }
 
     g_sceneCam.Update();
@@ -337,6 +328,9 @@ void SceneView::Render(const ImVec2& size)
     renderer.editorCamera = OptionalView<Camera>::Some(&g_sceneCam);
     renderer.Render();
     renderer.editorCamera = OptionalView<Camera>::None();
+
+    IdPass idPass(g_idColorTarget, g_idDepthTarget);
+    idPass.Dispatch(g_sceneCam);
 
     /*auto& renderer = SystemManager::GetSystem<Renderer>();
     renderer.UpdateAnimators();
@@ -539,7 +533,7 @@ void SceneView::Present(bool& show)
         ImVec2 relMousePos = ImVec2(mousePos.x - windowPos.x, windowPos.y + windowSize.y - mousePos.y);
         
         u64 pixelData = 0;
-        //Graphics::ReadPixels((u32)relMousePos.x, (u32)relMousePos.y, 1, 1, &pixelData, g_renderTargetIDs);
+        Graphics::ReadTexture(g_idColorTarget, &pixelData, Extend3D((u32)relMousePos.x, (u32)relMousePos.y, 0), Extend3D(1, 1, 1));
         if (pixelData != 0)
         {
             Selection::SetSelected(Object<Entity>(pixelData));

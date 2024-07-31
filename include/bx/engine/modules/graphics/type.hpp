@@ -606,6 +606,7 @@ struct ComputePassDescriptor
 
 b8 IsVertexFormatInt(const VertexFormat& format);
 b8 IsTextureFormatSrgb(const TextureFormat& format);
+u32 SizeOfTextureFormat(const TextureFormat& format);
 
 // TODO: remove
 struct DebugVertex

@@ -81,7 +81,8 @@ public:
 	static void FlushBufferWrites();
 	// Write data to texture, write is queued untill `FlushTextureWrites` is called, a compute or render pass is started or when the frame is finished.
 	// Data is copied over immediately and can be freed after calling
-	static void WriteTexture(TextureHandle texture, const u8* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void WriteTexture(TextureHandle texture, const void* data, const ImageDataLayout& dataLayout, const Extend3D& size);
+	static void ReadTexture(TextureHandle texture, void* data,  const Extend3D& offset, const Extend3D& size);
 	static void FlushTextureWrites();
 
 	// Debug draw utilities

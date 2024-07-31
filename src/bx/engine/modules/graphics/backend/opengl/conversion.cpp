@@ -172,14 +172,14 @@ namespace Gl
 		case TextureFormat::R8_SNORM:
 			return GL_RED;
 		case TextureFormat::R8_UINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 		case TextureFormat::R8_SINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 
 		case TextureFormat::R16_UINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 		case TextureFormat::R16_SINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 		case TextureFormat::R16_UNORM:
 			return GL_RED;
 		case TextureFormat::R16_SNORM:
@@ -191,20 +191,20 @@ namespace Gl
 		case TextureFormat::RG8_SNORM:
 			return GL_RG;
 		case TextureFormat::RG8_UINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 		case TextureFormat::RG8_SINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 
 		case TextureFormat::R32_UINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 		case TextureFormat::R32_SINT:
-			return GL_RED;
+			return GL_RED_INTEGER;
 		case TextureFormat::R32_FLOAT:
 			return GL_RED;
 		case TextureFormat::RG16_UINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 		case TextureFormat::RG16_SINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 		case TextureFormat::RG16_UNORM:
 			return GL_RG;
 		case TextureFormat::RG16_SNORM:
@@ -218,9 +218,9 @@ namespace Gl
 		case TextureFormat::RGBA8_SNORM:
 			return GL_RGBA;
 		case TextureFormat::RGBA8_UINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGBA8_SINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		/*case TextureFormat::BGRA8_UNORM:
 			return GL_BGRA;*/
 		/*case TextureFormat::BGRA8_UNORM_SRGB:
@@ -229,22 +229,22 @@ namespace Gl
 		case TextureFormat::RGB9E5_UFLOAT:
 			return GL_RGB;
 		case TextureFormat::RGB10A2_UINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGB10A2_UNORM:
 			return GL_RGBA;
 		case TextureFormat::RG11B10_FLOAT:
 			return GL_RGB;
 
 		case TextureFormat::RG32_UINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 		case TextureFormat::RG32_SINT:
-			return GL_RG;
+			return GL_RG_INTEGER;
 		case TextureFormat::RG32_FLOAT:
 			return GL_RG;
 		case TextureFormat::RGBA16_UINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGBA16_SINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGBA16_UNORM:
 			return GL_RGBA;
 		case TextureFormat::RGBA16_SNORM:
@@ -253,9 +253,9 @@ namespace Gl
 			return GL_RGBA;
 
 		case TextureFormat::RGBA32_UINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGBA32_SINT:
-			return GL_RGBA;
+			return GL_RGBA_INTEGER;
 		case TextureFormat::RGBA32_FLOAT:
 			return GL_RGBA;
 

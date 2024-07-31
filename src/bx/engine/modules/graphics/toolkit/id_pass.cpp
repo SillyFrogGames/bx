@@ -2,6 +2,10 @@
 
 #include "bx/engine/containers/lazy_init.hpp"
 
+#include "bx/framework/components/transform.hpp"
+#include "bx/framework/components/mesh_filter.hpp"
+#include "bx/framework/components/mesh_renderer.hpp"
+
 const char* ID_PASS_SHADER_SRC = R""""(
 
 #ifdef VERTEX
@@ -21,6 +25,12 @@ layout (binding = 1, std140) uniform ModelBuffer
     uvec2 EntityID;
 };
 
+void main()
+{
+   gl_Position = ViewProjMtx * WorldMeshMtx * vec4(Position, 1.0);
+   Frag_EntityID = EntityID;
+}
+
 #endif // VERTEX
 
 #ifdef FRAGMENT
@@ -38,6 +48,11 @@ void main()
 
 )"""";
 
+struct VertexMeshUniform
+{
+    Mat4 world = Mat4::Identity();
+    u64 entityId;
+};
 
 struct IdPipelineArgs
 {
@@ -82,7 +97,7 @@ struct IdPipeline : public LazyInitMap<IdPipeline, GraphicsPipelineHandle, IdPip
         };
 
         VertexBufferLayout vertexBufferLayout{};
-        vertexBufferLayout.stride = 1;//TODO!!
+        vertexBufferLayout.stride = sizeof(Mesh::Vertex);
         vertexBufferLayout.attributes = {
             VertexAttribute(VertexFormat::FLOAT_32X3, 0, 0)
         };
@@ -93,7 +108,7 @@ struct IdPipeline : public LazyInitMap<IdPipeline, GraphicsPipelineHandle, IdPip
         TextureFormat depthFormat = Graphics::GetTextureCreateInfo(args.depthTarget).format;
 
         GraphicsPipelineCreateInfo pipelineCreateInfo{};
-        pipelineCreateInfo.name = Optional<String>::Some("Present Pipeline");
+        pipelineCreateInfo.name = Optional<String>::Some("Id Pipeline");
         pipelineCreateInfo.layout = pipelineLayoutDescriptor;
         pipelineCreateInfo.vertexShader = vertexShader;
         pipelineCreateInfo.fragmentShader = fragmentShader;
@@ -120,38 +135,70 @@ IdPass::IdPass(TextureHandle colorTarget, TextureHandle depthTarget)
     colorTargetView = Graphics::CreateTextureView(colorTarget);
     depthTargetView = Graphics::CreateTextureView(depthTarget);
 
-    // TODO: const buffer
-    // TODO: model buffer with max limit
-
-    /*BindGroupCreateInfo createInfo{};
-    createInfo.name = Optional<String>::Some("Id BindGroup");
-    createInfo.layout = Graphics::GetBindGroupLayout(IdPipeline::Get(), 0);
-    createInfo.entries = {
-        BindGroupEntry(0, BindingResource::TextureView(textureView)),
-    };
-    bindGroup = Graphics::CreateBindGroup(createInfo);*/
+    BufferCreateInfo constantBufferCreateInfo{};
+    constantBufferCreateInfo.name = Optional<String>::Some("Id Pass Constant Buffer");
+    constantBufferCreateInfo.size = sizeof(Mat4);
+    constantBufferCreateInfo.usageFlags = BufferUsageFlags::COPY_DST | BufferUsageFlags::UNIFORM;
+    constantBuffer = Graphics::CreateBuffer(constantBufferCreateInfo);
 }
 
 IdPass::~IdPass()
 {
-    //Graphics::DestroyBindGroup(bindGroup);
+    Graphics::DestroyBuffer(constantBuffer);
     Graphics::DestroyTextureView(colorTargetView);
     Graphics::DestroyTextureView(depthTargetView);
 }
 
-void IdPass::Dispatch()
+void IdPass::Dispatch(const Camera& camera)
 {
+    Graphics::WriteBuffer(constantBuffer, 0, &camera.GetViewProjection(), sizeof(Mat4));
+
     RenderPassDescriptor renderPassDescriptor{};
     renderPassDescriptor.name = Optional<String>::Some("Id");
-    renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(Graphics::GetSwapchainColorTargetView()) };
+    renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(colorTargetView) };
+    renderPassDescriptor.depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::Some(RenderPassDepthStencilAttachment(depthTargetView));
 
     RenderPassHandle renderPass = Graphics::BeginRenderPass(renderPassDescriptor);
     {
-        // TODO: loop over ecs, prepare and upload mesh ids and matrices, then draw
+        GraphicsPipelineHandle pipeline = IdPipeline::Get({ colorTarget, depthTarget });
+        Graphics::SetGraphicsPipeline(pipeline);
 
-        Graphics::SetGraphicsPipeline(IdPipeline::Get({ colorTarget, depthTarget }));
-        Graphics::SetBindGroup(0, bindGroup);
-        Graphics::Draw(3);
+        EntityManager::ForEach<Transform, MeshFilter, MeshRenderer>(
+            [&](Entity entity, const Transform& trx, const MeshFilter& mf, const MeshRenderer& mr)
+            {
+                for (const auto& mesh : mf.GetMeshes())
+                {
+                    if (!mesh) continue;
+                    const auto& meshData = mesh.GetData();
+
+                    VertexMeshUniform meshUniform{};
+                    meshUniform.world = trx.GetMatrix() * meshData.GetMatrix();
+                    meshUniform.entityId = entity.GetId();
+
+                    BufferCreateInfo meshUniformCreateInfo{};
+                    meshUniformCreateInfo.name = Optional<String>::Some("Mesh Uniform");
+                    meshUniformCreateInfo.size = sizeof(VertexMeshUniform);
+                    meshUniformCreateInfo.usageFlags = BufferUsageFlags::UNIFORM;
+                    BufferHandle meshUniformBuffer = Graphics::CreateBuffer(meshUniformCreateInfo, &meshUniform);
+                
+                    BindGroupCreateInfo createInfo{};
+                    createInfo.name = Optional<String>::Some("Id Pass BindGroup");
+                    createInfo.layout = Graphics::GetBindGroupLayout(pipeline, 0);
+                    createInfo.entries = {
+                        BindGroupEntry(0, BindingResource::Buffer(BufferBinding(constantBuffer))),
+                        BindGroupEntry(1, BindingResource::Buffer(BufferBinding(meshUniformBuffer)))
+                    };
+                    BindGroupHandle bindGroup = Graphics::CreateBindGroup(createInfo);
+
+                    Graphics::SetVertexBuffer(0, BufferSlice(meshData.GetVertexBuffer()));
+                    Graphics::SetIndexBuffer(BufferSlice(meshData.GetIndexBuffer()), IndexFormat::UINT32);
+                    Graphics::SetBindGroup(0, bindGroup);
+                    Graphics::DrawIndexed(meshData.GetIndices().size());
+
+                    Graphics::DestroyBindGroup(bindGroup);
+                    Graphics::DestroyBuffer(meshUniformBuffer);
+                }
+            });
     }
     Graphics::EndRenderPass(renderPass);
 }
