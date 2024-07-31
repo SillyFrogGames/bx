@@ -114,7 +114,7 @@ void BuildShaderPipelines()
                 if (s->shaderPipelines.find(shaderResource.GetUUID()) == s->shaderPipelines.end())
                 {
                     GraphicsPipelineCreateInfo createInfo{};
-                    createInfo.name = Optional<String>::Some("Shader Pipeline");
+                    createInfo.name = "Shader Pipeline";
                     createInfo.vertexShader = shader.GetVertexShader();
                     createInfo.fragmentShader = shader.GetFragmentShader();
                     createInfo.vertexBuffers = { vertexBufferLayout };
@@ -142,7 +142,7 @@ void UpdateAnimators()
             if (boneBufferIter == s->animatorBoneBuffers.end())
             {
                 BufferCreateInfo createInfo{};
-                createInfo.name = Optional<String>::Some("Animator Bones");
+                createInfo.name = "Animator Bones Buffer";
                 createInfo.size = sizeof(Mat4) * 100;
                 createInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE;
 
@@ -226,7 +226,7 @@ void RecreateRenderTargets()
         Window::GetSize(&w, &h);
 
         TextureCreateInfo colorTargetCreateInfo{};
-        colorTargetCreateInfo.name = Optional<String>::Some("Color Target");
+        colorTargetCreateInfo.name = "Color Target";
         colorTargetCreateInfo.size = Extend3D(w, h, 1);
         colorTargetCreateInfo.format = TextureFormat::RGBA32_FLOAT;
         colorTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
@@ -234,7 +234,7 @@ void RecreateRenderTargets()
         s->colorTarget = Graphics::CreateTexture(colorTargetCreateInfo);
 
         TextureCreateInfo depthTargetCreateInfo{};
-        depthTargetCreateInfo.name = Optional<String>::Some("Depth Target");
+        depthTargetCreateInfo.name = "Depth Target";
         depthTargetCreateInfo.size = Extend3D(w, h, 1);
         depthTargetCreateInfo.format = TextureFormat::DEPTH24_PLUS_STENCIL8;
         depthTargetCreateInfo.usageFlags = TextureUsageFlags::RENDER_ATTACHMENT;
@@ -251,13 +251,13 @@ void Renderer::Initialize()
     s = std::make_unique<RendererState>();
 
     BufferCreateInfo vertexConstantsCreateInfo{};
-    vertexConstantsCreateInfo.name = Optional<String>::Some("Vertex Constants");
+    vertexConstantsCreateInfo.name = "Vertex Constants";
     vertexConstantsCreateInfo.size = sizeof(VertexConstantsUniform);
     vertexConstantsCreateInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::COPY_DST;
     s->vertexConstantsBuffer = Graphics::CreateBuffer(vertexConstantsCreateInfo);
 
     BufferCreateInfo lightSourceCreateInfo{};
-    lightSourceCreateInfo.name = Optional<String>::Some("Light Sources");
+    lightSourceCreateInfo.name = "Light Sources";
     lightSourceCreateInfo.size = sizeof(LightSourceData) * 10;
     lightSourceCreateInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::COPY_DST;
     s->lightSourceBuffer = Graphics::CreateBuffer(lightSourceCreateInfo);
@@ -289,7 +289,7 @@ void Renderer::Render()
     TextureViewHandle depthTargetView = Graphics::CreateTextureView(s->depthTarget);
 
     RenderPassDescriptor renderPassDescriptor{};
-    renderPassDescriptor.name = Optional<String>::Some("Draw Meshes");
+    renderPassDescriptor.name = "Draw Meshes Pass";
     renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(colorTargetView) };
     renderPassDescriptor.depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::Some(depthTargetView);
 
@@ -337,14 +337,14 @@ void Renderer::Render()
                     // TODO: should be push constants (need to be emulated on opengl)
                     // TODO: use same patterns as the animator bones buffer
                     BufferCreateInfo meshUniformCreateInfo{};
-                    meshUniformCreateInfo.name = Optional<String>::Some("Mesh Uniform");
+                    meshUniformCreateInfo.name = "Mesh Uniform Buffer";
                     meshUniformCreateInfo.size = sizeof(VertexMeshUniform);
                     meshUniformCreateInfo.usageFlags = BufferUsageFlags::UNIFORM;
                     BufferHandle meshUniformBuffer = Graphics::CreateBuffer(meshUniformCreateInfo, &meshUniform);
 
                     // TODO: very lazy, shouldn't be created every frame probably
                     BindGroupCreateInfo createInfo{};
-                    createInfo.name = Optional<String>::Some("Renderer Core BindGroup");
+                    createInfo.name = "Renderer Core BindGroup";
                     createInfo.layout = Graphics::GetBindGroupLayout(graphicsPipeline, 0);
                     createInfo.entries = {
                         BindGroupEntry(0, BindingResource::Buffer(BufferBinding(s->vertexConstantsBuffer))),

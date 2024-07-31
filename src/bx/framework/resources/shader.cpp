@@ -34,13 +34,13 @@ bool Resource<Shader>::Load(const String& filename, Shader& data)
     data.SetSource(ss.str());
 
     ShaderCreateInfo vertexCreateInfo{};
-    vertexCreateInfo.name = Optional<String>::Some(Log::Format("{} Vertex Shader", filename));
+    vertexCreateInfo.name = Log::Format("{} Vertex Shader", filename);
     vertexCreateInfo.shaderType = ShaderType::VERTEX;
     vertexCreateInfo.src = "#define VERTEX\n" + data.m_source; // TODO: remove this cardinal sin
     data.m_vertexShader = Graphics::CreateShader(vertexCreateInfo);
 
     ShaderCreateInfo fragmentCreateInfo{};
-    fragmentCreateInfo.name = Optional<String>::Some(Log::Format("{} Fragment Shader", filename));
+    fragmentCreateInfo.name = Log::Format("{} Fragment Shader", filename);
     fragmentCreateInfo.shaderType = ShaderType::FRAGMENT;
     fragmentCreateInfo.src = "#define PIXEL\n" + data.m_source;
     data.m_fragmentShader = Graphics::CreateShader(fragmentCreateInfo);

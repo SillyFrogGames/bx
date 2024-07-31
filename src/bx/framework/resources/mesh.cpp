@@ -55,13 +55,13 @@ bool Resource<Mesh>::Load(const String& filename, Mesh& data)
     }
 
     BufferCreateInfo vertexCreateInfo{};
-    vertexCreateInfo.name = Optional<String>::Some(Log::Format("{} Vertex Buffer", filename));
+    vertexCreateInfo.name = Log::Format("{} Vertex Buffer", filename);
     vertexCreateInfo.size = vertices.size() * sizeof(Mesh::Vertex);
     vertexCreateInfo.usageFlags = BufferUsageFlags::VERTEX | BufferUsageFlags::COPY_SRC;
     data.m_vertexBuffer = Graphics::CreateBuffer(vertexCreateInfo, static_cast<const void*>(vertices.data()));
 
     BufferCreateInfo indexCreateInfo{};
-    indexCreateInfo.name = Optional<String>::Some(Log::Format("{} Index Buffer", filename));
+    indexCreateInfo.name = Log::Format("{} Index Buffer", filename);
     indexCreateInfo.size = data.m_indices.size() * sizeof(u32);
     indexCreateInfo.usageFlags = BufferUsageFlags::INDEX | BufferUsageFlags::COPY_SRC;
     data.m_indexBuffer = Graphics::CreateBuffer(indexCreateInfo, static_cast<const void*>(data.m_indices.data()));

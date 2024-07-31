@@ -77,13 +77,13 @@ struct IdPipeline : public LazyInitMap<IdPipeline, GraphicsPipelineHandle, IdPip
     IdPipeline(const IdPipelineArgs& args)
     {
         ShaderCreateInfo vertexCreateInfo{};
-        vertexCreateInfo.name = Optional<String>::Some("Id Vertex Shader");
+        vertexCreateInfo.name = "Id Vertex Shader";
         vertexCreateInfo.shaderType = ShaderType::VERTEX;
         vertexCreateInfo.src = ID_PASS_SHADER_SRC;
         ShaderHandle vertexShader = Graphics::CreateShader(vertexCreateInfo);
 
         ShaderCreateInfo fragmentCreateInfo{};
-        fragmentCreateInfo.name = Optional<String>::Some("Id Fragment Shader");
+        fragmentCreateInfo.name = "Id Fragment Shader";
         fragmentCreateInfo.shaderType = ShaderType::FRAGMENT;
         fragmentCreateInfo.src = ID_PASS_SHADER_SRC;
         ShaderHandle fragmentShader = Graphics::CreateShader(fragmentCreateInfo);
@@ -108,7 +108,7 @@ struct IdPipeline : public LazyInitMap<IdPipeline, GraphicsPipelineHandle, IdPip
         TextureFormat depthFormat = Graphics::GetTextureCreateInfo(args.depthTarget).format;
 
         GraphicsPipelineCreateInfo pipelineCreateInfo{};
-        pipelineCreateInfo.name = Optional<String>::Some("Id Pipeline");
+        pipelineCreateInfo.name = "Id Pipeline";
         pipelineCreateInfo.layout = pipelineLayoutDescriptor;
         pipelineCreateInfo.vertexShader = vertexShader;
         pipelineCreateInfo.fragmentShader = fragmentShader;
@@ -136,7 +136,7 @@ IdPass::IdPass(TextureHandle colorTarget, TextureHandle depthTarget)
     depthTargetView = Graphics::CreateTextureView(depthTarget);
 
     BufferCreateInfo constantBufferCreateInfo{};
-    constantBufferCreateInfo.name = Optional<String>::Some("Id Pass Constant Buffer");
+    constantBufferCreateInfo.name = "Id Pass Constant Buffer";
     constantBufferCreateInfo.size = sizeof(Mat4);
     constantBufferCreateInfo.usageFlags = BufferUsageFlags::COPY_DST | BufferUsageFlags::UNIFORM;
     constantBuffer = Graphics::CreateBuffer(constantBufferCreateInfo);
@@ -154,7 +154,7 @@ void IdPass::Dispatch(const Camera& camera)
     Graphics::WriteBuffer(constantBuffer, 0, &camera.GetViewProjection(), sizeof(Mat4));
 
     RenderPassDescriptor renderPassDescriptor{};
-    renderPassDescriptor.name = Optional<String>::Some("Id");
+    renderPassDescriptor.name = "Id";
     renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(colorTargetView) };
     renderPassDescriptor.depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::Some(RenderPassDepthStencilAttachment(depthTargetView));
 
@@ -176,13 +176,13 @@ void IdPass::Dispatch(const Camera& camera)
                     meshUniform.entityId = entity.GetId();
 
                     BufferCreateInfo meshUniformCreateInfo{};
-                    meshUniformCreateInfo.name = Optional<String>::Some("Mesh Uniform");
+                    meshUniformCreateInfo.name = "Mesh Uniform";
                     meshUniformCreateInfo.size = sizeof(VertexMeshUniform);
                     meshUniformCreateInfo.usageFlags = BufferUsageFlags::UNIFORM;
                     BufferHandle meshUniformBuffer = Graphics::CreateBuffer(meshUniformCreateInfo, &meshUniform);
                 
                     BindGroupCreateInfo createInfo{};
-                    createInfo.name = Optional<String>::Some("Id Pass BindGroup");
+                    createInfo.name = "Id Pass BindGroup";
                     createInfo.layout = Graphics::GetBindGroupLayout(pipeline, 0);
                     createInfo.entries = {
                         BindGroupEntry(0, BindingResource::Buffer(BufferBinding(constantBuffer))),

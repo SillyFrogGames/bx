@@ -27,7 +27,7 @@ struct SrgbToLinearPipeline : public LazyInit<SrgbToLinearPipeline, ComputePipel
     SrgbToLinearPipeline()
     {
         ShaderCreateInfo shaderCreateInfo{};
-        shaderCreateInfo.name = Optional<String>::Some("Srgb to Linear Shader");
+        shaderCreateInfo.name = "Srgb to Linear Shader";
         shaderCreateInfo.shaderType = ShaderType::COMPUTE;
         shaderCreateInfo.src = SRGB_TO_LINEAR_SHADER_SRC;
         ShaderHandle shader = Graphics::CreateShader(shaderCreateInfo);
@@ -41,7 +41,7 @@ struct SrgbToLinearPipeline : public LazyInit<SrgbToLinearPipeline, ComputePipel
         };
 
         ComputePipelineCreateInfo pipelineCreateInfo{};
-        pipelineCreateInfo.name = Optional<String>::Some("Srgb to Linear Pipeline");
+        pipelineCreateInfo.name = "Srgb to Linear Pipeline";
         pipelineCreateInfo.layout = pipelineLayoutDescriptor;
         pipelineCreateInfo.shader = shader;
         data = Graphics::CreateComputePipeline(pipelineCreateInfo);
@@ -67,7 +67,7 @@ SrgbToLinearPass::SrgbToLinearPass(TextureHandle srgbTexture, TextureHandle line
     linearTextureView = Graphics::CreateTextureView(linearTexture);
 
     BindGroupCreateInfo createInfo{};
-    createInfo.name = Optional<String>::Some("Srgb to Linear BindGroup");
+    createInfo.name = "Srgb to Linear BindGroup";
     createInfo.layout = Graphics::GetBindGroupLayout(SrgbToLinearPipeline::Get(), 0);
     createInfo.entries = {
         BindGroupEntry(0, BindingResource::TextureView(srgbTextureView)),
@@ -86,7 +86,7 @@ SrgbToLinearPass::~SrgbToLinearPass()
 void SrgbToLinearPass::Dispatch()
 {
     ComputePassDescriptor computePassDescriptor{};
-    computePassDescriptor.name = Optional<String>::Some("Srgb to Linear");
+    computePassDescriptor.name = "Srgb to Linear";
 
     ComputePassHandle computePass = Graphics::BeginComputePass(computePassDescriptor);
     {

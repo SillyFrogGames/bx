@@ -72,13 +72,13 @@ b8 Graphics::Initialize()
     Gl::Init(false);
 
     BufferCreateInfo bufferCreateInfo{};
-    bufferCreateInfo.name = Optional<String>::Some("Empty Buffer");
+    bufferCreateInfo.name = "Empty Buffer";
     bufferCreateInfo.size = 1;
     bufferCreateInfo.usageFlags = BufferUsageFlags::COPY_SRC | BufferUsageFlags::INDEX | BufferUsageFlags::VERTEX | BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE;
     s->emptyBuffer = Graphics::CreateBuffer(bufferCreateInfo);
 
     TextureCreateInfo textureCreateInfo{};
-    textureCreateInfo.name = Optional<String>::Some("Empty Texture");
+    textureCreateInfo.name = "Empty Texture";
     textureCreateInfo.size = Extend3D(1, 1, 1);
     textureCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING;
 
@@ -89,7 +89,7 @@ b8 Graphics::Initialize()
     Window::GetSize(&w, &h);
 
     TextureCreateInfo swapchainColorTargetCreateInfo{};
-    swapchainColorTargetCreateInfo.name = Optional<String>::Some("Swapchain Color Target");
+    swapchainColorTargetCreateInfo.name = "Swapchain Color Target";
     swapchainColorTargetCreateInfo.size = Extend3D(w, h, 1);
     swapchainColorTargetCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::COPY_DST | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::RENDER_ATTACHMENT;
     s->swapchainColorTarget = Graphics::CreateTexture(swapchainColorTargetCreateInfo);
@@ -123,7 +123,7 @@ void Graphics::NewFrame()
         Window::GetSize(&w, &h);
 
         TextureCreateInfo swapchainColorTargetCreateInfo{};
-        swapchainColorTargetCreateInfo.name = Optional<String>::Some("Swapchain Color Target");
+        swapchainColorTargetCreateInfo.name = "Swapchain Color Target";
         swapchainColorTargetCreateInfo.size = Extend3D(w, h, 1);
         swapchainColorTargetCreateInfo.format = TextureFormat::RGBA8_UNORM;
         swapchainColorTargetCreateInfo.usageFlags = TextureUsageFlags::COPY_SRC | TextureUsageFlags::COPY_DST | TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::RENDER_ATTACHMENT;
@@ -365,8 +365,7 @@ ShaderHandle Graphics::CreateShader(const ShaderCreateInfo& createInfo)
     }
 
     GLenum type = ShaderTypeToGl(createInfo.shaderType);
-    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    s->shaders.try_emplace(shaderHandle, name, type, meta + createInfo.src);
+    s->shaders.try_emplace(shaderHandle, createInfo.name, type, meta + createInfo.src);
 
     return shaderHandle;
 }
@@ -395,8 +394,7 @@ GraphicsPipelineHandle Graphics::CreateGraphicsPipeline(const GraphicsPipelineCr
     auto& fragShaderIter = s->shaders.find(createInfo.fragmentShader);
     BX_ENSURE(fragShaderIter != s->shaders.end());
 
-    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    ShaderProgram shaderProgram(name, List<Shader*>{ &vertShaderIter->second, & fragShaderIter->second });
+    ShaderProgram shaderProgram(createInfo.name, List<Shader*>{ &vertShaderIter->second, & fragShaderIter->second });
     s->graphicsPipelines.try_emplace(graphicsPipelineHandle, std::move(shaderProgram), createInfo.vertexBuffers, createInfo.layout);
 
     return graphicsPipelineHandle;
@@ -421,8 +419,7 @@ ComputePipelineHandle Graphics::CreateComputePipeline(const ComputePipelineCreat
     auto& shaderIter = s->shaders.find(createInfo.shader);
     BX_ENSURE(shaderIter != s->shaders.end());
 
-    String name = createInfo.name.IsSome() ? createInfo.name.Unwrap() : "Unnamed";
-    s->computePipelines.emplace(std::make_pair(computePipelineHandle, std::move(ShaderProgram(name, List<Shader*>{ &shaderIter->second }))));
+    s->computePipelines.emplace(std::make_pair(computePipelineHandle, std::move(ShaderProgram(createInfo.name, List<Shader*>{ &shaderIter->second }))));
 
     return computePipelineHandle;
 }

@@ -65,13 +65,13 @@ struct PresentPipeline : public LazyInit<PresentPipeline, GraphicsPipelineHandle
     PresentPipeline()
     {
         ShaderCreateInfo vertexCreateInfo{};
-        vertexCreateInfo.name = Optional<String>::Some("Present Vertex Shader");
+        vertexCreateInfo.name = "Present Vertex Shader";
         vertexCreateInfo.shaderType = ShaderType::VERTEX;
         vertexCreateInfo.src = PRESENT_SHADER_SRC;
         ShaderHandle vertexShader = Graphics::CreateShader(vertexCreateInfo);
 
         ShaderCreateInfo fragmentCreateInfo{};
-        fragmentCreateInfo.name = Optional<String>::Some("Present Fragment Shader");
+        fragmentCreateInfo.name = "Present Fragment Shader";
         fragmentCreateInfo.shaderType = ShaderType::FRAGMENT;
         fragmentCreateInfo.src = PRESENT_SHADER_SRC;
         ShaderHandle fragmentShader = Graphics::CreateShader(fragmentCreateInfo);
@@ -87,7 +87,7 @@ struct PresentPipeline : public LazyInit<PresentPipeline, GraphicsPipelineHandle
         colorTargetState.format = Graphics::GetTextureCreateInfo(Graphics::GetSwapchainColorTarget()).format;
 
         GraphicsPipelineCreateInfo pipelineCreateInfo{};
-        pipelineCreateInfo.name = Optional<String>::Some("Present Pipeline");
+        pipelineCreateInfo.name = "Present Pipeline";
         pipelineCreateInfo.layout = pipelineLayoutDescriptor;
         pipelineCreateInfo.vertexShader = vertexShader;
         pipelineCreateInfo.fragmentShader = fragmentShader;
@@ -113,7 +113,7 @@ PresentPass::PresentPass(TextureHandle texture)
     textureView = Graphics::CreateTextureView(texture);
 
     BindGroupCreateInfo createInfo{};
-    createInfo.name = Optional<String>::Some("Present BindGroup");
+    createInfo.name = "Present BindGroup";
     createInfo.layout = Graphics::GetBindGroupLayout(PresentPipeline::Get(), 0);
     createInfo.entries = {
         BindGroupEntry(0, BindingResource::TextureView(textureView)),
@@ -130,7 +130,7 @@ PresentPass::~PresentPass()
 void PresentPass::Dispatch()
 {
     RenderPassDescriptor renderPassDescriptor{};
-    renderPassDescriptor.name = Optional<String>::Some("Present");
+    renderPassDescriptor.name = "Present";
     renderPassDescriptor.colorAttachments = { RenderPassColorAttachment(Graphics::GetSwapchainColorTargetView()) };
 
     RenderPassHandle renderPass = Graphics::BeginRenderPass(renderPassDescriptor);

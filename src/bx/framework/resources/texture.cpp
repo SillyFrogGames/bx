@@ -42,7 +42,7 @@ bool Resource<Texture>::Load(const String& filename, Texture& data)
     // TODO: we NEED texture types to distinguish between srgb, unorm and float unorm textures!!!!!!
 
     TextureCreateInfo createInfo{};
-    createInfo.name = Optional<String>::Some(filename);
+    createInfo.name = filename;
     createInfo.format = TextureFormat::RGBA8_UNORM_SRGB;
     createInfo.size = Extend3D(data.width, data.height, 1);
     createInfo.usageFlags = TextureUsageFlags::TEXTURE_BINDING | TextureUsageFlags::STORAGE_BINDING | TextureUsageFlags::COPY_SRC;

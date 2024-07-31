@@ -450,7 +450,7 @@ struct BindGroupEntry
 
 struct BindGroupCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Bind Group";
 
 	BindGroupLayoutHandle layout = BindGroupLayoutHandle::null;
 	List<BindGroupEntry> entries = List<BindGroupEntry>{};
@@ -472,7 +472,7 @@ struct PipelineLayoutDescriptor
 
 struct GraphicsPipelineCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Graphics Pipeline";
 
 	ShaderHandle vertexShader = ShaderHandle::null;
 	ShaderHandle fragmentShader = ShaderHandle::null;
@@ -491,7 +491,7 @@ struct GraphicsPipelineCreateInfo
 
 struct ComputePipelineCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Compute Pipeline";
 
 	ShaderHandle shader = ShaderHandle::null;
 	PipelineLayoutDescriptor layout;
@@ -500,7 +500,7 @@ struct ComputePipelineCreateInfo
 
 struct ShaderCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Shader";
 
 	ShaderType shaderType;
 	String src;
@@ -508,7 +508,7 @@ struct ShaderCreateInfo
 
 struct BufferCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Buffer";
 
 	BufferUsageFlags usageFlags = 0;
 	u64 size;
@@ -516,7 +516,7 @@ struct BufferCreateInfo
 
 struct SamplerCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Sampler";
 
 	SamplerAddressMode addressModeU = SamplerAddressMode::CLAMP_TO_EDGE;
 	SamplerAddressMode addressModeV = SamplerAddressMode::CLAMP_TO_EDGE;
@@ -531,7 +531,7 @@ struct SamplerCreateInfo
 
 struct TextureCreateInfo
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Texture";
 
 	Extend3D size = Extend3D{};
 	u32 mipLevelCount = 1;
@@ -593,7 +593,7 @@ struct RenderPassDepthStencilAttachment
 
 struct RenderPassDescriptor
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Render Pass";
 
 	List<RenderPassColorAttachment> colorAttachments = List<RenderPassColorAttachment>{};
 	Optional<RenderPassDepthStencilAttachment> depthStencilAttachment = Optional<RenderPassDepthStencilAttachment>::None();
@@ -601,7 +601,7 @@ struct RenderPassDescriptor
 
 struct ComputePassDescriptor
 {
-	Optional<String> name = Optional<String>::None();
+	String name = "Compute Pass";
 };
 
 b8 IsVertexFormatInt(const VertexFormat& format);

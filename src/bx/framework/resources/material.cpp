@@ -62,7 +62,7 @@ BindGroupHandle Material::GetBindGroup(BindGroupLayoutHandle layout) const
         TextureViewHandle albedoTextureView = Graphics::CreateTextureView(albedoTexture); // TODO: handle leak! don't care atm
 
         BindGroupCreateInfo createInfo{};
-        createInfo.name = Optional<String>::Some("Material Bind Group");
+        createInfo.name = "Material Bind Group";
         createInfo.layout = layout;
         createInfo.entries = {
             // TODO: 3 is a bit weird, emulate bind GROUPS on opengl
