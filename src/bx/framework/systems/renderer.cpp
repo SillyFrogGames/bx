@@ -52,7 +52,6 @@ struct LightSourceData
 struct RendererState : NoCopy
 {
     HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
-    //HashMap<UUID, BufferHandle> animatorBoneBuffers{};
 
     TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
