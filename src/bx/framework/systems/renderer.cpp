@@ -7,7 +7,9 @@
 #include "bx/framework/components/animator.hpp"
 #include "bx/framework/components/light.hpp"
 
-#include "bx/engine/modules/graphics/toolkit/present_pass.hpp"
+#include "bx/framework/systems/renderer/id_pass.hpp"
+#include "bx/framework/systems/renderer/present_pass.hpp"
+#include "bx/framework/systems/renderer/srgb_to_linear_pass.hpp"
 
 #include <bx/engine/core/file.hpp>
 #include <bx/engine/core/data.hpp>
@@ -247,6 +249,10 @@ void Renderer::Initialize()
 
 void Renderer::Shutdown()
 {
+    IdPass::ClearPipelineCache();
+    PresentPass::ClearPipelineCache();
+    SrgbToLinearPass::ClearPipelineCache();
+
     s.reset();
 }
 

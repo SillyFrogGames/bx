@@ -16,7 +16,6 @@
 #ifdef BX_GRAPHICS_OPENGL_BACKEND
 #include <bx/engine/modules/graphics/backend/graphics_opengl.hpp>
 #endif
-#include <bx/engine/modules/graphics/toolkit/id_pass.hpp>
 
 #include <bx/framework/components/transform.hpp>
 #include <bx/framework/components/camera.hpp>
@@ -198,8 +197,8 @@ void SceneView::Render(const ImVec2& size)
     renderer.Render();
     renderer.editorCamera = OptionalView<Camera>::None();
 
-    IdPass idPass(g_idColorTarget, g_idDepthTarget);
-    idPass.Dispatch(g_sceneCam);
+    /*IdPass idPass(g_idColorTarget, g_idDepthTarget);
+    idPass.Dispatch(g_sceneCam);*/
 }
 
 static void CopySceneClipboard()
