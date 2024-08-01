@@ -52,7 +52,7 @@ struct LightSourceData
 struct RendererState : NoCopy
 {
     HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
-    HashMap<UUID, BufferHandle> animatorBoneBuffers{};
+    //HashMap<UUID, BufferHandle> animatorBoneBuffers{};
 
     TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
@@ -136,25 +136,6 @@ void UpdateAnimators()
         [&](Entity entity, Animator& anim)
         {
             anim.Update();
-
-            BufferHandle boneBuffer;
-            auto& boneBufferIter = s->animatorBoneBuffers.find(anim.GetUUID());
-            if (boneBufferIter == s->animatorBoneBuffers.end())
-            {
-                BufferCreateInfo createInfo{};
-                createInfo.name = "Animator Bones Buffer";
-                createInfo.size = sizeof(Mat4) * 100;
-                createInfo.usageFlags = BufferUsageFlags::UNIFORM | BufferUsageFlags::STORAGE;
-
-                boneBuffer = Graphics::CreateBuffer(createInfo);
-                s->animatorBoneBuffers.insert(std::make_pair(anim.GetUUID(), boneBuffer));
-            }
-            else
-            {
-                boneBuffer = boneBufferIter->second;
-            }
-            
-            Graphics::WriteBuffer(boneBuffer, 0, anim.GetBoneMatrices().data(), anim.GetBoneMatrices().size() * sizeof(Mat4));
         });
 }
 
@@ -305,7 +286,7 @@ void Renderer::Render()
                 if (entity.HasComponent<Animator>())
                 {
                     const auto& anim = entity.GetComponent<Animator>();
-                    animatorBonesBuffer = s->animatorBoneBuffers.find(anim.GetUUID())->second;
+                    animatorBonesBuffer = anim.GetBoneBuffer();
                 }
                 else
                 {
