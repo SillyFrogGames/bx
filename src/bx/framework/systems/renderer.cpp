@@ -53,7 +53,7 @@ struct LightSourceData
 
 struct RendererState : NoCopy
 {
-    HashMap<UUID, GraphicsPipelineHandle> shaderPipelines{};
+    HashMap<ResourceHandle, GraphicsPipelineHandle> shaderPipelines{};
 
     TextureHandle colorTarget = TextureHandle::null;
     TextureHandle depthTarget = TextureHandle::null;
@@ -112,7 +112,7 @@ void BuildShaderPipelines()
                 const Resource<Shader>& shaderResource = materialData.GetShader();
                 const Shader& shader = shaderResource.GetData();
 
-                if (s->shaderPipelines.find(shaderResource.GetUUID()) == s->shaderPipelines.end())
+                if (s->shaderPipelines.find(shaderResource.GetHandle()) == s->shaderPipelines.end())
                 {
                     GraphicsPipelineCreateInfo createInfo{};
                     createInfo.name = "Shader Pipeline";
@@ -125,7 +125,7 @@ void BuildShaderPipelines()
                     createInfo.depthFormat = Optional<TextureFormat>::Some(depthFormat);
 
                     GraphicsPipelineHandle graphicsPipeline = Graphics::CreateGraphicsPipeline(createInfo);
-                    s->shaderPipelines.insert(std::make_pair(shaderResource.GetUUID(), graphicsPipeline));
+                    s->shaderPipelines.insert(std::make_pair(shaderResource.GetHandle(), graphicsPipeline));
                 }
             }
         });
@@ -311,7 +311,7 @@ void Renderer::Render()
                     const auto& materialData = material.GetData();
                     const auto& shader = materialData.GetShader();
 
-                    auto& graphicsPipelineIter = s->shaderPipelines.find(shader.GetUUID());
+                    auto& graphicsPipelineIter = s->shaderPipelines.find(shader.GetHandle());
                     BX_ASSERT(graphicsPipelineIter != s->shaderPipelines.end(), "Missing graphics pipeline, this should not happen.");
                     GraphicsPipelineHandle graphicsPipeline = graphicsPipelineIter->second;
 
